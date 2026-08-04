@@ -2,12 +2,12 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 904,
-  "mismatch": 30,
+  "match": 913,
+  "mismatch": 21,
   "oracle_reject": 9
  },
  "tested": 934,
- "match_rate": 96.79,
+ "match_rate": 97.75,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -106,8 +106,7 @@
   },
   "dig": {
    "total": 24,
-   "match": 23,
-   "mismatch": 1
+   "match": 24
   },
   "dir": {
    "total": 7,
@@ -136,8 +135,7 @@
   },
   "ethtool": {
    "total": 5,
-   "match": 3,
-   "mismatch": 2
+   "match": 5
   },
   "file": {
    "total": 3,
@@ -264,8 +262,7 @@
   },
   "lsattr": {
    "total": 4,
-   "match": 3,
-   "mismatch": 1
+   "match": 4
   },
   "lsb_release": {
    "total": 1,
@@ -691,8 +688,7 @@
   },
   "timedatectl": {
    "total": 4,
-   "mismatch": 3,
-   "match": 1
+   "match": 4
   },
   "toml": {
    "total": 2,
@@ -708,7 +704,7 @@
   },
   "tracepath": {
    "total": 1,
-   "mismatch": 1
+   "match": 1
   },
   "traceroute": {
    "total": 11,
@@ -737,7 +733,7 @@
   },
   "tune2fs": {
    "total": 1,
-   "mismatch": 1
+   "match": 1
   },
   "typeset": {
    "total": 5,
@@ -909,66 +905,6 @@
    ]
   },
   {
-   "platform": "centos-7.7",
-   "base": "timedatectl",
-   "parser": "timedatectl",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.epoch_utc",
-     "kind": "value_mismatch",
-     "expected": "1583888001",
-     "actual": "1583913201"
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "tracepath",
-   "parser": "tracepath",
-   "status": "mismatch",
-   "diff_count": 24,
-   "kinds": {
-    "type_mismatch": 24
-   },
-   "sample": [
-    {
-     "path": "$.hops[4].host",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'no'"
-    },
-    {
-     "path": "$.hops[6].host",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'no'"
-    },
-    {
-     "path": "$.hops[7].host",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'no'"
-    },
-    {
-     "path": "$.hops[11].host",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'no'"
-    },
-    {
-     "path": "$.hops[12].host",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'no'"
-    }
-   ]
-  },
-  {
    "platform": "generic",
    "base": "cbt-multiple-rows-raw",
    "parser": "cbt",
@@ -1070,24 +1006,6 @@
   },
   {
    "platform": "generic",
-   "base": "dig-answer-spaces",
-   "parser": "dig",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$[0].answer[0].data",
-     "kind": "value_mismatch",
-     "expected": "'Blocked - see https://www.spamcop.net/bl.shtml?w.z.y.x'",
-     "actual": "'\"Blocked - see https://www.spamcop.net/bl.shtml?w.z.y.x\"'"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "env-multiline-raw",
    "parser": "env",
    "status": "mismatch",
@@ -1101,72 +1019,6 @@
      "kind": "type_mismatch",
      "expected": "{'TERM_PROGRAM': 'Apple_Terminal', 'SHELL': '/bin/zsh', 'TERM': 'xterm-256color', 'TMPDIR': '/var/folders/8g/r6tdh9kj6z3",
      "actual": "[{'name': 'TERM_PROGRAM', 'value': 'Apple_Terminal'}, {'name': 'SHELL', 'value': '/bin/zsh'}, {'name': 'TERM', 'value': "
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "ethtool--module-info-convert-units",
-   "parser": "ethtool",
-   "status": "mismatch",
-   "diff_count": 10,
-   "kinds": {
-    "extra_key": 5,
-    "missing_key": 5
-   },
-   "sample": [
-    {
-     "path": "$.br,_nominal",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin,_max",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin,_min",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin_max",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.br_margin_min",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "ethtool--module-info",
-   "parser": "ethtool",
-   "status": "mismatch",
-   "diff_count": 10,
-   "kinds": {
-    "extra_key": 5,
-    "missing_key": 5
-   },
-   "sample": [
-    {
-     "path": "$.br,_nominal",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin,_max",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin,_min",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.br_margin_max",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.br_margin_min",
-     "kind": "missing_key"
     }
    ]
   },
@@ -1487,24 +1339,6 @@
   },
   {
    "platform": "generic",
-   "base": "timedatectl-rtc-local",
-   "parser": "timedatectl",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.epoch_utc",
-     "kind": "value_mismatch",
-     "expected": "1678709858",
-     "actual": "1678735058"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "traceroute-n-ipv6-streaming",
    "parser": "traceroute_s",
    "status": "mismatch",
@@ -1542,42 +1376,6 @@
      "kind": "type_mismatch",
      "expected": "'2605:9000:0:400a::f1'",
      "actual": "None"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "tune2fs-l",
-   "parser": "tune2fs",
-   "status": "mismatch",
-   "diff_count": 4,
-   "kinds": {
-    "value_mismatch": 4
-   },
-   "sample": [
-    {
-     "path": "$.filesystem_created_epoch",
-     "kind": "value_mismatch",
-     "expected": "1586211037",
-     "actual": "1586185837"
-    },
-    {
-     "path": "$.last_checked_epoch",
-     "kind": "value_mismatch",
-     "expected": "1649456662",
-     "actual": "1649431462"
-    },
-    {
-     "path": "$.last_mount_time_epoch",
-     "kind": "value_mismatch",
-     "expected": "1663625780",
-     "actual": "1663600580"
-    },
-    {
-     "path": "$.last_write_time_epoch",
-     "kind": "value_mismatch",
-     "expected": "1663625780",
-     "actual": "1663600580"
     }
    ]
   },
@@ -1653,42 +1451,6 @@
      "kind": "type_mismatch",
      "expected": "7018",
      "actual": "None"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-18.04",
-   "base": "timedatectl",
-   "parser": "timedatectl",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.epoch_utc",
-     "kind": "value_mismatch",
-     "expected": "1583887871",
-     "actual": "1583913071"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-20.04",
-   "base": "lsattr-spaces",
-   "parser": "lsattr",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$[0].file",
-     "kind": "value_mismatch",
-     "expected": "'./ok ok ok ok ok'",
-     "actual": "'./ok'"
     }
    ]
   }

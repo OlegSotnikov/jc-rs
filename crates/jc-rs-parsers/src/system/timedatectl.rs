@@ -168,8 +168,11 @@ fn parse_timedatectl(input: &str) -> Map<String, Value> {
         } else {
             ut.as_str()
         };
+        // The field is UTC by definition, so the stamp must be read as UTC.
+        // `naive_epoch` reads it as local, which put epoch_utc out by the
+        // machine's offset.
         let parsed = parse_timestamp(ts_str, None);
-        if let Some(e) = parsed.naive_epoch {
+        if let Some(e) = parsed.utc_epoch.or(parsed.naive_epoch) {
             out.insert("epoch_utc".to_string(), Value::Number(e.into()));
         }
     }
