@@ -111,9 +111,20 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       # Catches the manifest problems that only surface at publish time:
       # missing description/licence, or files the build needs that sit outside
-      # the crate directory. The dependent crates cannot be verified until
-      # jc-rs-core is on crates.io, hence --no-verify on those.
+      # the crate directory.
+      #
+      # Only jc-rs-core can be packaged for real right now. `cargo package`
+      # resolves dependencies from the registry even under --no-verify, and the
+      # other three declare a version dependency on jc-rs-core, which is not
+      # published yet. `--list` validates the manifest and shows exactly what
+      # would ship without touching the index. Once v0.1.0 is out, all four can
+      # use the full form.
       - run: cargo package -p jc-rs-core
-      - run: cargo package -p jc-rs-utils --no-verify
-      - run: cargo package -p jc-rs-parsers --no-verify
-      - run: cargo package -p jc-rs --no-verify
+      - name: manifest + file list for the dependent crates
+        run: |
+          set -euo pipefail
+          for crate in jc-rs-utils jc-rs-parsers jc-rs; do
+            echo "── $crate ──"
+            cargo package --list -p "$crate" | tail -5
+            echo "   $(cargo package --list -p "$crate" | wc -l) files"
+          done
