@@ -115,22 +115,11 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-      # Catches the manifest problems that only surface at publish time:
-      # missing description/licence, or files the build needs that sit outside
-      # the crate directory.
-      #
-      # Only jc-rs-core can be packaged for real right now. `cargo package`
-      # resolves dependencies from the registry even under --no-verify, and the
-      # other three declare a version dependency on jc-rs-core, which is not
-      # published yet. `--list` validates the manifest and shows exactly what
-      # would ship without touching the index. Once v0.1.0 is out, all four can
-      # use the full form.
+      # Catches what only surfaces at publish time: a missing manifest field,
+      # or a file the build needs that sits outside its crate directory. Each
+      # crate is packaged AND the packaged copy is compiled, which is the part
+      # that catches the second case.
       - run: cargo package -p jc-rs-core
-      - name: manifest + file list for the dependent crates
-        run: |
-          set -euo pipefail
-          for crate in jc-rs-utils jc-rs-parsers jc-rs; do
-            echo "── $crate ──"
-            cargo package --list -p "$crate" | tail -5
-            echo "   $(cargo package --list -p "$crate" | wc -l) files"
-          done
+      - run: cargo package -p jc-rs-utils
+      - run: cargo package -p jc-rs-parsers
+      - run: cargo package -p jc-rs
