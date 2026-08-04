@@ -10,10 +10,10 @@ $ dig example.com | jc-rs -p --dig
 ```
 
 > **Status: pre-release. Do not use this yet.**
-> Current compatibility with jc: **86.1%** (804 of 934 fixture pairs).
+> Current compatibility with jc: **97.8%** (913 of 934 fixture pairs).
 > Baseline of the code this started from was 80.0%.
-> v0.1.0 ships when that number is 100% and streaming is real. The number comes
-> from `make differential` and is published whatever it says — see
+> v0.1.0 ships when that number is 100%. The number comes from
+> `make differential` and is published whatever it says — see
 > [tests/differential/REPORT.md](tests/differential/REPORT.md).
 
 ---
@@ -32,7 +32,8 @@ commitment:
    it is bad, never rounded up by excluding awkward fixtures. jc-rs invents no
    schemas — jc is the authority, and where the two disagree jc-rs has the bug.
 2. **Streaming that actually streams.** jc emits NDJSON line-by-line as input
-   arrives, so `tail -f access.log | jc-rs --clf-s` has to work.
+   arrives, and so does jc-rs: `tail -f access.log | jc-rs -u --clf-s` prints
+   each record as the log grows, rather than one array at EOF.
 3. **Distribution.** Static binaries for five targets, five crates, npm, brew and
    a `scratch` Docker image.
 
@@ -61,8 +62,8 @@ Two details decide whether the number means anything:
 ```console
 $ make differential
 jc 1.25.7 · 943 pairs · 236 parsers known
-match 804 · mismatch 106 · error 24
-match rate over oracle-valid pairs: 86.1%  (934 pairs)
+match 913 · mismatch 21 · error 0
+match rate over oracle-valid pairs: 97.8%  (934 pairs)
 reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 ```
 
@@ -97,6 +98,10 @@ jc-rs -p /proc/meminfo
 # line slicing (zero-based, exclusive end)
 cat log.txt | jc-rs 2: --syslog
 
+# streaming — one JSON object per record, as it arrives (-u to flush per line)
+tail -f access.log | jc-rs -u --clf-s
+ping example.com  | jc-rs -u --ping-s
+
 # with jq
 ss -tlnp | jc-rs --ss | jq '[.[].local_port] | unique'
 ```
@@ -121,7 +126,7 @@ original jc in `PATH`.
 git clone --recurse-submodules https://github.com/OlegSotnikov/jc-rs.git
 cd jc-rs
 make build          # cargo build --release
-make check          # lint + tests + full differential run
+make check          # lint + fixture sync + test ratchet + full differential run
 ```
 
 The differential suite needs the jc submodule and the Python packages jc's own

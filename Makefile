@@ -14,8 +14,12 @@ build: ## release build
 	cargo build --release
 
 .PHONY: test
-test: ## cargo tests (unit + integration)
+test: ## cargo tests (unit + integration) — red by design, see ci/known-failures.txt
 	TZ=PST8PDT cargo test --workspace
+
+.PHONY: ratchet
+ratchet: ## the real test gate: fails on new failures AND on known ones that pass
+	./ci/run-tests.sh
 
 .PHONY: sync-fixtures
 sync-fixtures: submodule ## overwrite tests/fixtures from the pinned jc source
@@ -65,7 +69,7 @@ bench: ## criterion benchmarks
 	cargo bench -p jc-rs-bench
 
 .PHONY: check
-check: lint check-fixtures test differential ## universal verification: lint + fixture sync + tests + differential
+check: lint check-fixtures ratchet differential ## universal verification: lint + fixture sync + test ratchet + differential
 	@echo "check complete"
 
 .PHONY: clean

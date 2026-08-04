@@ -17,16 +17,16 @@ That premise decides most design arguments:
 - Never exclude an awkward fixture from the count; report it in a category.
 - Publish the number even when it is bad.
 
-Current state: 804/934 = 86.1% (`tests/differential/REPORT.md`), workspace
+Current state: 913/934 = 97.8% (`tests/differential/REPORT.md`), workspace
 version `0.0.0` (the crates.io releases exist only to hold the names).
 
 ## Commands
 
 ```bash
 make build              # cargo build --release
-make check              # lint + fixture sync + tests + differential — the universal gate
+make check              # lint + fixture sync + test ratchet + differential — the universal gate
 make lint               # cargo clippy --workspace --all-targets -- -D warnings; cargo fmt --check
-./ci/run-tests.sh       # unit tests as a ratchet — THIS is the test gate, not `make test`
+make ratchet            # unit tests as a ratchet (./ci/run-tests.sh) — the test gate, not `make test`
 make differential       # full jc corpus; rewrites tests/differential/{REPORT.md,report.json}
 make bench              # criterion, -p jc-rs-bench
 make submodule deps-py  # one-time setup: pin the jc oracle + its optional Python deps
@@ -38,7 +38,7 @@ Narrower runs:
 TZ=PST8PDT cargo test -p jc-rs-parsers disk::mdadm          # one module's tests
 TZ=PST8PDT cargo test -p jc-rs --test integration           # CLI integration tests
 python3 tests/differential/validate.py --parser mdadm -v    # differential for one parser
-python3 tests/differential/validate.py --fail-under 86.0    # the CI floor
+python3 tests/differential/validate.py --fail-under 97.7    # the CI floor
 ```
 
 `TZ=PST8PDT` is mandatory and non-obvious: jc's fixtures carry `*_epoch` fields
@@ -58,7 +58,7 @@ defects, exposed when `tests/fixtures/` became a verbatim mirror of jc's corpus)
 passing — when you fix a parser, delete its line in the same commit. The file
 should only ever get shorter. `make test` on its own is red by design.
 
-**`--fail-under 86.0`** in `.github/workflows/ci.yml`. Raise the floor in the
+**`--fail-under 97.7`** in `.github/workflows/ci.yml`. Raise the floor in the
 same commit that raises the number; never lower it silently.
 
 ## Architecture
@@ -67,7 +67,7 @@ Five crates, dependency order `core → utils → parsers → jc-rs`:
 
 | Crate | Role |
 |---|---|
-| `jc-rs-core` | `Parser`/`StreamingParser` traits, `ParseOutput`, `ParserInfo`, `ParseError`/`CjError`, and the registry |
+| `jc-rs-core` | `Parser`/`StreamingParser`/`LineParser` traits, `ParseOutput`, `ParserInfo`, `ParseError`/`CjError`, and the registry |
 | `jc-rs-utils` | shared helpers: `simple_table_parse`/`sparse_table_parse`, `convert_to_*`, `normalize_key`, `parse_timestamp`, `slice_lines` |
 | `jc-rs-parsers` | every parser, grouped by domain (`disk/ format/ log/ misc/ network/ package/ proc/ security/ string/ system/`) |
 | `jc-rs` | the CLI binary: `args`, `magic`, `meta`, `output`, `streaming` |
@@ -79,6 +79,14 @@ each parser declares a `static INFO: ParserInfo`, a `static X_PARSER`, and an
 `extern crate jc_rs_parsers;` solely to force linking so those submissions run.
 Lookup goes through `find_parser()` (accepts `name`, `kebab-case`, or
 `--argument`) and `find_magic_parser()` (matches argv against `magic_commands`).
+
+**Streaming is a session, not a method.** The registry holds
+`&'static dyn Parser`, which cannot be downcast, so `Parser::as_streaming()`
+hands back the sub-trait and `StreamingParser::session()` mints an owned
+`LineParser` carrying the per-run state. A streaming parser's `Parser::parse()`
+must be `parse_via_session(self, input, quiet)` — the batch path and the live
+path have to be the same code, because the differential only exercises the
+batch one.
 
 `docs/api-contracts.md` is the authoritative spec for these interfaces — types,
 error-variant semantics, naming conventions (`name` is snake_case, `argument` is
@@ -110,19 +118,21 @@ the number to move, and update the CI floor.
 
 ## Known structural gaps
 
-- **Streaming does not stream.** `crates/jc-rs/src/streaming.rs` implements a
-  correct line-driven path, but `main.rs` never calls it — the CLI holds a
-  `dyn Parser` and cannot downcast to `StreamingParser` (see the "Streaming
-  parser path" comment in `main.rs`). All 17 `*_s` parsers therefore emit one
-  JSON array at EOF where jc emits NDJSON live. Fixtures are stored as arrays, so
-  a green differential does **not** mean streaming works; test it by piping
-  slowly and asserting output arrives before EOF.
+- **`-r/--raw` reaches no parser.** jc's parsers skip `_process()` in raw mode;
+  ours apply their conversions unconditionally, so every `-r` invocation is
+  quietly wrong (two fixtures fail on this alone). Fixing it means threading a
+  `raw` parameter through `Parser::parse`.
 - **Key order.** Keys serialise alphabetically; jc preserves schema order. Values
   agree so the differential passes, but no two outputs ever `diff` clean. Fixing
   it needs `serde_json`'s `preserve_order` plus per-parser key sequences.
 - **Lint debt.** The workspace manifest bulk-allows ~80 clippy lints plus
   `dead_code`, `unused_imports`, `unused_variables`, `unused_mut`. CI is already
   at `-D warnings`, so removing them in batches is self-verifying.
+- **Streaming is only live under `-u`.** Without it both jc and jc-rs
+  block-buffer stdout when piped; that is jc's behaviour, not an oversight.
+  `crates/jc-rs/tests/streaming.rs` covers what the differential structurally
+  cannot — its fixtures are arrays and its input ends immediately, so a parser
+  that buffers to EOF scores identically to one that streams.
 
 `tasks/todo.md` carries the current milestone list and the per-parser failure
 counts; `tests/differential/report.json` has every failing case with paths and

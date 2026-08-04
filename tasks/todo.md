@@ -4,13 +4,12 @@ Last updated: 2026-08-04
 
 ## Where this stands
 
-Independent project, single root commit on 2026-08-04. Everything below M0/M1 is
-done; the rest is not.
+**Compatibility right now: 913/934 = 97.8%.** The imported codebase measured
+80.0%. Run `make differential` to regenerate; `tests/differential/REPORT.md` has
+the per-fixture breakdown, `report.json` the per-case diffs.
 
-**Compatibility right now: 804/934 = 86.1%.** The imported codebase measured
-80.0% before the two fixes below.
-Run `make differential` to regenerate; `tests/differential/REPORT.md` has the
-per-fixture breakdown.
+No fixture errors out any more: every pair produces output, and the 21 that
+remain are mismatches in the detail.
 
 ## Done
 
@@ -21,108 +20,92 @@ per-fixture breakdown.
       only when jc reproduces its own fixture; everything else is reported by
       category. Two things that make the number trustworthy and were not
       obvious:
-      - `tests/fixtures/` is now a **verbatim mirror** of the `jc` submodule
+      - `tests/fixtures/` is a **verbatim mirror** of the `jc` submodule
         (`make sync-fixtures`, enforced by `make check-fixtures`). 17 fixtures
         in the imported copy carried the implementation's own output rather than
         jc's; the mirror removes that whole class of problem.
       - the run is pinned to **`TZ=PST8PDT`**, which is what jc's `runtests.sh`
         uses. In any other zone jc cannot reproduce its own `*_epoch` fields and
         146 fixtures silently leave the denominator.
-- [x] jc submodule pinned to **v1.25.7** (was v1.25.6).
+- [x] jc submodule pinned to **v1.25.7**.
 - [x] Independent project: single root commit, no upstream remotes, our own MIT
       licence. `LICENSE` retains the two upstream copyright lines that MIT
-      requires for the imported portions; README carries a one-line
-      "inspired by" credit and nothing more.
-- [x] **Fix: naive timestamps were converted as UTC** (`jc-rs-utils/src/timestamp.rs`).
-      Every `*_epoch` across ~20 parsers was out by the UTC offset. This one fix
-      moved the corpus 80.0% → 86.1%.
-- [x] **Fix: `ping_s` summary dropped `time_ms`** (parsed into state, never
-      serialised). 13 → 32 matching fixtures.
-
+      requires for the imported portions.
 - [x] **CI/CD on GitHub Actions.** `ci.yml` (fmt, clippy, build on three OSes,
       fixture-sync check, test ratchet, full differential with the report as a
       job summary, crate packaging), `release.yml` (five targets, musl for
       Linux, completions, `jc` alias, checksums, scratch Docker image),
-      `publish-crates.yml` (crates.io in dependency order). Two ratchets keep
-      the signal honest: `ci/known-failures.txt` fails on new failures *and* on
-      known ones that start passing, and the differential has a
-      `--fail-under 86.0` floor.
-- [x] Fixes found while wiring CI: the streaming meta key was `_jc_meta`
-      everywhere except the streaming path, which emitted `_cj_meta`; the zsh
-      completion hint still wrote `_cj`; four clippy findings and a removed lint
-      in the allow-list. The whole tree is now `cargo fmt` clean and passes
-      `clippy -D warnings`.
+      `publish-crates.yml` (crates.io in dependency order, Trusted Publishing).
 
-## Blocked
-
-- [ ] **Two repository secrets are missing**, so the corresponding jobs degrade
-      to a dry run instead of publishing:
-      `CARGO_REGISTRY_TOKEN` (crates.io) and `DOCKERHUB_USERNAME` +
-      `DOCKERHUB_TOKEN` (the `appmasterio` namespace). Add them under
-      Settings → Secrets and variables → Actions.
+- [x] **M2 — streaming, for real.** Streaming parsers emitted one JSON array at
+      EOF; jc emits NDJSON as input arrives. The blocker was structural: the
+      registry holds `&'static dyn Parser` and a trait object cannot be
+      downcast, so the CLI could not reach a line-at-a-time API.
+      - `LineParser` is a stateful session (`parse_line(&mut self)` +
+        `finalize()`), created per run by `StreamingParser::session()`.
+        `Parser::as_streaming()` reaches it without `Any`.
+      - `parse_via_session()` drives a session over a whole string, so a
+        streaming parser's batch path and its live path are the same code.
+      - The CLI reads stdin through `BufReader::lines()`, writes through a
+        `BufWriter`, and flushes per record under `-u` — matching jc's
+        `flush=self.unbuffer` exactly, verified against jc itself.
+      - `crates/jc-rs/tests/streaming.rs` asserts records arrive before EOF.
+        The differential cannot: its fixtures are arrays and its input ends
+        immediately, so a parser that buffers scores the same as one that
+        streams.
+- [x] **The seven missing parsers.** `tsv`, `tsv_s`, `tsv_ih`, `tsv_ih_s`,
+      `csv_ih`, `csv_ih_s`, `typeset`. The six delimited ones share one
+      session, as they share one `DictReader` call in jc.
+- [x] **`--proc` autodetect.** Was 11 of jc's 50 signatures; now all of them,
+      in jc's order (which matters: smaps/maps and zoneinfo/vmstat each match
+      the other's files). 9/9, and the entry point for 51 hidden `proc_*`
+      parsers and all `/proc/...` magic syntax works.
+- [x] **Timestamps.** Two bugs, both "a naive local time read as UTC":
+      `mdadm` and `tune2fs` had their own conversions, and the shared helper
+      discarded a parsed `%z` offset the wrong way round. Between them, 55
+      fixtures.
+- [x] **Parser fixes:** `ls_s` (dropped `size`/`links` unless bare integers),
+      `ufw` (never emitted `log`), `ping_s` (no ICMP error table at all;
+      `ping -I` banner offsets), `rsync_s` (unanchored patterns, missing
+      `epoch`, `--stats` block, decimal size units), `ethtool` (local key
+      normaliser produced keys with commas in them), `tracepath` (`\S+`
+      matched "no" in "no reply"), `lsattr` (filenames with spaces), `dig`
+      (TXT quotes), `timedatectl` (`epoch_utc` read as local).
+- [x] **Known failures: 15 → 4.** Each line deleted in the commit that fixed
+      the parser. No fixture was edited.
 
 ## Next, in order
 
-- [ ] **M2 — streaming redesign.** Two defects, one cause:
-      1. streaming parsers emit a JSON array; jc emits NDJSON, one object per line
-      2. nothing is emitted until EOF, so `tail -f … | jc-rs --clf-s` produces
-         nothing, ever
-      The comment at `crates/jc-rs/src/main.rs:486` explains why: the current
-      design cannot downcast `dyn Parser`. The fix is a separate
-      `StreamingParser` trait (or enum dispatch) plus a line-driven output path
-      honouring `-u/--unbuffer`.
-      Affects all 17 `*_s` parsers.
-- [ ] **M3 — parity.** 39 parsers still failing. Largest first:
-      `mdadm` (33), `git_log` + `git_log_s` (20), `rsync_s` (7), `dir` (7),
-      `upower` (6), `ufw` (5), `stat_s` (5), `stat` (4), `ls_s` (4), `ping_s` (4).
-      Then the 7 parsers that do not exist at all: `tsv`, `tsv-s`, `tsv-ih`,
-      `tsv-ih-s`, `csv-ih`, `csv-ih-s`, `typeset`.
-      Also `--proc` autodetect (9 errors) — the entry point for 51 hidden
-      `proc_*` parsers and all `/proc/...` magic syntax.
+- [ ] **The last 21 mismatches.** `route` (2, an IPv6 row dropped), `certbot`
+      (2), `date` (2, `week_of_year` off by one), `plist` (2),
+      `traceroute_s` (2), and one each in `stat_s`, `cbt`, `env`,
+      `git_ls_remote`, `iptables`, `iwconfig`, `m3u`, `openvpn`,
+      `pkg_index_apk`, `rsync`, `xml`.
+- [ ] **`-r/--raw` is not implemented.** jc's parsers skip `_process()` in raw
+      mode; ours apply their conversions unconditionally and the flag reaches
+      no parser. Two fixtures fail on this alone (`env-multiline-raw`,
+      `iwconfig-raw`), and every `-r` invocation is quietly wrong. Needs a
+      `raw` parameter threaded through `Parser::parse`.
 - [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
-      Values agree but no two outputs ever `diff` clean. Needs an order-preserving
-      map (`serde_json` `preserve_order`) and per-parser key sequences.
+      Values agree but no two outputs ever `diff` clean. Needs an
+      order-preserving map (`serde_json` `preserve_order`) and per-parser key
+      sequences.
+- [ ] **149 fixtures are still `unmapped`** — the filename does not resolve to
+      a parser name. That is honest reporting, not coverage. Worth reducing.
 - [ ] **M4 — hygiene.** The workspace manifest bulk-disables ~80 clippy lints
       plus `dead_code`, `unused_imports`, `unused_variables`, `unused_mut`.
       Remove them in batches, keep CI at `-D warnings`.
-- [ ] **`make test` is red on purpose: 648 pass, 15 fail.** These tests were
-      green only because they compared against the edited fixture copy.
-      Restoring jc's originals made them fail, which is correct — each one is a
-      real defect, and together they are the shortest path into M3:
-
-      ```
-      disk::mdadm::tests::test_mdadm_examine_raid1_ok
-      disk::mdadm::tests::test_mdadm_query_raid1_ok
-      disk::tune2fs::tests::test_tune2fs
-      log::git_log::tests::test_git_log_default
-      log::git_log::tests::test_git_log_medium
-      log::git_log::tests::test_git_log_blank_author_fix
-      log::git_log::tests::test_git_log_hash_in_message
-      log::git_log::tests::test_git_log_is_hash_regex
-      log::git_log_s::tests::test_git_log_s_golden
-      network::ethtool::tests::test_ethtool_module_info_golden
-      network::iw_scan::tests::test_iw_scan_centos_golden
-      network::route::tests::test_route_centos_6n_golden
-      network::route_print::tests::test_route_print_win10_golden
-      network::route_print::tests::test_route_print_win2016_golden
-      network::tracepath::tests::test_tracepath_centos_golden
-      ```
-
-      Do not make them pass by touching a fixture. Fix the parser. The suite
-      goes green as part of M3 and CI stays red until then, which is the honest
-      signal.
-- [ ] **M5 — distribution.** GitHub Releases (musl x86_64/aarch64, macOS both
-      arches, Windows), five crates on crates.io (all names verified free
-      2026-08-04), npm for `jc-rs-wasm`, Homebrew tap, `scratch` Docker image,
-      shell completions in the archives, `cargo-binstall` metadata.
+- [ ] **M5 — distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
+      `jc-rs-wasm` (that crate is not written yet), and a fish completion — the
+      generator exists in `crates/jc-rs/src/completions.rs` but no CLI flag
+      reaches it.
 - [ ] **M6 — jc-rs.com.** Next.js 16 + Tailwind v4 on webapps-kz behind the
-      Cloudflare tunnel. Zone `jc-rs.com` is already active in Cloudflare
-      (`cfe25a3a86ec23e886d075a99deab437`); DNS, tunnel route and nginx vhost are
-      deliberately **not** created yet — a hostname with no container behind it
-      returns 502. Content: install, honest comparison table, the live
+      Cloudflare tunnel. Zone is already active; DNS, tunnel route and nginx
+      vhost are deliberately **not** created yet — a hostname with no container
+      behind it returns 502. Content: install, honest comparison table, the live
       compatibility report, a generated page per parser, WASM playground.
 - [ ] **M7 — announce.** Notify Kelly Brazil directly *before*
-      any public post. The headline is the audit and the reproducible number,
+      any public post. The headline is the reproducible number and the harness,
       not "rewritten in Rust".
 
 ## Things that will bite you
@@ -133,8 +116,12 @@ per-fixture breakdown.
   `ruamel.yaml`, `pygments`) or ~30 fixtures fall into `oracle_reject`.
   `make deps-py`.
 - **Do not "fix" a parser by editing a fixture.** `make check-fixtures` will
-  catch it, and it is the exact mistake that produced the 100% claim.
-- **149 fixtures are still `unmapped`** — the filename does not resolve to a
-  parser name. That is honest reporting, not coverage. Worth reducing.
+  catch it, and it is the exact mistake that produced the imported code's 100%
+  claim.
+- **Streaming is only live with `-u`.** Without it both jc and jc-rs
+  block-buffer stdout when piped. That is jc's behaviour, not an oversight.
+- **A streaming parser's `parse()` and its live path must stay the same code**
+  (`parse_via_session`). If they diverge, the differential — which only
+  exercises the batch path — stops saying anything about what a pipe produces.
 - `cargo install jc-rs` must never be documented as `cargo install jc`: that
   name belongs to an unrelated 2022 crate.

@@ -16,7 +16,8 @@ pub enum ParseOutput {
 - **Object**: Used when a parser produces a single record (e.g. `date`, `uname`, `os-release`). The map is a flat or nested JSON object.
 - **Array**: Used when a parser produces multiple records (e.g. `ps`, `ls`, `netstat`). Each element is one record.
 
-Streaming parsers always yield `Object` variants, one per successfully parsed line.
+Streaming parsers yield one `Record` (a JSON object) per record; the type is
+narrower than `ParseOutput` because a single line cannot produce an array.
 
 ### Platform
 
@@ -125,6 +126,7 @@ pub enum CjError {
 pub trait Parser: Send + Sync {
     fn info(&self) -> &'static ParserInfo;
     fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError>;
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> { None }
 }
 ```
 
@@ -134,23 +136,61 @@ pub trait Parser: Send + Sync {
   - When `quiet` is `true`: suppress all warning messages to stderr. Still return `Err(...)` for hard failures.
   - When `quiet` is `false`: may emit warnings to stderr via `jc_rs_utils::warning_message()`.
   - Parsers must NOT panic. All errors must be returned as `Err(ParseError)`.
+- `as_streaming()` is how the CLI reaches the streaming interface. The registry
+  stores parsers as `&'static dyn Parser`, and a trait object cannot be
+  downcast to a sub-trait; a streaming parser overrides this to return `self`
+  rather than the crate reaching for `Any`.
 
-### StreamingParser (optional, for line-by-line parsers)
+### StreamingParser and LineParser (for line-by-line parsers)
 
 ```rust
+pub type Record = serde_json::Map<String, Value>;
+
 pub trait StreamingParser: Parser {
-    fn parse_line(&self, line: &str, quiet: bool) -> Result<Option<ParseOutput>, ParseError>;
-    fn finalize(&self) -> Result<Option<ParseOutput>, ParseError> { Ok(None) }
+    fn session(&self) -> Box<dyn LineParser>;
+}
+
+pub trait LineParser {
+    fn parse_line(&mut self, line: &str, quiet: bool) -> Result<Option<Record>, ParseError>;
+    fn finalize(&mut self, quiet: bool) -> Result<Option<Record>, ParseError> { Ok(None) }
+    fn take_next(&mut self) -> Option<Record> { None }
 }
 ```
 
+The parser itself lives in the registry as a shared `&'static` and cannot hold
+per-run state, so `session()` mints an owned `LineParser` that carries it — the
+`PING` banner that decides how later lines are read, the commit being
+accumulated, the column widths taken from a header row.
+
 **Contract:**
 - `parse_line()`:
-  - `Ok(Some(output))`: the line was successfully parsed into a JSON object
-  - `Ok(None)`: the line should be skipped (e.g. header, blank, separator)
-  - `Err(e)`: the line could not be parsed
-- `finalize()`: called after the last line; flush any buffered state. Default returns `Ok(None)`.
-- A `StreamingParser` must ALSO have a working `Parser::parse()` implementation. This should split the input by lines, call `parse_line()` on each, collect all `Some(...)` results, and return them as `ParseOutput::Array(...)`.
+  - `Ok(Some(record))`: the line completed a record. Not necessarily *this*
+    line's record: a parser accumulating a multi-line item emits the previous
+    item when a new one begins.
+  - `Ok(None)`: the line completed nothing (header, blank, or merely
+    accumulated into state).
+  - `Err(e)`: the line could not be parsed. Under `-qq` the CLI turns this into
+    a `_jc_meta.success = false` record and continues; otherwise it aborts.
+- `finalize()`: called once after the last line; flushes a trailing record or a
+  summary block.
+- `take_next()`: extra records the last `parse_line` produced, in the order they
+  follow the one it returned. Almost every parser leaves this defaulted; it
+  exists for the case where one line closes a record *and* opens another that
+  is already complete.
+- A streaming parser's `Parser::parse()` **must** be
+  `parse_via_session(self, input, quiet)`. Having the batch path go through the
+  same session is what keeps the two from drifting: the differential corpus
+  only exercises the batch path, so separate implementations would mean a green
+  differential said nothing about what a live pipe produces.
+- `FnSession::new(f)` wraps a plain per-line function for parsers whose lines
+  are independent of one another.
+
+### Streaming output
+
+The CLI emits **NDJSON** for a streaming parser — one JSON value per line, as
+jc does — not a single array. `-u/--unbuffer` flushes after each record; without
+it the stream is block-buffered, which is also jc's behaviour
+(`print(..., flush=self.unbuffer)`).
 
 ## 4. Parser Registry (`jc_rs_core::registry`)
 
@@ -267,17 +307,20 @@ The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
 
 3. Read input:
    a. Standard parser: read all stdin into a String
-   b. Streaming parser: read stdin line-by-line
+   b. Streaming parser: never read_to_string -- on a live pipe it returns only
+      when the writer closes, which for `tail -f` is never. Read line by line.
 
 4. Execute parser:
    a. Standard: parser.parse(&input, quiet) -> Result<ParseOutput, ParseError>
-   b. Streaming: iterate lines, call streaming_parser.parse_line() on each,
-      collect results. On error: if ignore_exceptions, emit error meta object
-      and continue; otherwise propagate error.
+   b. Streaming: p.as_streaming() -> session(), feed each line to
+      parse_line(), print each record immediately as NDJSON, then finalize().
+      On error: if ignore_exceptions, emit an error record and continue;
+      otherwise abort with exit 100.
 
 5. Post-process output:
-   a. Apply --slice if requested
-   b. Add _cj_meta if --meta requested (timestamp, parser name, magic info)
+   a. Apply --slice if requested (lazily for positive ranges; a negative index
+      is only meaningful relative to the end, so it buffers)
+   b. Add _jc_meta if --meta requested (timestamp, parser name, magic info)
    c. Serialize to JSON (pretty or compact)
    d. Colorize if terminal and not --mono
    e. Print to stdout
@@ -290,11 +333,11 @@ The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
 
 ### Meta Object Structure
 
-When `--meta` is enabled, the CLI wraps output with a `_cj_meta` key:
+When `--meta` is enabled, the CLI wraps output with a `_jc_meta` key:
 
 ```json
 {
-  "_cj_meta": {
+  "_jc_meta": {
     "parser": "df",
     "timestamp": 1711500000.0,
     "slice": "0:5",
@@ -310,7 +353,7 @@ When a streaming parser encounters an error with `ignore_exceptions = true`:
 
 ```json
 {
-  "_cj_meta": {
+  "_jc_meta": {
     "success": false,
     "error": "ParseError: unexpected input format: ...",
     "line": "the original line that failed"
@@ -323,6 +366,6 @@ When a line parses successfully with `ignore_exceptions = true`:
 ```json
 {
   "field1": "value1",
-  "_cj_meta": { "success": true }
+  "_jc_meta": { "success": true }
 }
 ```
