@@ -64,7 +64,13 @@ fn run(args: &[&str], stdin_data: Option<&[u8]>) -> (i32, String, String) {
 fn version_exits_zero_and_prints_version() {
     let (code, out, _) = run(&["--version"], None);
     assert_eq!(code, 0, "exit code should be 0");
-    assert!(out.contains("0.1.0"), "expected version string, got: {out}");
+    // Read the version from the manifest rather than hard-coding it: a literal
+    // here silently rots the moment the workspace version moves.
+    let expected = env!("CARGO_PKG_VERSION");
+    assert!(
+        out.contains(expected),
+        "expected version {expected}, got: {out}"
+    );
 }
 
 #[test]
