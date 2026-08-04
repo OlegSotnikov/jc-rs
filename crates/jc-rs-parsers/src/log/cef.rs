@@ -211,7 +211,15 @@ fn add_epoch_fields(map: &mut Map<String, Value>, field_prefix: &str, ts_value: 
         }
     }
 
-    let parsed = parse_timestamp(trimmed, &[formats::F1400, formats::F1410, formats::F1420, formats::F1430]);
+    let parsed = parse_timestamp(
+        trimmed,
+        &[
+            formats::F1400,
+            formats::F1410,
+            formats::F1420,
+            formats::F1430,
+        ],
+    );
     map.insert(
         format!("{field_prefix}_epoch"),
         match parsed.naive_epoch {

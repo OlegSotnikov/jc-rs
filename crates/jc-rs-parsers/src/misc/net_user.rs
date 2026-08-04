@@ -28,10 +28,7 @@ static INFO: ParserInfo = ParserInfo {
 fn parse_net_date(s: &str) -> String {
     let s = s.trim();
     // Try common Windows date formats
-    for hint in [
-        &[formats::F1700][..],
-        &[formats::F1600][..],
-    ] {
+    for hint in [&[formats::F1700][..], &[formats::F1600][..]] {
         let parsed = parse_timestamp(s, hint);
         if let Some(iso) = parsed.iso {
             return iso;

@@ -244,7 +244,18 @@ fn process_device(dev: &mut Map<String, Value>) {
                 let time_str = parts[..parts.len() - 3].join(" ");
                 dev.insert("updated".to_string(), Value::String(time_str.clone()));
                 // Compute epoch from time string
-                let parsed = parse_timestamp(&time_str, &[formats::F1000, formats::F2000, formats::F3000, formats::F4000, formats::F5000, formats::F8000, formats::F8100]);
+                let parsed = parse_timestamp(
+                    &time_str,
+                    &[
+                        formats::F1000,
+                        formats::F2000,
+                        formats::F3000,
+                        formats::F4000,
+                        formats::F5000,
+                        formats::F8000,
+                        formats::F8100,
+                    ],
+                );
                 dev.insert(
                     "updated_epoch".to_string(),
                     parsed

@@ -43,6 +43,7 @@ pub struct Args {
     // Completions
     pub bash_comp: bool, // -B / --bash-comp
     pub zsh_comp: bool,  // -Z / --zsh-comp
+    pub fish_comp: bool, // -F / --fish-comp
 
     // Parser selected via --parser-name
     pub parser_name: Option<String>,
@@ -75,6 +76,7 @@ fn long_options_map() -> HashMap<&'static str, &'static str> {
     m.insert("--yaml-out", "y");
     m.insert("--bash-comp", "B");
     m.insert("--zsh-comp", "Z");
+    m.insert("--fish-comp", "F");
     m.insert("--list", "l");
     m.insert("--list-all", "L");
     m
@@ -244,6 +246,7 @@ pub fn parse_args(argv: &[String]) -> Args {
     args.yaml = option_chars.contains(&'y');
     args.bash_comp = option_chars.contains(&'B');
     args.zsh_comp = option_chars.contains(&'Z');
+    args.fish_comp = option_chars.contains(&'F');
     args.list_parsers = option_chars.contains(&'l');
     args.list_all = option_chars.contains(&'L');
 
