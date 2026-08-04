@@ -68,6 +68,10 @@ differential-gate: build submodule ## the release gate: 100% of oracle-valid pai
 bench: ## criterion benchmarks
 	cargo bench -p jc-rs-bench
 
+.PHONY: bench-vs-jc
+bench-vs-jc: build submodule ## time jc-rs against jc on the same inputs
+	./ci/bench-vs-jc.sh
+
 .PHONY: check
 check: lint check-fixtures ratchet differential ## universal verification: lint + fixture sync + test ratchet + differential
 	@echo "check complete"

@@ -65,7 +65,7 @@ fn add_epoch(record: &mut Map<String, Value>) {
         return;
     };
     let stamp = format!("{} {}", date.replace('/', "-"), time);
-    let ts = jc_rs_utils::parse_timestamp(&stamp, Some("%Y-%m-%d %H:%M:%S"));
+    let ts = jc_rs_utils::parse_timestamp(&stamp, &[jc_rs_utils::timestamp::formats::F7250]);
     if let Some(epoch) = ts.naive_epoch {
         record.insert("epoch".to_string(), Value::Number(epoch.into()));
     }

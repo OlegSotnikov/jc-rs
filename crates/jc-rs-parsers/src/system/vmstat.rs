@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::{convert_to_int, parse_timestamp};
+use jc_rs_utils::{convert_to_int, parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
@@ -208,7 +208,7 @@ impl LineParser for VmstatSession {
                     Some(t) => format!("{} {}", ts, t),
                     None => ts.clone(),
                 };
-                let parsed = parse_timestamp(&ts_with_tz, None);
+                let parsed = parse_timestamp(&ts_with_tz, &[formats::F7250, formats::F7255]);
                 record.insert(
                     "epoch".to_string(),
                     parsed
@@ -270,7 +270,7 @@ impl LineParser for VmstatSession {
                     Some(t) => format!("{} {}", ts, t),
                     None => ts.clone(),
                 };
-                let parsed = parse_timestamp(&ts_with_tz, None);
+                let parsed = parse_timestamp(&ts_with_tz, &[formats::F7250, formats::F7255]);
                 record.insert(
                     "epoch".to_string(),
                     parsed

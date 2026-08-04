@@ -175,7 +175,7 @@ impl Parser for LastParser {
                 let login_end = rest + 5;
                 if login_end <= tokens.len() {
                     let login = tokens[rest..login_end].join(" ");
-                    let ts = parse_timestamp(&login, None);
+                    let ts = parse_timestamp(&login, &[]);
                     if let Some(e) = ts.naive_epoch {
                         obj.insert("login_epoch".to_string(), Value::Number(e.into()));
                     }
@@ -214,7 +214,7 @@ impl Parser for LastParser {
                         let logout_end = after + 5;
                         if logout_end <= tokens.len() {
                             let logout = tokens[after..logout_end].join(" ");
-                            let ts2 = parse_timestamp(&logout, None);
+                            let ts2 = parse_timestamp(&logout, &[]);
                             if let Some(e2) = ts2.naive_epoch {
                                 obj.insert("logout_epoch".to_string(), Value::Number(e2.into()));
                                 if let Some(le) = obj.get("login_epoch").and_then(|v| v.as_i64()) {

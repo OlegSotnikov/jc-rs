@@ -87,9 +87,13 @@ remain are mismatches in the detail.
       `iwconfig-raw`), and every `-r` invocation is quietly wrong. Needs a
       `raw` parameter threaded through `Parser::parse`.
 - [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
-      Values agree but no two outputs ever `diff` clean. Needs an
-      order-preserving map (`serde_json` `preserve_order`) and per-parser key
-      sequences.
+      Values agree but no two outputs ever `diff` clean.
+      **`serde_json`'s `preserve_order` feature is not the answer — measured.**
+      It swaps `BTreeMap` for `IndexMap`, and on this corpus that costs 30–40%
+      of throughput (csv 10k rows 29 → 38 ms, pkg-index-deb 88 → 120 ms,
+      clf 10k lines 193 → 278 ms) because the hasher is SipHash and cannot be
+      swapped through serde_json. Doing this properly means an ordered
+      serializer with a per-parser key sequence, not a feature flag.
 - [ ] **149 fixtures are still `unmapped`** — the filename does not resolve to
       a parser name. That is honest reporting, not coverage. Worth reducing.
 - [ ] **M4 — hygiene.** The workspace manifest bulk-disables ~80 clippy lints
@@ -107,6 +111,26 @@ remain are mismatches in the detail.
 - [ ] **M7 — announce.** Notify Kelly Brazil directly *before*
       any public post. The headline is the reproducible number and the harness,
       not "rewritten in Rust".
+
+## Performance notes
+
+`make bench-vs-jc` times both implementations with one harness; the README
+table comes from it. What the profile says today:
+
+- **Startup dominates the win** (~20x). It is mostly Python interpreter start,
+  which is why the gap narrows to 3–5x on throughput.
+- **`[profile.release]` was missing entirely** until 2026-08-04. Adding
+  `lto = "fat"`, `codegen-units = 1`, `panic = "abort"` and `strip` cut
+  ~25% off throughput and 40% off the binary (8.7 → 5.2 MB).
+- **Format hints matter more than they look.** `parse_timestamp` walks jc's
+  34-format table until one parses; without a hint a format near the end costs
+  ~30 failed `strptime` attempts *per record*. Every call site now passes the
+  same hint set as the jc parser it mirrors — and because hinted formats are
+  tried first, this is a correctness contract, not only a speed one.
+- **The remaining per-record cost is fields, not parsing.** A 22-field `clf`
+  record costs ~12 µs against ~3 µs for a 4-field csv row; that is one `String`
+  allocation and one map insert per field. Cutting it means changing how
+  records are built, not micro-tuning the parsers.
 
 ## Things that will bite you
 

@@ -2,7 +2,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::LazyLock;
@@ -84,7 +84,7 @@ fn parse_name_email(line: &str) -> (Option<String>, Option<String>) {
 }
 
 fn add_timestamps(obj: &mut Map<String, Value>, date_str: &str) {
-    let ts = parse_timestamp(date_str, Some("%a %b %d %H:%M:%S %Y %z"));
+    let ts = parse_timestamp(date_str, &[formats::F1100]);
     obj.insert(
         "epoch".to_string(),
         ts.naive_epoch

@@ -171,6 +171,51 @@ static FORMATS: &[FmtEntry] = &[
     }, // id 8300
 ];
 
+
+/// jc's datetime formats, addressed by the same numeric ids jc uses so a call
+/// site here can be read against the jc parser it mirrors.
+///
+/// A parser passing the right hint matters for more than speed: hinted formats
+/// are tried *first*, so for a string two formats can both parse, the hint
+/// decides which one wins -- exactly as in jc.
+pub mod formats {
+    pub const F1000: &str = "%a %b %d %H:%M:%S %Y";
+    pub const F1100: &str = "%a %b %d %H:%M:%S %Y %z";
+    pub const F1300: &str = "%Y-%m-%dT%H:%M:%S.%f%Z";
+    pub const F1310: &str = "%Y-%m-%dT%H:%M:%S.%f";
+    pub const F1400: &str = "%b %d %Y %H:%M:%S.%f UTC";
+    pub const F1410: &str = "%b %d %Y %H:%M:%S.%f";
+    pub const F1420: &str = "%b %d %Y %H:%M:%S UTC";
+    pub const F1430: &str = "%b %d %Y %H:%M:%S";
+    pub const F1500: &str = "%Y-%m-%d %H:%M";
+    pub const F1600: &str = "%m/%d/%Y %I:%M %p";
+    pub const F1700: &str = "%m/%d/%Y, %I:%M:%S %p";
+    pub const F1705: &str = "%m/%d/%Y, %I:%M:%S %p %Z";
+    pub const F1710: &str = "%m/%d/%Y, %I:%M:%S %p UTC%z";
+    pub const F1720: &str = "%A, %B %d, %Y %I:%M:%S %p";
+    pub const F1750: &str = "%Y/%m/%d-%H:%M:%S.%f";
+    pub const F1755: &str = "%Y/%m/%d-%H:%M:%S.%f%z";
+    pub const F1760: &str = "%Y-%m-%d %H:%M:%S%z";
+    pub const F1800: &str = "%d/%b/%Y:%H:%M:%S %z";
+    pub const F2000: &str = "%a %d %b %Y %I:%M:%S %p %Z";
+    pub const F3000: &str = "%a %d %b %Y %I:%M:%S %p";
+    pub const F3100: &str = "%a %d %b %Y %I:%M:%S %p %z";
+    pub const F3500: &str = "%a, %d %b %Y %H:%M:%S %Z";
+    pub const F4000: &str = "%A %d %B %Y %I:%M:%S %p %Z";
+    pub const F5000: &str = "%A %d %B %Y %I:%M:%S %p";
+    pub const F6000: &str = "%a %b %d %I:%M:%S %p %Z %Y";
+    pub const F7000: &str = "%a %b %d %H:%M:%S %Z %Y";
+    pub const F7100: &str = "%b %d %H:%M:%S %Y";
+    pub const F7200: &str = "%Y-%m-%d %H:%M:%S.%f %z";
+    pub const F7250: &str = "%Y-%m-%d %H:%M:%S";
+    pub const F7255: &str = "%Y-%m-%d %H:%M:%S %Z";
+    pub const F7300: &str = "%a %Y-%m-%d %H:%M:%S %Z";
+    pub const F8000: &str = "%a %d %b %Y %H:%M:%S %Z";
+    pub const F8100: &str = "%a %d %b %Y %H:%M:%S";
+    pub const F8200: &str = "%A %d %B %Y, %H:%M:%S UTC%z";
+    pub const F8300: &str = "%A %d %B %Y, %H:%M:%S";
+}
+
 /// Non-UTC timezone abbreviations to strip from datetime strings.
 /// This list comes directly from jc's utils.py.
 static TZ_ABBR: &[&str] = &[
@@ -207,7 +252,7 @@ static OFFSET_SUFFIXES: &[&str] = &[
 ];
 
 // LRU cache: key = (input string, optional format hint), value = TimestampResult
-type TimestampCache = Mutex<LruCache<(String, Option<String>), TimestampResult>>;
+type TimestampCache = Mutex<LruCache<(String, &'static [&'static str]), TimestampResult>>;
 static CACHE: std::sync::OnceLock<TimestampCache> = std::sync::OnceLock::new();
 
 fn cache() -> &'static TimestampCache {
@@ -325,8 +370,8 @@ fn try_parse_aware(s: &str, fmt: &str) -> Option<DateTime<FixedOffset>> {
 /// Parse a datetime string into a `TimestampResult`.
 ///
 /// `format_hint`: an optional format string to try first.
-pub fn parse_timestamp(input: &str, format_hint: Option<&str>) -> TimestampResult {
-    let cache_key = (input.to_string(), format_hint.map(|s| s.to_string()));
+pub fn parse_timestamp(input: &str, hints: &'static [&'static str]) -> TimestampResult {
+    let cache_key = (input.to_string(), hints);
 
     // Check cache
     if let Ok(mut c) = cache().lock()
@@ -335,7 +380,7 @@ pub fn parse_timestamp(input: &str, format_hint: Option<&str>) -> TimestampResul
         return cached.clone();
     }
 
-    let result = do_parse(input, format_hint);
+    let result = do_parse(input, hints);
 
     // Store in cache
     if let Ok(mut c) = cache().lock() {
@@ -345,23 +390,20 @@ pub fn parse_timestamp(input: &str, format_hint: Option<&str>) -> TimestampResul
     result
 }
 
-fn do_parse(input: &str, format_hint: Option<&str>) -> TimestampResult {
+fn do_parse(input: &str, hints: &[&str]) -> TimestampResult {
     let (normalized, utc_tz) = normalize_datetime_str(input);
 
-    // Build ordered format list: hint first (if provided and matches a known format),
-    // then the rest in order.
-    let mut fmt_list: Vec<&str> = Vec::new();
-
-    if let Some(hint) = format_hint {
-        fmt_list.push(hint);
-    }
-
-    for entry in FORMATS {
-        // Don't add the hint again
-        if format_hint != Some(entry.fmt) {
-            fmt_list.push(entry.fmt);
-        }
-    }
+    // Hinted formats first, then the rest in jc's order. Without a hint every
+    // parse walks the whole table until something sticks, which for a format
+    // near the end of the list is ~30 failed strptime attempts per record.
+    let mut fmt_list: Vec<&str> = Vec::with_capacity(FORMATS.len());
+    fmt_list.extend_from_slice(hints);
+    fmt_list.extend(
+        FORMATS
+            .iter()
+            .map(|entry| entry.fmt)
+            .filter(|fmt| !hints.contains(fmt)),
+    );
 
     let mut naive_epoch: Option<i64> = None;
     let mut utc_epoch: Option<i64> = None;
@@ -427,7 +469,7 @@ mod tests {
         // gap is PDT's offset. An earlier version of this test asserted the two
         // were equal, which is what a UTC-everywhere implementation produces —
         // and that bug put every *_epoch field in the corpus out by the offset.
-        let r = parse_timestamp("2003-10-11T22:14:15.003Z", None);
+        let r = parse_timestamp("2003-10-11T22:14:15.003Z", &[]);
         assert_eq!(r.utc_epoch, Some(1065910455));
         assert_eq!(
             r.naive_epoch.expect("naive epoch") - r.utc_epoch.expect("utc epoch"),
@@ -450,21 +492,21 @@ mod tests {
     #[test]
     fn test_parse_no_tz() {
         // No timezone — naive only
-        let r = parse_timestamp("2021-03-23 00:14", None);
+        let r = parse_timestamp("2021-03-23 00:14", &[]);
         assert!(r.naive_epoch.is_some());
         assert!(r.utc_epoch.is_none());
     }
 
     #[test]
     fn test_parse_utc_explicit() {
-        let r = parse_timestamp("Wed Mar 24 11:11:30 UTC 2021", None);
+        let r = parse_timestamp("Wed Mar 24 11:11:30 UTC 2021", &[]);
         assert!(r.naive_epoch.is_some());
         assert!(r.utc_epoch.is_some());
     }
 
     #[test]
     fn test_parse_invalid() {
-        let r = parse_timestamp("not a date", None);
+        let r = parse_timestamp("not a date", &[]);
         assert!(r.naive_epoch.is_none());
         assert!(r.utc_epoch.is_none());
         assert!(r.iso.is_none());
@@ -473,15 +515,15 @@ mod tests {
     #[test]
     fn test_parse_with_gmt() {
         // GMT should be treated as UTC
-        let r = parse_timestamp("Wed, 31 Jan 2024 00:39:28 GMT", None);
+        let r = parse_timestamp("Wed, 31 Jan 2024 00:39:28 GMT", &[]);
         assert!(r.naive_epoch.is_some());
         assert!(r.utc_epoch.is_some());
     }
 
     #[test]
     fn test_cache_works() {
-        let r1 = parse_timestamp("2021-03-23 00:14", None);
-        let r2 = parse_timestamp("2021-03-23 00:14", None);
+        let r1 = parse_timestamp("2021-03-23 00:14", &[]);
+        let r2 = parse_timestamp("2021-03-23 00:14", &[]);
         assert_eq!(r1, r2);
     }
 }

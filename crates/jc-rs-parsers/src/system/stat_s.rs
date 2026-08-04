@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::{convert_to_int, parse_timestamp};
+use jc_rs_utils::{convert_to_int, parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct StatSParser;
@@ -37,7 +37,7 @@ fn parse_time_field(val: &str, obj: &mut Map<String, Value>, key: &str) {
         obj.insert(format!("{}_epoch_utc", key), Value::Null);
     } else {
         obj.insert(key.to_string(), Value::String(val.to_string()));
-        let ts = parse_timestamp(val, None);
+        let ts = parse_timestamp(val, &[formats::F7100, formats::F7200]);
         obj.insert(
             format!("{}_epoch", key),
             ts.naive_epoch.map(Value::from).unwrap_or(Value::Null),

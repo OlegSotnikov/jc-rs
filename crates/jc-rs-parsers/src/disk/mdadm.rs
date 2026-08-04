@@ -95,7 +95,7 @@ fn normalize_key(key: &str) -> String {
 /// pinned to, and a different number of hours everywhere else.
 fn parse_date_epoch(s: &str) -> Option<i64> {
     let normalized = s.trim().split_whitespace().collect::<Vec<&str>>().join(" ");
-    jc_rs_utils::parse_timestamp(&normalized, Some("%a %b %d %H:%M:%S %Y")).naive_epoch
+    jc_rs_utils::parse_timestamp(&normalized, &[jc_rs_utils::timestamp::formats::F1000]).naive_epoch
 }
 
 /// Replicate jc's convert_to_int: extract all digit characters, concatenate, parse as i64.

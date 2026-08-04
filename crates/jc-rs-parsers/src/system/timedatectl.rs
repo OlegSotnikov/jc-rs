@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct TimedatectlParser;
@@ -171,7 +171,7 @@ fn parse_timedatectl(input: &str) -> Map<String, Value> {
         // The field is UTC by definition, so the stamp must be read as UTC.
         // `naive_epoch` reads it as local, which put epoch_utc out by the
         // machine's offset.
-        let parsed = parse_timestamp(ts_str, None);
+        let parsed = parse_timestamp(ts_str, &[formats::F7300]);
         if let Some(e) = parsed.utc_epoch.or(parsed.naive_epoch) {
             out.insert("epoch_utc".to_string(), Value::Number(e.into()));
         }

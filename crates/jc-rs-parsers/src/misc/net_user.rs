@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 struct NetUserParser;
@@ -28,8 +28,11 @@ static INFO: ParserInfo = ParserInfo {
 fn parse_net_date(s: &str) -> String {
     let s = s.trim();
     // Try common Windows date formats
-    for fmt in &["%m/%d/%Y %I:%M:%S %p", "%m/%d/%Y %I:%M %p"] {
-        let parsed = parse_timestamp(s, Some(fmt));
+    for hint in [
+        &[formats::F1700][..],
+        &[formats::F1600][..],
+    ] {
+        let parsed = parse_timestamp(s, hint);
         if let Some(iso) = parsed.iso {
             return iso;
         }

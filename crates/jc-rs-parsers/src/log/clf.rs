@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
@@ -197,7 +197,7 @@ pub fn parse_clf_line(line: &str) -> Map<String, Value> {
 
         // Compute epoch timestamps from date field
         if !date.is_empty() {
-            let ts = parse_timestamp(date, None);
+            let ts = parse_timestamp(date, &[formats::F1800]);
             map.insert(
                 "epoch".to_string(),
                 match ts.naive_epoch {

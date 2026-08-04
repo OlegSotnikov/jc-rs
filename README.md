@@ -69,17 +69,23 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 
 ## Speed
 
-Linux x86-64, jc 1.25.7 on Python 3.12, 20 runs each (5 for the large input):
+Measured by [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), which times both sides with
+one harness on the same inputs — median of 5–11 runs, Linux x86-64, jc 1.25.7 on
+Python 3.12. Re-run it yourself with `make bench-vs-jc`; a number you cannot
+reproduce is a number nobody should print.
 
 | Scenario | jc | jc-rs | Speedup |
 |---|---|---|---|
-| Cold start (`-v`) | 163.4 ms | 4.1 ms | **40×** |
-| `ps aux`, 110 lines | 166.6 ms | 6.6 ms | **25×** |
-| `pkg-index-deb`, 29,735 lines / 1.5 MB | 336.6 ms | 63.8 ms | **5.3×** |
+| Cold start (`-v`) | 138 ms | 7 ms | **19.7×** |
+| `ps aux`, 110 lines | 156 ms | 12 ms | **13.0×** |
+| `csv`, 10,000 rows | 200 ms | 41 ms | **4.9×** |
+| `pkg-index-deb`, 1.5 MB | 309 ms | 88 ms | **3.5×** |
+| `clf`, 10,000 log lines | 604 ms | 208 ms | **2.9×** |
 
-On the large input the two produce byte-identical output (1,755 records). The gap
-on small inputs is Python interpreter startup, which is why it matters most in
-loops, git hooks and per-host automation rather than at an interactive prompt.
+The gap is largest at startup, which is why it matters most in loops, git hooks
+and per-host automation rather than at an interactive prompt. On throughput it
+narrows to 3–5×: both implementations end up bound by the same per-field work,
+and `clf` — 22 fields and a timestamp per line — is the honest floor.
 
 ## Usage
 

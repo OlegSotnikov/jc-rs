@@ -193,11 +193,11 @@ fn bench_timestamp(c: &mut Criterion) {
     group.bench_function("warm_cache_mixed", |b| {
         // Pre-warm the cache
         for s in &samples {
-            let _ = parse_timestamp(s, None);
+            let _ = parse_timestamp(s, &[]);
         }
         b.iter(|| {
             for s in &samples {
-                black_box(parse_timestamp(black_box(s), None));
+                black_box(parse_timestamp(black_box(s), &[]));
             }
         })
     });
@@ -207,16 +207,16 @@ fn bench_timestamp(c: &mut Criterion) {
     let late_match = "2021-03-23 00:14:00 UTC"; // matches fmt id 7255 (near end)
 
     group.bench_function("early_format_match", |b| {
-        b.iter(|| black_box(parse_timestamp(black_box(early_match), None)))
+        b.iter(|| black_box(parse_timestamp(black_box(early_match), &[])))
     });
 
     group.bench_function("late_format_match", |b| {
-        b.iter(|| black_box(parse_timestamp(black_box(late_match), None)))
+        b.iter(|| black_box(parse_timestamp(black_box(late_match), &[])))
     });
 
     // ISO 8601 with Z (common case)
     group.bench_function("iso8601_zulu", |b| {
-        b.iter(|| black_box(parse_timestamp(black_box("2003-10-11T22:14:15.003Z"), None)))
+        b.iter(|| black_box(parse_timestamp(black_box("2003-10-11T22:14:15.003Z"), &[])))
     });
 
     // With format hint (skips search, hits the hint directly)
@@ -224,7 +224,7 @@ fn bench_timestamp(c: &mut Criterion) {
         b.iter(|| {
             black_box(parse_timestamp(
                 black_box("2021-03-23 00:14"),
-                Some("%Y-%m-%d %H:%M"),
+                &[jc_rs_utils::timestamp::formats::F1500],
             ))
         })
     });

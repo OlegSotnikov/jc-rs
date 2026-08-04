@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 struct CefParser;
@@ -211,7 +211,7 @@ fn add_epoch_fields(map: &mut Map<String, Value>, field_prefix: &str, ts_value: 
         }
     }
 
-    let parsed = parse_timestamp(trimmed, None);
+    let parsed = parse_timestamp(trimmed, &[formats::F1400, formats::F1410, formats::F1420, formats::F1430]);
     map.insert(
         format!("{field_prefix}_epoch"),
         match parsed.naive_epoch {

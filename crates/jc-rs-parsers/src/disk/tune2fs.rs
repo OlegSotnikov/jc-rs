@@ -91,7 +91,7 @@ fn parse_date_epoch(s: &str) -> Option<i64> {
     let normalized = s.split_whitespace().collect::<Vec<&str>>().join(" ");
     // tune2fs prints local time with no zone; reading it as UTC put every
     // *_epoch out by the machine's offset.
-    jc_rs_utils::parse_timestamp(&normalized, Some("%a %b %d %H:%M:%S %Y")).naive_epoch
+    jc_rs_utils::parse_timestamp(&normalized, &[jc_rs_utils::timestamp::formats::F1000]).naive_epoch
 }
 
 fn parse_tune2fs(input: &str) -> Map<String, Value> {
