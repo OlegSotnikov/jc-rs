@@ -13,6 +13,20 @@ categories = ["wasm", "parser-implementations"]
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+# wasm-pack ships its own wasm-opt, which is older than the feature set rustc
+# emits for wasm32 today -- it rejects the module with "Bulk memory operations
+# require bulk memory". Naming the features keeps the optimisation instead of
+# turning wasm-opt off, which is the other way people work around this.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-O",
+    "--enable-bulk-memory",
+    "--enable-sign-ext",
+    "--enable-mutable-globals",
+    "--enable-nontrapping-float-to-int",
+    "--enable-reference-types",
+]
+
 [dependencies]
 jc-rs-core = { path = "../jc-rs-core", version = "0.0.0" }
 jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.0.0" }

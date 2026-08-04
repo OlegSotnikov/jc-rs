@@ -73,6 +73,7 @@ wasm: ## build the npm package into crates/jc-rs-wasm/pkg (needs wasm-pack)
 	@command -v wasm-pack >/dev/null || { \
 	  echo "wasm-pack not installed: cargo install wasm-pack"; exit 1; }
 	wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
+	node crates/jc-rs-wasm/tests/smoke.mjs
 	@echo "package at crates/jc-rs-wasm/pkg"
 
 .PHONY: bench-vs-jc

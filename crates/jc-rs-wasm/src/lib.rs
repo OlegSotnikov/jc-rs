@@ -121,8 +121,15 @@ pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
+/// serde-wasm-bindgen maps a Rust map to a JS `Map` by default, which is the
+/// right call for arbitrary keys and the wrong one here: every consumer expects
+/// `record.status`, `JSON.stringify(record)` and object spread to work. Records
+/// are JSON objects, so they serialize as plain objects.
 fn to_js<T: Serialize + ?Sized>(value: &T) -> Result<JsValue, JsError> {
-    serde_wasm_bindgen::to_value(value).map_err(|e| JsError::new(&e.to_string()))
+    let serializer = serde_wasm_bindgen::Serializer::new().serialize_maps_as_objects(true);
+    value
+        .serialize(&serializer)
+        .map_err(|e| JsError::new(&e.to_string()))
 }
 
 #[cfg(test)]

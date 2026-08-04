@@ -29,6 +29,7 @@ make lint               # cargo clippy --workspace --all-targets -- -D warnings;
 make ratchet            # unit tests as a ratchet (./ci/run-tests.sh) — the test gate, not `make test`
 make differential       # full jc corpus; rewrites tests/differential/{REPORT.md,report.json}
 make bench              # criterion, -p jc-rs-bench
+make wasm               # build + Node-test the npm package (needs wasm-pack)
 make submodule deps-py  # one-time setup: pin the jc oracle + its optional Python deps
 ```
 
@@ -70,6 +71,7 @@ Five crates, dependency order `core → utils → parsers → jc-rs`:
 | `jc-rs-utils` | shared helpers: `simple_table_parse`/`sparse_table_parse`, `convert_to_*`, `normalize_key`, `parse_timestamp`, `slice_lines` |
 | `jc-rs-parsers` | every parser, grouped by domain (`disk/ format/ log/ misc/ network/ package/ proc/ security/ string/ system/`) |
 | `jc-rs` | the CLI binary: `args`, `magic`, `meta`, `output`, `streaming` |
+| `jc-rs-wasm` | `wasm-bindgen` wrapper: `parse`, `parseRaw`, `parsers`, `StreamSession` |
 | `jc-rs-bench` | criterion benchmarks |
 
 **Registration is link-time via `inventory`.** There is no central parser list:

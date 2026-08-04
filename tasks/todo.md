@@ -97,6 +97,12 @@ to make visible.
       job. Five targets, the scratch image, crates.io via Trusted Publishing,
       and bash/zsh/fish completions in every archive.
 
+      Verified locally, not just wired: `wasm-pack` builds a 3.65 MB bundle
+      and `crates/jc-rs-wasm/tests/smoke.mjs` runs it under Node. That test
+      exists because the first version built and typed correctly while every
+      record came back as `{}` — serde-wasm-bindgen maps a Rust map to a JS
+      `Map` unless told to serialize maps as objects.
+
       **Three things need a human before a release can complete them**, each
       gated so the job reports and skips rather than failing:
       - the `OlegSotnikov/homebrew-tap` repository does not exist yet, and
