@@ -2,10 +2,11 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 
 pub struct TracerouteStreamParser;
 
@@ -17,7 +18,7 @@ static INFO: ParserInfo = ParserInfo {
     author: "jc-rs contributors",
     author_email: "",
     compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
-    tags: &[Tag::Command],
+    tags: &[Tag::Command, Tag::Streaming],
     magic_commands: &[],
     streaming: true,
     hidden: false,
@@ -234,6 +235,18 @@ fn get_probes(hop_string: &str) -> Vec<Map<String, Value>> {
     probes
 }
 
+static HEADER_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"traceroute6? to (\S+)\s+\((\d+\.\d+\.\d+\.\d+|[0-9a-fA-F:]+)\)")
+        .expect("valid traceroute header pattern")
+});
+
+static HOPS_BYTES_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\d+) hops max, (\d+) byte packets").expect("valid hops/bytes pattern")
+});
+
+static HOP_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^\s*(\d+)?\s+(.+)$").expect("valid hop pattern"));
+
 impl Parser for TracerouteStreamParser {
     fn info(&self) -> &'static ParserInfo {
         &INFO
@@ -243,115 +256,111 @@ impl Parser for TracerouteStreamParser {
         if input.trim().is_empty() {
             return Ok(ParseOutput::Array(vec![]));
         }
+        parse_via_session(self, input, quiet)
+    }
 
-        let re_header =
-            Regex::new(r"traceroute6? to (\S+)\s+\((\d+\.\d+\.\d+\.\d+|[0-9a-fA-F:]+)\)")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_hops_bytes = Regex::new(r"(\d+) hops max, (\d+) byte packets")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_hop =
-            Regex::new(r"^\s*(\d+)?\s+(.+)$").map_err(|e| ParseError::Regex(e.to_string()))?;
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
+    }
+}
 
-        let lines: Vec<&str> = input
-            .lines()
-            .filter(|l| !l.contains("traceroute: Warning:") && !l.contains("traceroute6: Warning:"))
-            .collect();
+impl StreamingParser for TracerouteStreamParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(TracerouteSession::default())
+    }
+}
 
-        if lines.is_empty() {
-            return Ok(ParseOutput::Array(vec![]));
+/// A hop's probes can wrap onto continuation lines, so a hop is only complete
+/// when the next numbered hop starts (or the input ends).
+#[derive(Default)]
+struct TracerouteSession {
+    current_hop: Option<(i64, String)>,
+}
+
+impl TracerouteSession {
+    fn hop_record(hop: (i64, String)) -> Record {
+        let (index, text) = hop;
+        let probes = get_probes(&text);
+        let mut record = Record::with_capacity(3);
+        record.insert("type".to_string(), Value::String("hop".to_string()));
+        record.insert("hop".to_string(), Value::Number(index.into()));
+        record.insert(
+            "probes".to_string(),
+            Value::Array(probes.into_iter().map(Value::Object).collect()),
+        );
+        record
+    }
+}
+
+impl LineParser for TracerouteSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        if line.trim().is_empty()
+            || line.contains("traceroute: Warning:")
+            || line.contains("traceroute6: Warning:")
+        {
+            return Ok(None);
         }
 
-        let mut results: Vec<Map<String, Value>> = Vec::new();
-        let mut current_hop: Option<(i64, String)> = None;
+        if line.starts_with("traceroute") {
+            let mut header = Record::with_capacity(5);
+            header.insert("type".to_string(), Value::String("header".to_string()));
 
-        for line in &lines {
-            if line.trim().is_empty() {
-                continue;
+            if let Some(caps) = HEADER_RE.captures(line) {
+                header.insert(
+                    "destination_name".to_string(),
+                    Value::String(caps.get(1).map_or("", |m| m.as_str()).to_string()),
+                );
+                header.insert(
+                    "destination_ip".to_string(),
+                    Value::String(caps.get(2).map_or("", |m| m.as_str()).to_string()),
+                );
             }
-
-            // Header line
-            if line.starts_with("traceroute") {
-                let mut header = Map::new();
-                header.insert("type".to_string(), Value::String("header".to_string()));
-
-                if let Some(caps) = re_header.captures(line) {
-                    header.insert(
-                        "destination_name".to_string(),
-                        Value::String(caps.get(1).map_or("", |m| m.as_str()).to_string()),
-                    );
-                    header.insert(
-                        "destination_ip".to_string(),
-                        Value::String(caps.get(2).map_or("", |m| m.as_str()).to_string()),
-                    );
-                }
-                if let Some(caps) = re_hops_bytes.captures(line) {
-                    header.insert(
-                        "max_hops".to_string(),
-                        caps.get(1)
-                            .and_then(|m| m.as_str().parse::<i64>().ok())
-                            .map(|n| Value::Number(n.into()))
-                            .unwrap_or(Value::Null),
-                    );
-                    header.insert(
-                        "data_bytes".to_string(),
-                        caps.get(2)
-                            .and_then(|m| m.as_str().parse::<i64>().ok())
-                            .map(|n| Value::Number(n.into()))
-                            .unwrap_or(Value::Null),
-                    );
-                }
-                results.push(header);
-                continue;
+            if let Some(caps) = HOPS_BYTES_RE.captures(line) {
+                let number = |i: usize| -> Value {
+                    caps.get(i)
+                        .and_then(|m| m.as_str().parse::<i64>().ok())
+                        .map_or(Value::Null, |n| Value::Number(n.into()))
+                };
+                header.insert("max_hops".to_string(), number(1));
+                header.insert("data_bytes".to_string(), number(2));
             }
-
-            if let Some(caps) = re_hop.captures(line) {
-                if let Some(hop_num_str) = caps.get(1) {
-                    // Flush previous hop
-                    if let Some((idx, hop_str)) = current_hop.take() {
-                        let probes = get_probes(&hop_str);
-                        let mut hop_obj = Map::new();
-                        hop_obj.insert("type".to_string(), Value::String("hop".to_string()));
-                        hop_obj.insert("hop".to_string(), Value::Number(idx.into()));
-                        hop_obj.insert(
-                            "probes".to_string(),
-                            Value::Array(probes.into_iter().map(Value::Object).collect()),
-                        );
-                        results.push(hop_obj);
-                    }
-                    let hop_idx = hop_num_str.as_str().parse::<i64>().unwrap_or(0);
-                    let hop_str = caps.get(2).map_or("", |m| m.as_str()).to_string();
-                    current_hop = Some((hop_idx, hop_str));
-                } else {
-                    // Continuation line
-                    if let Some((_, ref mut hop_str)) = current_hop {
-                        hop_str.push(' ');
-                        hop_str.push_str(caps.get(2).map_or("", |m| m.as_str()));
-                    }
-                }
-            }
+            return Ok(Some(header));
         }
 
-        // Flush last hop
-        if let Some((idx, hop_str)) = current_hop {
-            let probes = get_probes(&hop_str);
-            let mut hop_obj = Map::new();
-            hop_obj.insert("type".to_string(), Value::String("hop".to_string()));
-            hop_obj.insert("hop".to_string(), Value::Number(idx.into()));
-            hop_obj.insert(
-                "probes".to_string(),
-                Value::Array(probes.into_iter().map(Value::Object).collect()),
-            );
-            results.push(hop_obj);
-        }
+        let Some(caps) = HOP_RE.captures(line) else {
+            return Ok(None);
+        };
+        let text = caps.get(2).map_or("", |m| m.as_str());
 
-        Ok(ParseOutput::Array(results))
+        match caps.get(1) {
+            Some(hop_num) => {
+                let finished = self.current_hop.take();
+                self.current_hop = Some((
+                    hop_num.as_str().parse::<i64>().unwrap_or(0),
+                    text.to_string(),
+                ));
+                Ok(finished.map(Self::hop_record))
+            }
+            None => {
+                // Continuation of the hop currently being built.
+                if let Some((_, ref mut hop_text)) = self.current_hop {
+                    hop_text.push(' ');
+                    hop_text.push_str(text);
+                }
+                Ok(None)
+            }
+        }
+    }
+
+    fn finalize(&mut self, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        Ok(self.current_hop.take().map(Self::hop_record))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jc_rs_core::traits::Parser;
+    use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 
     #[test]
     fn test_traceroute_s_ipv4_golden() {

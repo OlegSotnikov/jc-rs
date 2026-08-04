@@ -2,10 +2,10 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
-use super::vmstat::parse_vmstat;
+use super::vmstat::VmstatSession;
 
 pub struct VmstatSParser;
 
@@ -35,9 +35,18 @@ impl Parser for VmstatSParser {
         &INFO
     }
 
-    fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
-        let rows = parse_vmstat(input);
-        Ok(ParseOutput::Array(rows))
+    fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
+        parse_via_session(self, input, quiet)
+    }
+
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
+    }
+}
+
+impl StreamingParser for VmstatSParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(VmstatSession::default())
     }
 }
 

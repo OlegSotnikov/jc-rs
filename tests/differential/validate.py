@@ -146,7 +146,7 @@ def run_jc(jc, parser: str, data: bytes, raw: bool, streaming: bool):
         return False, f"{type(exc).__name__}: {exc}"
 
 
-def run_bin(parser: str, data: bytes, raw: bool):
+def run_bin(parser: str, data: bytes, raw: bool, streaming: bool = False):
     cmd = [str(BIN), "--" + parser.replace("_", "-"), "-q"]
     if raw:
         cmd.append("-r")
@@ -159,12 +159,19 @@ def run_bin(parser: str, data: bytes, raw: bool):
     out = proc.stdout.decode(errors="replace").strip()
     if not out:
         return False, "empty output"
+
+    # Streaming parsers emit NDJSON -- one JSON value per line, as jc does. A
+    # single-record stream is therefore a bare object, and decoding the whole
+    # output as one document would compare a dict against the fixture's list
+    # and report a type mismatch that is not one.
+    if streaming:
+        try:
+            return True, [json.loads(line) for line in out.splitlines() if line.strip()]
+        except json.JSONDecodeError as exc:
+            return False, f"invalid NDJSON: {exc}"
+
     try:
         return True, json.loads(out)
-    except json.JSONDecodeError:
-        pass
-    try:                                            # streaming parsers emit NDJSON
-        return True, [json.loads(line) for line in out.splitlines() if line.strip()]
     except json.JSONDecodeError as exc:
         return False, f"invalid JSON: {exc}"
 
@@ -244,7 +251,7 @@ def main() -> int:
         counts["oracle_ok"] += 1
         per_parser[pair["parser"]]["total"] += 1
 
-        ok, value = run_bin(pair["parser"], data, pair["raw"])
+        ok, value = run_bin(pair["parser"], data, pair["raw"], pair["streaming"])
         if not ok:
             counts["error"] += 1
             per_parser[pair["parser"]]["error"] += 1

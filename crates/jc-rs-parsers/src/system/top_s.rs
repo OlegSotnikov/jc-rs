@@ -2,10 +2,10 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
-use super::top::parse_top;
+use super::top::TopSession;
 
 pub struct TopSParser;
 
@@ -36,8 +36,17 @@ impl Parser for TopSParser {
     }
 
     fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
-        let rows = parse_top(input, quiet);
-        Ok(ParseOutput::Array(rows))
+        parse_via_session(self, input, quiet)
+    }
+
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
+    }
+}
+
+impl StreamingParser for TopSParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(TopSession::default())
     }
 }
 

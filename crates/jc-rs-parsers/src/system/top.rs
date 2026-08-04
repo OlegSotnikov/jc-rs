@@ -4,7 +4,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::{convert_size_to_int, convert_to_float, convert_to_int, sparse_table_parse};
 use regex::Regex;
@@ -188,26 +188,39 @@ const FLOAT_KEYS: &[&str] = &[
     "used",
 ];
 
-pub fn parse_top(input: &str, _quiet: bool) -> Vec<Map<String, Value>> {
-    let mut raw_output: Vec<Map<String, Value>> = Vec::new();
-    let mut item_obj: Map<String, Value> = Map::new();
-    let mut process_table = false;
-    let mut process_lines: Vec<String> = Vec::new();
+/// `top` repeats a whole sample -- header lines then a process table -- and
+/// opens the next one with `top - `. A sample is complete only when the next
+/// one begins, or at end of input.
+#[derive(Default)]
+pub(crate) struct TopSession {
+    item_obj: Map<String, Value>,
+    process_table: bool,
+    process_lines: Vec<String>,
+}
 
-    for line in input.lines() {
+impl TopSession {
+    fn flush(&mut self) -> Option<Record> {
+        if self.item_obj.is_empty() {
+            return None;
+        }
+        if !self.process_lines.is_empty() {
+            let table_str = self.process_lines.join("\n");
+            let procs = parse_process_table(&table_str);
+            self.item_obj
+                .insert("processes".to_string(), Value::Array(procs));
+            self.process_lines.clear();
+        }
+        self.process_table = false;
+        Some(process_snapshot(std::mem::take(&mut self.item_obj)))
+    }
+}
+
+impl LineParser for TopSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        let mut finished = None;
         if line.starts_with("top - ") {
             // Flush previous snapshot
-            if !item_obj.is_empty() {
-                if !process_lines.is_empty() {
-                    let table_str = process_lines.join("\n");
-                    let procs = parse_process_table(&table_str);
-                    item_obj.insert("processes".to_string(), Value::Array(procs));
-                }
-                raw_output.push(process_snapshot(item_obj));
-                process_table = false;
-                process_lines.clear();
-                item_obj = Map::new();
-            }
+            finished = self.flush();
 
             // Parse "top - HH:MM:SS up ..." line
             let rest = &line[6..]; // strip "top - "
@@ -219,67 +232,79 @@ pub fn parse_top(input: &str, _quiet: bool) -> Vec<Map<String, Value>> {
                 let load5_str = caps[5].to_string();
                 let load15_str = caps[6].to_string();
 
-                item_obj.insert("time".to_string(), Value::String(time_str));
-                item_obj.insert("uptime".to_string(), Value::String(uptime_str));
-                item_obj.insert("users".to_string(), Value::String(users_str));
-                item_obj.insert("load_1m".to_string(), Value::String(load1_str));
-                item_obj.insert("load_5m".to_string(), Value::String(load5_str));
-                item_obj.insert("load_15m".to_string(), Value::String(load15_str));
+                self.item_obj
+                    .insert("time".to_string(), Value::String(time_str));
+                self.item_obj
+                    .insert("uptime".to_string(), Value::String(uptime_str));
+                self.item_obj
+                    .insert("users".to_string(), Value::String(users_str));
+                self.item_obj
+                    .insert("load_1m".to_string(), Value::String(load1_str));
+                self.item_obj
+                    .insert("load_5m".to_string(), Value::String(load5_str));
+                self.item_obj
+                    .insert("load_15m".to_string(), Value::String(load15_str));
             }
-            continue;
+            // Hand back the sample this line closed, if any.
+            return Ok(finished);
         }
 
         if line.starts_with("Tasks:") {
             // Tasks: 108 total,   2 running, 106 sleeping,   0 stopped,   0 zombie
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 10 {
-                item_obj.insert(
+                self.item_obj.insert(
                     "tasks_total".to_string(),
                     Value::String(parts[1].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "tasks_running".to_string(),
                     Value::String(parts[3].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "tasks_sleeping".to_string(),
                     Value::String(parts[5].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "tasks_stopped".to_string(),
                     Value::String(parts[7].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "tasks_zombie".to_string(),
                     Value::String(parts[9].to_string()),
                 );
             }
-            continue;
+            return Ok(None);
         }
 
         if line.starts_with("%Cpu(s):") {
             // %Cpu(s):  5.9 us,  5.9 sy,  0.0 ni, 88.2 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 16 {
-                item_obj.insert("cpu_user".to_string(), Value::String(parts[1].to_string()));
-                item_obj.insert("cpu_sys".to_string(), Value::String(parts[3].to_string()));
-                item_obj.insert("cpu_nice".to_string(), Value::String(parts[5].to_string()));
-                item_obj.insert("cpu_idle".to_string(), Value::String(parts[7].to_string()));
-                item_obj.insert("cpu_wait".to_string(), Value::String(parts[9].to_string()));
-                item_obj.insert(
+                self.item_obj
+                    .insert("cpu_user".to_string(), Value::String(parts[1].to_string()));
+                self.item_obj
+                    .insert("cpu_sys".to_string(), Value::String(parts[3].to_string()));
+                self.item_obj
+                    .insert("cpu_nice".to_string(), Value::String(parts[5].to_string()));
+                self.item_obj
+                    .insert("cpu_idle".to_string(), Value::String(parts[7].to_string()));
+                self.item_obj
+                    .insert("cpu_wait".to_string(), Value::String(parts[9].to_string()));
+                self.item_obj.insert(
                     "cpu_hardware".to_string(),
                     Value::String(parts[11].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "cpu_software".to_string(),
                     Value::String(parts[13].to_string()),
                 );
-                item_obj.insert(
+                self.item_obj.insert(
                     "cpu_steal".to_string(),
                     Value::String(parts[15].to_string()),
                 );
             }
-            continue;
+            return Ok(None);
         }
 
         // XiB Mem : N total, N free, N used, N buff/cache
@@ -287,59 +312,71 @@ pub fn parse_top(input: &str, _quiet: bool) -> Vec<Map<String, Value>> {
         if line.len() > 1 && line[1..].starts_with("iB Mem") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 10 {
-                item_obj.insert("mem_unit".to_string(), Value::String(parts[0].to_string()));
-                item_obj.insert("mem_total".to_string(), Value::String(parts[3].to_string()));
-                item_obj.insert("mem_free".to_string(), Value::String(parts[5].to_string()));
-                item_obj.insert("mem_used".to_string(), Value::String(parts[7].to_string()));
-                item_obj.insert(
+                self.item_obj
+                    .insert("mem_unit".to_string(), Value::String(parts[0].to_string()));
+                self.item_obj
+                    .insert("mem_total".to_string(), Value::String(parts[3].to_string()));
+                self.item_obj
+                    .insert("mem_free".to_string(), Value::String(parts[5].to_string()));
+                self.item_obj
+                    .insert("mem_used".to_string(), Value::String(parts[7].to_string()));
+                self.item_obj.insert(
                     "mem_buff_cache".to_string(),
                     Value::String(parts[9].to_string()),
                 );
             }
-            continue;
+            return Ok(None);
         }
 
         // XiB Swap: N total, N free, N used. N avail Mem
         if line.len() > 1 && line[1..].starts_with("iB Swap") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() >= 9 {
-                item_obj.insert("swap_unit".to_string(), Value::String(parts[0].to_string()));
-                item_obj.insert(
+                self.item_obj
+                    .insert("swap_unit".to_string(), Value::String(parts[0].to_string()));
+                self.item_obj.insert(
                     "swap_total".to_string(),
                     Value::String(parts[2].to_string()),
                 );
-                item_obj.insert("swap_free".to_string(), Value::String(parts[4].to_string()));
-                item_obj.insert("swap_used".to_string(), Value::String(parts[6].to_string()));
-                item_obj.insert(
+                self.item_obj
+                    .insert("swap_free".to_string(), Value::String(parts[4].to_string()));
+                self.item_obj
+                    .insert("swap_used".to_string(), Value::String(parts[6].to_string()));
+                self.item_obj.insert(
                     "mem_available".to_string(),
                     Value::String(parts[8].to_string()),
                 );
             }
-            continue;
+            return Ok(None);
         }
 
         // Empty line signals start of process table
-        if !process_table && line.trim().is_empty() {
-            process_table = true;
-            continue;
+        if !self.process_table && line.trim().is_empty() {
+            self.process_table = true;
+            return Ok(None);
         }
 
-        if process_table && !line.trim().is_empty() {
-            process_lines.push(line.to_string());
+        if self.process_table && !line.trim().is_empty() {
+            self.process_lines.push(line.to_string());
         }
+        Ok(finished)
     }
 
-    // Flush last snapshot
-    if !item_obj.is_empty() {
-        if !process_lines.is_empty() {
-            let table_str = process_lines.join("\n");
-            let procs = parse_process_table(&table_str);
-            item_obj.insert("processes".to_string(), Value::Array(procs));
-        }
-        raw_output.push(process_snapshot(item_obj));
+    fn finalize(&mut self, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        Ok(self.flush())
     }
+}
 
-    raw_output
+pub fn parse_top(input: &str, _quiet: bool) -> Vec<Map<String, Value>> {
+    let mut session = TopSession::default();
+    let mut out: Vec<Map<String, Value>> = input
+        .lines()
+        .filter_map(|line| session.parse_line(line, true).ok().flatten())
+        .collect();
+    if let Ok(Some(last)) = session.finalize(true) {
+        out.push(last);
+    }
+    out
 }
 
 /// Convert raw string values in a top snapshot to proper types.

@@ -2,7 +2,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::{convert_to_float, simple_table_parse};
 use serde_json::{Map, Value};
@@ -41,66 +41,83 @@ impl Parser for MpstatParser {
     }
 }
 
-pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
-    let mut raw_output: Vec<Map<String, Value>> = Vec::new();
-    let mut header_found = false;
-    let mut header_text = String::new();
-    let mut header_start: usize = 0;
-    let mut stat_type = "cpu";
+const FLOAT_LIST: &[&str] = &[
+    "percent_usr",
+    "percent_nice",
+    "percent_sys",
+    "percent_iowait",
+    "percent_irq",
+    "percent_soft",
+    "percent_steal",
+    "percent_guest",
+    "percent_gnice",
+    "percent_idle",
+    "intr_s",
+    "nmi_s",
+    "loc_s",
+    "spu_s",
+    "pmi_s",
+    "iwi_s",
+    "rtr_s",
+    "res_s",
+    "cal_s",
+    "tlb_s",
+    "trm_s",
+    "thr_s",
+    "dfr_s",
+    "mce_s",
+    "mcp_s",
+    "err_s",
+    "mis_s",
+    "pin_s",
+    "npi_s",
+    "piw_s",
+    "hi_s",
+    "timer_s",
+    "net_tx_s",
+    "net_rx_s",
+    "block_s",
+    "irq_poll_s",
+    "block_iopoll_s",
+    "tasklet_s",
+    "sched_s",
+    "hrtimer_s",
+    "rcu_s",
+];
 
-    let float_list = &[
-        "percent_usr",
-        "percent_nice",
-        "percent_sys",
-        "percent_iowait",
-        "percent_irq",
-        "percent_soft",
-        "percent_steal",
-        "percent_guest",
-        "percent_gnice",
-        "percent_idle",
-        "intr_s",
-        "nmi_s",
-        "loc_s",
-        "spu_s",
-        "pmi_s",
-        "iwi_s",
-        "rtr_s",
-        "res_s",
-        "cal_s",
-        "tlb_s",
-        "trm_s",
-        "thr_s",
-        "dfr_s",
-        "mce_s",
-        "mcp_s",
-        "err_s",
-        "mis_s",
-        "pin_s",
-        "npi_s",
-        "piw_s",
-        "hi_s",
-        "timer_s",
-        "net_tx_s",
-        "net_rx_s",
-        "block_s",
-        "irq_poll_s",
-        "block_iopoll_s",
-        "tasklet_s",
-        "sched_s",
-        "hrtimer_s",
-        "rcu_s",
-    ];
+/// `mpstat` prints a header, then rows measured against its column positions.
+/// The session keeps that header so each row can be converted on arrival.
+pub(crate) struct MpstatSession {
+    header_found: bool,
+    header_text: String,
+    header_start: usize,
+    stat_type: &'static str,
+}
 
-    for line in input.lines().filter(|l| !l.trim().is_empty()) {
+impl Default for MpstatSession {
+    fn default() -> Self {
+        Self {
+            header_found: false,
+            header_text: String::new(),
+            header_start: 0,
+            stat_type: "cpu",
+        }
+    }
+}
+
+impl LineParser for MpstatSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        if line.trim().is_empty() {
+            return Ok(None);
+        }
         // Check for header line (contains ' CPU ' or ' NODE ')
         if line.contains(" CPU ") || line.contains(" NODE ") {
-            header_found = true;
+            self.header_found = true;
 
             if line.contains("%usr") {
-                stat_type = "cpu";
+                self.stat_type = "cpu";
             } else {
-                stat_type = "interrupts";
+                self.stat_type = "interrupts";
             }
 
             // Normalize header
@@ -110,7 +127,7 @@ pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
                 .to_lowercase();
 
             // Find the position of "cpu " or "node " in the original line
-            header_start = if let Some(pos) = line.find("CPU ") {
+            self.header_start = if let Some(pos) = line.find("CPU ") {
                 pos
             } else if let Some(pos) = line.find("NODE ") {
                 pos
@@ -118,30 +135,30 @@ pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
                 0
             };
 
-            header_text = normalized[header_start..].to_string();
-            continue;
+            self.header_text = normalized[self.header_start..].to_string();
+            return Ok(None);
         }
 
-        if !header_found {
-            continue;
+        if !self.header_found {
+            return Ok(None);
         }
 
         // Data line
-        if line.len() < header_start {
-            continue;
+        if line.len() < self.header_start {
+            return Ok(None);
         }
 
-        // Parse the data portion of the line (from header_start position)
-        let data_portion = if header_start <= line.len() {
-            &line[header_start..]
+        // Parse the data portion of the line (from self.header_start position)
+        let data_portion = if self.header_start <= line.len() {
+            &line[self.header_start..]
         } else {
-            continue;
+            return Ok(None);
         };
 
-        let table_str = format!("{}\n{}", header_text, data_portion);
+        let table_str = format!("{}\n{}", self.header_text, data_portion);
         let rows = simple_table_parse(&table_str);
         if rows.is_empty() {
-            continue;
+            return Ok(None);
         }
 
         let mut output_line: Map<String, Value> = Map::new();
@@ -150,7 +167,7 @@ pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
         for (key, val) in &rows[0] {
             let v = match val {
                 Value::String(s) => {
-                    let is_float_key = float_list.contains(&key.as_str())
+                    let is_float_key = FLOAT_LIST.contains(&key.as_str())
                         || (key.len() > 2
                             && key.ends_with("_s")
                             && key
@@ -172,11 +189,14 @@ pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
             output_line.insert(key.clone(), v);
         }
 
-        output_line.insert("type".to_string(), Value::String(stat_type.to_string()));
+        output_line.insert(
+            "type".to_string(),
+            Value::String(self.stat_type.to_string()),
+        );
 
-        // Extract time from beginning of the line (before header_start)
-        let item_time = if header_start > 0 && header_start <= line.len() {
-            line[..header_start].trim().to_string()
+        // Extract time from beginning of the line (before self.header_start)
+        let item_time = if self.header_start > 0 && self.header_start <= line.len() {
+            line[..self.header_start].trim().to_string()
         } else {
             String::new()
         };
@@ -187,10 +207,16 @@ pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
             output_line.insert("time".to_string(), Value::String(item_time));
         }
 
-        raw_output.push(output_line);
+        Ok(Some(output_line))
     }
+}
 
-    raw_output
+pub fn parse_mpstat(input: &str) -> Vec<Map<String, Value>> {
+    let mut session = MpstatSession::default();
+    input
+        .lines()
+        .filter_map(|line| session.parse_line(line, true).ok().flatten())
+        .collect()
 }
 
 #[cfg(test)]

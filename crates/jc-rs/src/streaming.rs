@@ -1,15 +1,21 @@
-//! Streaming parser support.
+//! Streaming parser runtime.
 //!
-//! Reads stdin line by line, calls `StreamingParser::parse_line()` on each,
-//! and prints each result immediately. Mirrors `JcCli::streaming_parse_and_print()`.
+//! Reads input a line at a time, feeds each line to the parser's session, and
+//! writes every record the moment it exists. This is the difference between
+//! `tail -f access.log | jc-rs --clf-s` printing as the log grows and printing
+//! nothing at all: the standard path cannot start until stdin closes, and for
+//! a live pipe it never does.
+//!
+//! Output is NDJSON -- one JSON value per line, as jc emits -- not a single
+//! array. Mirrors `JcCli::streaming_parse_and_print()`.
 
 use jc_rs_core::traits::{Parser, StreamingParser};
-use jc_rs_core::types::{ParseOutput, Tag};
+use jc_rs_core::types::Tag;
 use serde_json::{Map, Value};
-use std::io;
+use std::io::{self, BufWriter, StdoutLock, Write};
 
 use crate::meta::{MetaInfo, inject_meta};
-use crate::output::{ColorScheme, print_output};
+use crate::output::{ColorScheme, render_output};
 
 /// Streaming output options.
 pub struct StreamingOptions<'a> {
@@ -20,130 +26,161 @@ pub struct StreamingOptions<'a> {
     pub unbuffer: bool,
     pub meta_out: bool,
     pub meta_info: &'a MetaInfo,
+    /// jc's `-qq`: keep going after a line that will not parse, and label every
+    /// record with `_jc_meta.success`.
     pub ignore_exceptions: bool,
 }
 
-/// Run a streaming parser over stdin.
+/// Writes records as they arrive.
 ///
-/// Returns the number of lines successfully processed, or an error if the
-/// parser failed fatally (when `ignore_exceptions` is false).
-pub fn run_streaming<P: Parser + StreamingParser>(
-    parser: &P,
+/// The buffer is what keeps a 30,000-line input from costing 30,000 syscalls;
+/// `-u` (unbuffer) flushes after every record instead, which is what a live
+/// pipeline needs and what jc's own `flush=self.unbuffer` does.
+struct RecordWriter<'a> {
+    out: BufWriter<StdoutLock<'static>>,
+    opts: &'a StreamingOptions<'a>,
+}
+
+impl<'a> RecordWriter<'a> {
+    fn new(opts: &'a StreamingOptions<'a>) -> Self {
+        Self {
+            out: BufWriter::new(io::stdout().lock()),
+            opts,
+        }
+    }
+
+    /// Returns `false` once the reader downstream has gone away, so the caller
+    /// can stop rather than parse the rest of the input for nobody.
+    fn write(&mut self, value: &Value) -> bool {
+        let text = render_output(
+            value,
+            self.opts.pretty,
+            self.opts.yaml,
+            self.opts.use_color,
+            self.opts.scheme,
+        );
+
+        let mut result = writeln!(self.out, "{}", text);
+        if result.is_ok() && self.opts.unbuffer {
+            result = self.out.flush();
+        }
+
+        match result {
+            Ok(()) => true,
+            // `head -5` closing the pipe is a normal end, not an error.
+            Err(e) if e.kind() == io::ErrorKind::BrokenPipe => false,
+            Err(e) => {
+                eprintln!("jc-rs: error writing output: {}", e);
+                false
+            }
+        }
+    }
+
+    fn finish(mut self) {
+        if let Err(e) = self.out.flush()
+            && e.kind() != io::ErrorKind::BrokenPipe
+        {
+            eprintln!("jc-rs: error writing output: {}", e);
+        }
+    }
+}
+
+/// Run a streaming parser over an iterator of input lines.
+///
+/// Returns the number of records emitted, or an error when a line fails to
+/// parse and `ignore_exceptions` is off.
+pub fn run_streaming(
+    parser: &dyn StreamingParser,
     opts: &StreamingOptions,
-    lines_iter: impl Iterator<Item = Result<String, io::Error>>,
+    lines: impl Iterator<Item = Result<String, io::Error>>,
 ) -> Result<u64, String> {
+    let mut session = parser.session();
+    let mut writer = RecordWriter::new(opts);
     let mut count: u64 = 0;
 
-    for line_result in lines_iter {
-        let line = match line_result {
+    let mut emit = |writer: &mut RecordWriter, record: Map<String, Value>| -> bool {
+        let mut value = Value::Object(record);
+        if opts.meta_out {
+            inject_meta(&mut value, opts.meta_info);
+        }
+        if opts.ignore_exceptions {
+            mark_success(&mut value);
+        }
+        count += 1;
+        writer.write(&value)
+    };
+
+    for line in lines {
+        let line = match line {
             Ok(l) => l,
             Err(e) => {
-                eprintln!("jc-rs: io error reading stdin: {}", e);
+                eprintln!("jc-rs: io error reading input: {}", e);
                 break;
             }
         };
 
-        match parser.parse_line(&line, opts.ignore_exceptions) {
-            Ok(Some(output)) => {
-                let mut val = parse_output_to_value(output);
-                if opts.meta_out {
-                    inject_meta(&mut val, opts.meta_info);
+        match session.parse_line(&line, opts.ignore_exceptions) {
+            Ok(Some(record)) => {
+                if !emit(&mut writer, record) {
+                    writer.finish();
+                    return Ok(count);
                 }
-                // In streaming mode with ignore_exceptions, add success=true
-                if opts.ignore_exceptions {
-                    add_streaming_success(&mut val, true, None);
-                }
-                print_output(
-                    &val,
-                    opts.pretty,
-                    opts.yaml,
-                    opts.use_color,
-                    opts.scheme,
-                    opts.unbuffer,
-                );
-                count += 1;
             }
-            Ok(None) => {
-                // Skip (header line, blank, etc.)
-            }
+            Ok(None) => {}
             Err(e) => {
-                if opts.ignore_exceptions {
-                    // Emit error meta object and continue
-                    let err_val = make_error_object(&e.to_string(), &line);
-                    print_output(
-                        &err_val,
-                        opts.pretty,
-                        opts.yaml,
-                        opts.use_color,
-                        opts.scheme,
-                        opts.unbuffer,
-                    );
-                } else {
-                    return Err(format!("Streaming parse error: {}", e));
+                if !opts.ignore_exceptions {
+                    writer.finish();
+                    return Err(e.to_string());
+                }
+                if !writer.write(&error_object(&e.to_string(), &line)) {
+                    writer.finish();
+                    return Ok(count);
                 }
             }
         }
     }
 
-    // Finalize
-    match parser.finalize() {
-        Ok(Some(output)) => {
-            let mut val = parse_output_to_value(output);
-            if opts.meta_out {
-                inject_meta(&mut val, opts.meta_info);
-            }
-            print_output(
-                &val,
-                opts.pretty,
-                opts.yaml,
-                opts.use_color,
-                opts.scheme,
-                opts.unbuffer,
-            );
+    match session.finalize(opts.ignore_exceptions) {
+        Ok(Some(record)) => {
+            emit(&mut writer, record);
         }
         Ok(None) => {}
         Err(e) => {
             if !opts.ignore_exceptions {
-                return Err(format!("Streaming finalize error: {}", e));
+                writer.finish();
+                return Err(e.to_string());
             }
         }
     }
 
+    writer.finish();
     Ok(count)
 }
 
-/// Build a streaming error object (mirrors the API contract).
-fn make_error_object(error: &str, line: &str) -> Value {
-    let mut meta = Map::new();
+/// jc's `stream_error`: the failed line is reported as a record of its own so
+/// that a consumer reading NDJSON sees the gap instead of silently missing it.
+fn error_object(error: &str, line: &str) -> Value {
+    let mut meta = Map::with_capacity(3);
     meta.insert("success".to_string(), Value::Bool(false));
     meta.insert("error".to_string(), Value::String(error.to_string()));
-    meta.insert("line".to_string(), Value::String(line.to_string()));
+    meta.insert("line".to_string(), Value::String(line.trim().to_string()));
 
-    let mut obj = Map::new();
+    let mut obj = Map::with_capacity(1);
     obj.insert("_jc_meta".to_string(), Value::Object(meta));
     Value::Object(obj)
 }
 
-/// Add `_jc_meta.success` to a streaming output value.
-fn add_streaming_success(val: &mut Value, success: bool, error: Option<&str>) {
-    if let Value::Object(map) = val {
-        let entry = map
-            .entry("_jc_meta".to_string())
-            .or_insert_with(|| Value::Object(Map::new()));
-        if let Value::Object(meta_map) = entry {
-            meta_map.insert("success".to_string(), Value::Bool(success));
-            if let Some(e) = error {
-                meta_map.insert("error".to_string(), Value::String(e.to_string()));
-            }
-        }
-    }
-}
-
-/// Convert a `ParseOutput` to a `serde_json::Value`.
-pub fn parse_output_to_value(output: ParseOutput) -> Value {
-    match output {
-        ParseOutput::Object(obj) => Value::Object(obj),
-        ParseOutput::Array(arr) => Value::Array(arr.into_iter().map(Value::Object).collect()),
+/// jc's `stream_success`: only present under `-qq`, where the consumer needs to
+/// tell a parsed record from an error record.
+fn mark_success(value: &mut Value) {
+    let Value::Object(map) = value else {
+        return;
+    };
+    let entry = map
+        .entry("_jc_meta".to_string())
+        .or_insert_with(|| Value::Object(Map::new()));
+    if let Value::Object(meta) = entry {
+        meta.insert("success".to_string(), Value::Bool(true));
     }
 }
 

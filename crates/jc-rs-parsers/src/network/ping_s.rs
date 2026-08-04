@@ -2,7 +2,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
@@ -17,7 +17,7 @@ static INFO: ParserInfo = ParserInfo {
     author: "jc-rs contributors",
     author_email: "",
     compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
-    tags: &[Tag::Command],
+    tags: &[Tag::Command, Tag::Streaming],
     magic_commands: &[],
     streaming: true,
     hidden: false,
@@ -678,80 +678,88 @@ impl Parser for PingStreamParser {
         &INFO
     }
 
-    fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+    fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
         if input.trim().is_empty() {
             return Ok(ParseOutput::Array(vec![]));
         }
+        parse_via_session(self, input, quiet)
+    }
 
-        let mut state = PingState::default();
-        let mut results: Vec<Map<String, Value>> = Vec::new();
-        let mut summary: Option<Map<String, Value>> = None;
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
+    }
+}
 
-        for line in input.lines() {
-            let line = line.trim_end();
-            if line.is_empty() {
-                continue;
-            }
-            if line.starts_with("WARNING: ") {
-                continue;
-            }
+impl StreamingParser for PingStreamParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(PingSession::default())
+    }
+}
 
-            // Check for PATTERN
-            if line.starts_with("PATTERN: ") {
-                state.pattern = Some(line[9..].trim().to_string());
-                continue;
-            }
+/// A ping reply is one line and goes out immediately -- that is what makes
+/// `ping host | jc-rs -u --ping-s` usable live. The trailing statistics block
+/// is several lines that accumulate into one record, so it is held until the
+/// end, which is also where jc emits it.
+#[derive(Default)]
+struct PingSession {
+    state: PingState,
+    summary: Option<Map<String, Value>>,
+}
 
-            // Detect OS
-            if state.linux.is_none() {
-                if line.trim_end().ends_with("bytes of data.") {
-                    state.linux = Some(true);
-                } else if line.contains("-->") {
-                    state.linux = Some(false);
-                } else if contains_ipv6(line) && line.trim_end().ends_with("data bytes") {
-                    state.linux = Some(true);
-                } else if !contains_ipv6(line) && line.trim_end().ends_with("data bytes") {
-                    state.linux = Some(false);
-                }
-            }
+impl LineParser for PingSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        let line = line.trim_end();
+        if line.is_empty() || line.starts_with("WARNING: ") {
+            return Ok(None);
+        }
 
-            let output = if state.linux == Some(true) {
-                parse_linux_line(line, &mut state)
-            } else if state.linux == Some(false) {
-                parse_bsd_line(line, &mut state)
-            } else {
-                // Not detected yet, try to parse anyway
-                if line.starts_with("PING ") {
-                    // Try linux first
-                    state.linux = Some(true);
-                    parse_linux_line(line, &mut state)
-                } else {
-                    None
-                }
-            };
+        if let Some(pattern) = line.strip_prefix("PATTERN: ") {
+            self.state.pattern = Some(pattern.trim().to_string());
+            return Ok(None);
+        }
 
-            if let Some(obj) = output {
-                if obj.get("type").and_then(|v| v.as_str()) == Some("summary") {
-                    summary = Some(obj);
-                } else {
-                    results.push(obj);
-                }
+        // The banner tells us which ping we are reading; every later line is
+        // parsed against that choice.
+        if self.state.linux.is_none() {
+            if line.ends_with("bytes of data.") {
+                self.state.linux = Some(true);
+            } else if line.contains("-->") {
+                self.state.linux = Some(false);
+            } else if line.ends_with("data bytes") {
+                self.state.linux = Some(contains_ipv6(line));
             }
         }
 
-        // Append summary at the end
-        if let Some(s) = summary {
-            results.push(s);
-        }
+        let output = match self.state.linux {
+            Some(true) => parse_linux_line(line, &mut self.state),
+            Some(false) => parse_bsd_line(line, &mut self.state),
+            None if line.starts_with("PING ") => {
+                self.state.linux = Some(true);
+                parse_linux_line(line, &mut self.state)
+            }
+            None => None,
+        };
 
-        Ok(ParseOutput::Array(results))
+        let Some(obj) = output else {
+            return Ok(None);
+        };
+
+        if obj.get("type").and_then(Value::as_str) == Some("summary") {
+            self.summary = Some(obj);
+            return Ok(None);
+        }
+        Ok(Some(obj))
+    }
+
+    fn finalize(&mut self, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        Ok(self.summary.take())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jc_rs_core::traits::Parser;
+    use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 
     #[test]
     fn test_ping_s_centos_golden() {
