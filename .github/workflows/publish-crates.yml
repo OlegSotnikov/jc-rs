@@ -62,8 +62,12 @@ jobs:
         if: steps.creds.outputs.have != 'true' || github.event.inputs.dry_run == 'true'
         run: |
           set -euo pipefail
+          # Only the root crate can be packaged in full before the first
+          # release: `cargo package` resolves the registry even with
+          # --no-verify, and the other three depend on jc-rs-core by version.
           cargo package -p jc-rs-core
-          cargo package -p jc-rs-utils   --no-verify
-          cargo package -p jc-rs-parsers --no-verify
-          cargo package -p jc-rs         --no-verify
-          echo "packaged all four crates; nothing was uploaded"
+          for crate in jc-rs-utils jc-rs-parsers jc-rs; do
+            cargo package --list -p "$crate" > /dev/null
+            echo "$crate manifest ok"
+          done
+          echo "nothing was uploaded"
