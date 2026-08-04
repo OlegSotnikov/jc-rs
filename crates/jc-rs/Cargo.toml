@@ -1,0 +1,30 @@
+[package]
+name = "jc-rs"
+version.workspace = true
+edition.workspace = true
+description = "jc-rs — convert CLI output, file types, and strings to JSON/YAML (Rust rewrite of jc)"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["json", "cli", "parser", "jc", "yaml"]
+categories = ["command-line-utilities", "encoding"]
+
+[[bin]]
+name = "jc-rs"
+path = "src/main.rs"
+
+[dependencies]
+jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
+jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.1.0" }
+jc-rs-utils = { path = "../jc-rs-utils", version = "0.1.0" }
+serde_json = { workspace = true }
+serde_yaml = "0.9"
+colored = "2"
+dirs = "5"
+atty = "0.2"
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
