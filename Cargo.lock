@@ -610,7 +610,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jc-rs"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "atty",
  "colored",
@@ -624,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "jc-rs-bench"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "criterion",
  "jc-rs-core",
@@ -635,7 +635,7 @@ dependencies = [
 
 [[package]]
 name = "jc-rs-core"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "inventory",
  "serde",
@@ -645,7 +645,7 @@ dependencies = [
 
 [[package]]
 name = "jc-rs-parsers"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "base64",
  "chrono",
@@ -668,7 +668,7 @@ dependencies = [
 
 [[package]]
 name = "jc-rs-utils"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "chrono",
  "jc-rs-core",
@@ -680,7 +680,7 @@ dependencies = [
 
 [[package]]
 name = "jc-rs-wasm"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "jc-rs-core",
  "jc-rs-parsers",

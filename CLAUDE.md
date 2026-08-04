@@ -18,7 +18,7 @@ That premise decides most design arguments:
 - Publish the number even when it is bad.
 
 Current state: 934/934 = 100% (`tests/differential/REPORT.md`), workspace
-version `0.0.0` (the crates.io releases exist only to hold the names).
+version `0.1.0` — the first real release.
 
 ## Commands
 
