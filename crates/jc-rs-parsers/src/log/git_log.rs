@@ -1,11 +1,11 @@
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::parse_timestamp;
 use regex::Regex;
 use serde_json::{Map, Value};
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 
 pub struct GitLogParser;
 
@@ -35,288 +35,287 @@ inventory::submit! {
     ParserEntry::new(&GIT_LOG_PARSER)
 }
 
-static HASH_RE: OnceLock<Regex> = OnceLock::new();
-static CHANGES_RE: OnceLock<Regex> = OnceLock::new();
+/// jc's own patterns, compiled once. `hash_pattern` is anchored at the start
+/// only (as `re.match` is) and paired with a length check, which together mean
+/// "exactly 40 hex characters".
+static HASH_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^(?:[0-9]|[a-f]){40}").expect("valid hash pattern"));
 
-fn get_hash_re() -> &'static Regex {
-    HASH_RE.get_or_init(|| Regex::new(r"^(?:[0-9a-f]){40}$").unwrap())
-}
-
-fn get_changes_re() -> &'static Regex {
-    CHANGES_RE.get_or_init(|| {
-        Regex::new(
-            r"\s(?P<files>\d+)\s+files? changed(?:,\s+(?P<insertions>\d+)\s+insertions?\(\+\))?(?:,\s+(?P<deletions>\d+)\s+deletions?\(-\))?",
-        )
-        .unwrap()
-    })
-}
+static CHANGES_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"^\s(?P<files>\d+)\s+files? changed(?:,\s+(?P<insertions>\d+)\s+insertions?\(\+\))?(?:,\s+(?P<deletions>\d+)\s+deletions?\(-\))?",
+    )
+    .expect("valid changes pattern")
+});
 
 fn is_commit_hash(s: &str) -> bool {
-    s.len() == 40 && get_hash_re().is_match(s)
+    s.len() == 40 && HASH_RE.is_match(s)
 }
 
-fn parse_name_email(s: &str) -> (Option<String>, Option<String>) {
-    // "Name <email>" or "<email>" or "Name"
-    let s = s.trim();
-    if let Some(lt_pos) = s.rfind('<') {
-        if s.ends_with('>') {
-            let name = s[..lt_pos].trim();
-            let email = &s[lt_pos + 1..s.len() - 1];
-            let name_opt = if name.is_empty() {
-                None
-            } else {
-                Some(name.to_string())
-            };
-            let email_opt = if email.is_empty() {
-                None
-            } else {
-                Some(email.to_string())
-            };
-            return (name_opt, email_opt);
+/// Split `Name <email>` the way jc does: everything before the last whitespace
+/// is the name, and the final token is the email only when it is bracketed.
+/// A trailing word that is not bracketed is therefore dropped, and `<>` becomes
+/// null rather than an empty string -- both are jc's behaviour, and jc is the
+/// schema authority.
+fn parse_name_email(line: &str) -> (Option<String>, Option<String>) {
+    let mut name = None;
+    let mut email = None;
+
+    match line.trim_end().rsplit_once(char::is_whitespace) {
+        Some((first, last)) => {
+            name = Some(first.to_string());
+            if let Some(addr) = last.strip_prefix('<').and_then(|v| v.strip_suffix('>')) {
+                email = Some(addr.to_string());
+            }
+        }
+        None => {
+            let value = line.trim_start();
+            match value.strip_prefix('<').and_then(|v| v.strip_suffix('>')) {
+                Some(addr) => email = Some(addr.to_string()),
+                None => name = Some(value.to_string()),
+            }
         }
     }
-    // No email bracket found
-    if s.is_empty() {
-        (None, None)
-    } else {
-        (Some(s.to_string()), None)
-    }
+
+    (
+        name.filter(|v| !v.is_empty()),
+        email.filter(|v| !v.is_empty()),
+    )
 }
 
 fn add_timestamps(obj: &mut Map<String, Value>, date_str: &str) {
     let ts = parse_timestamp(date_str, Some("%a %b %d %H:%M:%S %Y %z"));
-    match ts.naive_epoch {
-        Some(n) => obj.insert("epoch".to_string(), Value::Number(n.into())),
-        None => obj.insert("epoch".to_string(), Value::Null),
-    };
-    match ts.utc_epoch {
-        Some(n) => obj.insert("epoch_utc".to_string(), Value::Number(n.into())),
-        None => obj.insert("epoch_utc".to_string(), Value::Null),
-    };
+    obj.insert(
+        "epoch".to_string(),
+        ts.naive_epoch
+            .map_or(Value::Null, |n| Value::Number(n.into())),
+    );
+    obj.insert(
+        "epoch_utc".to_string(),
+        ts.utc_epoch
+            .map_or(Value::Null, |n| Value::Number(n.into())),
+    );
 }
 
-pub fn parse_git_log(input: &str) -> Vec<Map<String, Value>> {
-    let mut raw_output: Vec<Map<String, Value>> = Vec::new();
-    let mut output_line: Map<String, Value> = Map::new();
-    let mut message_lines: Vec<String> = Vec::new();
-    let mut file_list: Vec<Value> = Vec::new();
-    let mut file_stats_list: Vec<Value> = Vec::new();
+fn int_or_null(s: &str) -> Value {
+    s.trim()
+        .parse::<i64>()
+        .map_or(Value::Null, |n| Value::Number(n.into()))
+}
 
-    fn finalize_entry(
-        output_line: &mut Map<String, Value>,
-        message_lines: &mut Vec<String>,
-        file_list: &mut Vec<Value>,
-        file_stats_list: &mut Vec<Value>,
-        raw_output: &mut Vec<Map<String, Value>>,
-    ) {
-        if !output_line.is_empty() {
-            if !message_lines.is_empty() {
-                output_line.insert(
-                    "message".to_string(),
-                    Value::String(message_lines.join("\n")),
-                );
-            }
-            if !file_list.is_empty() {
-                if let Some(stats) = output_line.get_mut("stats") {
-                    if let Some(stats_obj) = stats.as_object_mut() {
-                        stats_obj.insert("files".to_string(), Value::Array(file_list.clone()));
-                    }
-                }
-            }
-            if !file_stats_list.is_empty() {
-                if let Some(stats) = output_line.get_mut("stats") {
-                    if let Some(stats_obj) = stats.as_object_mut() {
-                        stats_obj.insert(
-                            "file_stats".to_string(),
-                            Value::Array(file_stats_list.clone()),
-                        );
-                    }
-                }
-            }
-            raw_output.push(output_line.clone());
-            *output_line = Map::new();
-            *message_lines = Vec::new();
-            *file_list = Vec::new();
-            *file_stats_list = Vec::new();
+/// One commit under construction.
+///
+/// `git log` is a stream of commits whose end is only known when the next one
+/// begins, so the session emits the *previous* commit when it sees a new
+/// `commit <hash>` line and the last one from `finalize()`.
+#[derive(Default)]
+pub(crate) struct GitLogSession {
+    entry: Map<String, Value>,
+    message_lines: Vec<String>,
+    file_list: Vec<Value>,
+    file_stats: Vec<Value>,
+    /// jc leaks this between iterations: a file line with no `|` reuses the
+    /// previous line's count. Replicated deliberately -- see `parse_name_email`.
+    last_lines_changed: Option<String>,
+}
+
+impl GitLogSession {
+    /// Close the commit under construction and hand it back, if there is one.
+    ///
+    /// `join_message` is false on the oneline path, where the message came from
+    /// the commit line itself and jc does not overwrite it.
+    fn flush(&mut self, join_message: bool) -> Option<Record> {
+        if self.entry.is_empty() {
+            return None;
         }
+
+        if join_message && !self.message_lines.is_empty() {
+            self.entry.insert(
+                "message".to_string(),
+                Value::String(self.message_lines.join("\n")),
+            );
+        }
+
+        if !self.file_list.is_empty()
+            && let Some(stats) = self.entry.get_mut("stats").and_then(Value::as_object_mut)
+        {
+            stats.insert(
+                "files".to_string(),
+                Value::Array(std::mem::take(&mut self.file_list)),
+            );
+        }
+
+        if !self.file_stats.is_empty()
+            && let Some(stats) = self.entry.get_mut("stats").and_then(Value::as_object_mut)
+        {
+            stats.insert(
+                "file_stats".to_string(),
+                Value::Array(std::mem::take(&mut self.file_stats)),
+            );
+        }
+
+        let entry = std::mem::take(&mut self.entry);
+        self.message_lines.clear();
+        self.file_list.clear();
+        self.file_stats.clear();
+        Some(entry)
     }
 
-    for line in input.lines() {
-        let line_parts: Vec<&str> = line.splitn(2, char::is_whitespace).collect();
-        let first_word = line_parts.first().copied().unwrap_or("");
+    fn push_file(&mut self, line: &str) {
+        let (name_part, stat_part) = match line.split_once('|') {
+            Some((name, stats)) => (name, Some(stats)),
+            None => (line, None),
+        };
+        let file_name = name_part.trim();
+        self.file_list.push(Value::String(file_name.to_string()));
 
-        // Oneline format: "HASH message"
-        if !line.starts_with(' ') && !line.starts_with('\t') && is_commit_hash(first_word) {
-            finalize_entry(
-                &mut output_line,
-                &mut message_lines,
-                &mut file_list,
-                &mut file_stats_list,
-                &mut raw_output,
-            );
-            output_line.insert("commit".to_string(), Value::String(first_word.to_string()));
-            if let Some(msg) = line_parts.get(1) {
-                output_line.insert("message".to_string(), Value::String(msg.to_string()));
-            }
-            continue;
+        if let Some(stats) = stat_part {
+            self.last_lines_changed = stats
+                .trim()
+                .split(' ')
+                .next()
+                .map(|count| count.trim().to_string());
         }
 
-        // commit HASH line (medium/full/fuller formats)
-        if line.starts_with("commit ") {
-            finalize_entry(
-                &mut output_line,
-                &mut message_lines,
-                &mut file_list,
-                &mut file_stats_list,
-                &mut raw_output,
-            );
-            if let Some(hash) = line_parts.get(1) {
-                let hash = hash.trim();
-                output_line.insert("commit".to_string(), Value::String(hash.to_string()));
-            }
-            continue;
+        let mut file_stat = Map::with_capacity(2);
+        file_stat.insert("name".to_string(), Value::String(file_name.to_string()));
+        file_stat.insert(
+            "lines_changed".to_string(),
+            self.last_lines_changed
+                .as_deref()
+                .map_or(Value::Null, int_or_null),
+        );
+        self.file_stats.push(Value::Object(file_stat));
+    }
+
+    fn push_stats(&mut self, line: &str) {
+        let Some(caps) = CHANGES_RE.captures(line) else {
+            return;
+        };
+        let field = |name: &str| -> Value {
+            caps.name(name)
+                .map_or(Value::Number(0.into()), |m| int_or_null(m.as_str()))
+        };
+        let mut stats = Map::with_capacity(3);
+        stats.insert("files_changed".to_string(), field("files"));
+        stats.insert("insertions".to_string(), field("insertions"));
+        stats.insert("deletions".to_string(), field("deletions"));
+        self.entry.insert("stats".to_string(), Value::Object(stats));
+    }
+}
+
+impl LineParser for GitLogSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        let rest = |prefix: &str| line[prefix.len()..].trim().to_string();
+        let first_word = line.split_whitespace().next().unwrap_or("");
+
+        // Oneline style: "<hash> <subject>".
+        if !line.starts_with(' ') && is_commit_hash(first_word) {
+            let previous = self.flush(false);
+            self.entry
+                .insert("commit".to_string(), Value::String(first_word.to_string()));
+            let message = line[first_word.len()..].trim_start();
+            self.entry
+                .insert("message".to_string(), Value::String(message.to_string()));
+            return Ok(previous);
+        }
+
+        // Every other format opens with "commit <hash>".
+        if let Some(hash) = line.strip_prefix("commit ") {
+            let previous = self.flush(true);
+            self.entry
+                .insert("commit".to_string(), Value::String(hash.trim().to_string()));
+            return Ok(previous);
         }
 
         if line.starts_with("Merge: ") {
-            if let Some(val) = line_parts.get(1) {
-                output_line.insert("merge".to_string(), Value::String(val.trim().to_string()));
-            }
-            continue;
+            self.entry
+                .insert("merge".to_string(), Value::String(rest("Merge: ")));
+            return Ok(None);
         }
 
         if line.starts_with("Author: ") {
-            if let Some(val) = line_parts.get(1) {
-                let (name, email) = parse_name_email(val);
-                output_line.insert(
-                    "author".to_string(),
-                    name.map(Value::String).unwrap_or(Value::Null),
-                );
-                output_line.insert(
-                    "author_email".to_string(),
-                    email.map(Value::String).unwrap_or(Value::Null),
-                );
-            }
-            continue;
+            let (name, email) = parse_name_email(&rest("Author: "));
+            self.entry.insert(
+                "author".to_string(),
+                name.map_or(Value::Null, Value::String),
+            );
+            self.entry.insert(
+                "author_email".to_string(),
+                email.map_or(Value::Null, Value::String),
+            );
+            return Ok(None);
         }
 
-        // "Date:   ..." (with possible extra spaces after colon)
-        if line.starts_with("Date:") && !line.starts_with("Date-") {
-            let date_val = line["Date:".len()..].trim();
-            output_line.insert("date".to_string(), Value::String(date_val.to_string()));
-            add_timestamps(&mut output_line, date_val);
-            continue;
-        }
-
-        if line.starts_with("AuthorDate: ") {
-            if let Some(val) = line_parts.get(1) {
-                let date_val = val.trim();
-                output_line.insert("date".to_string(), Value::String(date_val.to_string()));
-                add_timestamps(&mut output_line, date_val);
-            }
-            continue;
+        if line.starts_with("Date: ") || line.starts_with("AuthorDate: ") {
+            let date = if line.starts_with("Date: ") {
+                rest("Date: ")
+            } else {
+                rest("AuthorDate: ")
+            };
+            add_timestamps(&mut self.entry, &date);
+            self.entry.insert("date".to_string(), Value::String(date));
+            return Ok(None);
         }
 
         if line.starts_with("CommitDate: ") {
-            if let Some(val) = line_parts.get(1) {
-                output_line.insert(
-                    "commit_by_date".to_string(),
-                    Value::String(val.trim().to_string()),
-                );
-            }
-            continue;
+            self.entry.insert(
+                "commit_by_date".to_string(),
+                Value::String(rest("CommitDate: ")),
+            );
+            return Ok(None);
         }
 
         if line.starts_with("Commit: ") {
-            if let Some(val) = line_parts.get(1) {
-                let (name, email) = parse_name_email(val);
-                output_line.insert(
-                    "commit_by".to_string(),
-                    name.map(Value::String).unwrap_or(Value::Null),
-                );
-                output_line.insert(
-                    "commit_by_email".to_string(),
-                    email.map(Value::String).unwrap_or(Value::Null),
-                );
-            }
-            continue;
+            let (name, email) = parse_name_email(&rest("Commit: "));
+            self.entry.insert(
+                "commit_by".to_string(),
+                name.map_or(Value::Null, Value::String),
+            );
+            self.entry.insert(
+                "commit_by_email".to_string(),
+                email.map_or(Value::Null, Value::String),
+            );
+            return Ok(None);
         }
 
-        // Message lines start with 4 spaces
+        // Message body is indented four spaces; `--stat` output one.
         if line.starts_with("    ") {
-            message_lines.push(line.trim().to_string());
-            continue;
+            self.message_lines.push(line.trim().to_string());
+            return Ok(None);
         }
 
-        // File stat lines start with a space
-        if line.starts_with(' ') || line.starts_with('\t') {
-            let trimmed = line.trim();
-            if trimmed.is_empty() {
-                continue;
-            }
-
-            // Summary line: " N files changed, ..."
-            if trimmed.contains("changed,")
-                || trimmed.contains("changed") && trimmed.contains("file")
-            {
-                let re = get_changes_re();
-                if let Some(caps) = re.captures(line) {
-                    let files = caps.name("files").map_or("0", |m| m.as_str());
-                    let insertions = caps.name("insertions").map_or("0", |m| m.as_str());
-                    let deletions = caps.name("deletions").map_or("0", |m| m.as_str());
-
-                    let mut stats_obj = Map::new();
-                    stats_obj.insert(
-                        "files_changed".to_string(),
-                        Value::Number(files.parse::<i64>().unwrap_or(0).into()),
-                    );
-                    stats_obj.insert(
-                        "insertions".to_string(),
-                        Value::Number(insertions.parse::<i64>().unwrap_or(0).into()),
-                    );
-                    stats_obj.insert(
-                        "deletions".to_string(),
-                        Value::Number(deletions.parse::<i64>().unwrap_or(0).into()),
-                    );
-                    output_line.insert("stats".to_string(), Value::Object(stats_obj));
-                }
-                continue;
-            }
-
-            // File detail line: " filename | N ++++----"
-            let parts: Vec<&str> = trimmed.splitn(2, '|').collect();
-            let file_name = parts[0].trim();
-            if !file_name.is_empty() {
-                file_list.push(Value::String(file_name.to_string()));
-
-                let mut file_stat_obj = Map::new();
-                file_stat_obj.insert("name".to_string(), Value::String(file_name.to_string()));
-
-                let lines_changed_val = if parts.len() > 1 {
-                    let stat_part = parts[1].trim();
-                    let count_str = stat_part.split_whitespace().next().unwrap_or("");
-                    match count_str.parse::<i64>() {
-                        Ok(n) => Value::Number(n.into()),
-                        Err(_) => Value::Null,
-                    }
-                } else {
-                    Value::Null
-                };
-                file_stat_obj.insert("lines_changed".to_string(), lines_changed_val);
-                file_stats_list.push(Value::Object(file_stat_obj));
+        if line.starts_with(' ') {
+            if line.contains("changed, ") {
+                self.push_stats(line);
+            } else {
+                self.push_file(line);
             }
         }
+
+        Ok(None)
     }
 
-    // Flush last entry
-    finalize_entry(
-        &mut output_line,
-        &mut message_lines,
-        &mut file_list,
-        &mut file_stats_list,
-        &mut raw_output,
-    );
+    fn finalize(&mut self, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        Ok(self.flush(true))
+    }
+}
 
-    raw_output
+pub fn parse_git_log(input: &str) -> Vec<Map<String, Value>> {
+    let mut session = GitLogSession::default();
+    let mut entries = Vec::new();
+
+    for line in input.lines() {
+        // The session is infallible; `expect` here would be dead code.
+        if let Ok(Some(entry)) = session.parse_line(line, true) {
+            entries.push(entry);
+        }
+    }
+    if let Ok(Some(entry)) = session.finalize(true) {
+        entries.push(entry);
+    }
+
+    entries
 }
 
 impl Parser for GitLogParser {

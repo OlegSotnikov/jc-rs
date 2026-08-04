@@ -2,10 +2,10 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
-use super::pidstat::parse_pidstat;
+use super::pidstat::PidstatSession;
 
 pub struct PidstatSParser;
 
@@ -35,9 +35,18 @@ impl Parser for PidstatSParser {
         &INFO
     }
 
-    fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
-        let rows = parse_pidstat(input);
-        Ok(ParseOutput::Array(rows))
+    fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
+        parse_via_session(self, input, quiet)
+    }
+
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
+    }
+}
+
+impl StreamingParser for PidstatSParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(PidstatSession::default())
     }
 }
 

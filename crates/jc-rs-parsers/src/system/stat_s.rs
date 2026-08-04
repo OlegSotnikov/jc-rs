@@ -2,7 +2,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::{convert_to_int, parse_timestamp};
 use serde_json::{Map, Value};
@@ -82,216 +82,239 @@ impl Parser for StatSParser {
         &INFO
     }
 
-    fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+    fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
         if input.trim().is_empty() {
             return Ok(ParseOutput::Array(vec![]));
         }
+        parse_via_session(self, input, quiet)
+    }
 
-        let cleandata: Vec<&str> = input.lines().filter(|l| !l.trim().is_empty()).collect();
-        if cleandata.is_empty() {
-            return Ok(ParseOutput::Array(vec![]));
-        }
-
-        let result = if cleandata[0].find("File:") == Some(2) {
-            parse_linux_streaming(&cleandata)
-        } else {
-            parse_bsd_streaming(&cleandata)
-        };
-
-        Ok(ParseOutput::Array(result))
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
     }
 }
 
-fn parse_linux_streaming(cleandata: &[&str]) -> Vec<Map<String, Value>> {
-    let mut result = Vec::new();
-    let mut obj: Map<String, Value> = Map::new();
+impl StreamingParser for StatSParser {
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(StatSession::default())
+    }
+}
 
-    for line in cleandata {
+fn apply_linux_field(line: &str, obj: &mut Map<String, Value>) {
+    if line.starts_with("  Size:") {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 8 {
+            obj.insert(
+                "size".to_string(),
+                convert_to_int(parts[1])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "blocks".to_string(),
+                convert_to_int(parts[3])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "io_blocks".to_string(),
+                convert_to_int(parts[6])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert("type".to_string(), Value::String(parts[7..].join(" ")));
+        }
+        return;
+    }
+    if line.starts_with("Device:") {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 6 {
+            obj.insert("device".to_string(), Value::String(parts[1].to_string()));
+            obj.insert(
+                "inode".to_string(),
+                convert_to_int(parts[3])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "links".to_string(),
+                convert_to_int(parts[5])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+        }
+        return;
+    }
+    if line.starts_with("Access: (") {
+        let cleaned = line.replace('(', " ").replace(')', " ").replace('/', " ");
+        let parts: Vec<&str> = cleaned.split_whitespace().collect();
+        if parts.len() >= 9 {
+            obj.insert("access".to_string(), Value::String(parts[1].to_string()));
+            obj.insert("flags".to_string(), Value::String(parts[2].to_string()));
+            obj.insert(
+                "uid".to_string(),
+                convert_to_int(parts[4])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert("user".to_string(), Value::String(parts[5].to_string()));
+            obj.insert(
+                "gid".to_string(),
+                convert_to_int(parts[7])
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert("group".to_string(), Value::String(parts[8].to_string()));
+        }
+        return;
+    }
+    if line.starts_with("Access: 2")
+        || line.starts_with("Access: 1")
+        || line.starts_with("Access: -")
+    {
+        let after = line.splitn(2, "Access: ").nth(1).unwrap_or("").trim();
+        parse_time_field(after, obj, "access_time");
+        return;
+    }
+    if line.starts_with("Modify:") {
+        let after = line.splitn(2, "Modify: ").nth(1).unwrap_or("").trim();
+        parse_time_field(after, obj, "modify_time");
+        return;
+    }
+    if line.starts_with("Change:") {
+        let after = line.splitn(2, "Change: ").nth(1).unwrap_or("").trim();
+        parse_time_field(after, obj, "change_time");
+        return;
+    }
+    if line.starts_with(" Birth:") {
+        let after = line.splitn(2, "Birth: ").nth(1).unwrap_or("").trim();
+        parse_time_field(after, obj, "birth_time");
+        return;
+    }
+}
+
+/// BSD `stat -t` prints a whole file per line, so a record needs no state.
+fn parse_bsd_line(line: &str) -> Option<Map<String, Value>> {
+    let parts = shell_split(line);
+    if parts.len() < 16 {
+        return None;
+    }
+    let mut obj = Map::new();
+    let filename = parts[15..].join(" ");
+    obj.insert("file".to_string(), Value::String(filename));
+    obj.insert(
+        "unix_device".to_string(),
+        convert_to_int(&parts[0])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert(
+        "inode".to_string(),
+        convert_to_int(&parts[1])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert("flags".to_string(), Value::String(parts[2].clone()));
+    obj.insert(
+        "links".to_string(),
+        convert_to_int(&parts[3])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert("user".to_string(), Value::String(parts[4].clone()));
+    obj.insert("group".to_string(), Value::String(parts[5].clone()));
+    obj.insert(
+        "rdev".to_string(),
+        convert_to_int(&parts[6])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert(
+        "size".to_string(),
+        convert_to_int(&parts[7])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    parse_time_field(&parts[8], &mut obj, "access_time");
+    parse_time_field(&parts[9], &mut obj, "modify_time");
+    parse_time_field(&parts[10], &mut obj, "change_time");
+    parse_time_field(&parts[11], &mut obj, "birth_time");
+    obj.insert(
+        "block_size".to_string(),
+        convert_to_int(&parts[12])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert(
+        "blocks".to_string(),
+        convert_to_int(&parts[13])
+            .map(Value::from)
+            .unwrap_or(Value::Null),
+    );
+    obj.insert("unix_flags".to_string(), Value::String(parts[14].clone()));
+    Some(obj)
+}
+
+/// Linux `stat` describes one file across several lines and starts the next
+/// with `File:`, so a record is complete only when the next one opens.
+#[derive(Default)]
+struct StatSession {
+    linux: Option<bool>,
+    obj: Map<String, Value>,
+}
+
+impl LineParser for StatSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        if line.trim().is_empty() {
+            return Ok(None);
+        }
+
+        // The first line decides the dialect: GNU indents `File:` by two.
+        let linux = *self
+            .linux
+            .get_or_insert_with(|| line.find("File:") == Some(2));
+
+        if !linux {
+            return Ok(parse_bsd_line(line));
+        }
+
         if line.find("File:") == Some(2) {
-            if !obj.is_empty() {
-                result.push(obj.clone());
-                obj = Map::new();
-            }
+            let previous = (!self.obj.is_empty()).then(|| std::mem::take(&mut self.obj));
+
             let after = line.splitn(2, "File:").nth(1).unwrap_or("").trim();
             let after = after
                 .trim_matches('\'')
                 .trim_matches('\u{2018}')
                 .trim_matches('\u{2019}');
-            if let Some(arrow_pos) = after.find(" -> ") {
-                let filename = after[..arrow_pos].trim_matches('\'');
-                let link_to = after[arrow_pos + 4..].trim_matches('\'');
-                obj.insert("file".to_string(), Value::String(filename.to_string()));
-                obj.insert("link_to".to_string(), Value::String(link_to.to_string()));
-            } else {
-                obj.insert("file".to_string(), Value::String(after.to_string()));
+            match after.split_once(" -> ") {
+                Some((filename, link_to)) => {
+                    self.obj.insert(
+                        "file".to_string(),
+                        Value::String(filename.trim_matches('\'').to_string()),
+                    );
+                    self.obj.insert(
+                        "link_to".to_string(),
+                        Value::String(link_to.trim_matches('\'').to_string()),
+                    );
+                }
+                None => {
+                    self.obj
+                        .insert("file".to_string(), Value::String(after.to_string()));
+                }
             }
-            continue;
+            return Ok(previous);
         }
-        if line.starts_with("  Size:") {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() >= 8 {
-                obj.insert(
-                    "size".to_string(),
-                    convert_to_int(parts[1])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "blocks".to_string(),
-                    convert_to_int(parts[3])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "io_blocks".to_string(),
-                    convert_to_int(parts[6])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert("type".to_string(), Value::String(parts[7..].join(" ")));
-            }
-            continue;
-        }
-        if line.starts_with("Device:") {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() >= 6 {
-                obj.insert("device".to_string(), Value::String(parts[1].to_string()));
-                obj.insert(
-                    "inode".to_string(),
-                    convert_to_int(parts[3])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "links".to_string(),
-                    convert_to_int(parts[5])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-            }
-            continue;
-        }
-        if line.starts_with("Access: (") {
-            let cleaned = line.replace('(', " ").replace(')', " ").replace('/', " ");
-            let parts: Vec<&str> = cleaned.split_whitespace().collect();
-            if parts.len() >= 9 {
-                obj.insert("access".to_string(), Value::String(parts[1].to_string()));
-                obj.insert("flags".to_string(), Value::String(parts[2].to_string()));
-                obj.insert(
-                    "uid".to_string(),
-                    convert_to_int(parts[4])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert("user".to_string(), Value::String(parts[5].to_string()));
-                obj.insert(
-                    "gid".to_string(),
-                    convert_to_int(parts[7])
-                        .map(Value::from)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert("group".to_string(), Value::String(parts[8].to_string()));
-            }
-            continue;
-        }
-        if line.starts_with("Access: 2")
-            || line.starts_with("Access: 1")
-            || line.starts_with("Access: -")
-        {
-            let after = line.splitn(2, "Access: ").nth(1).unwrap_or("").trim();
-            parse_time_field(after, &mut obj, "access_time");
-            continue;
-        }
-        if line.starts_with("Modify:") {
-            let after = line.splitn(2, "Modify: ").nth(1).unwrap_or("").trim();
-            parse_time_field(after, &mut obj, "modify_time");
-            continue;
-        }
-        if line.starts_with("Change:") {
-            let after = line.splitn(2, "Change: ").nth(1).unwrap_or("").trim();
-            parse_time_field(after, &mut obj, "change_time");
-            continue;
-        }
-        if line.starts_with(" Birth:") {
-            let after = line.splitn(2, "Birth: ").nth(1).unwrap_or("").trim();
-            parse_time_field(after, &mut obj, "birth_time");
-            continue;
-        }
+
+        apply_linux_field(line, &mut self.obj);
+        Ok(None)
     }
 
-    if !obj.is_empty() {
-        result.push(obj);
-    }
-
-    result
-}
-
-fn parse_bsd_streaming(cleandata: &[&str]) -> Vec<Map<String, Value>> {
-    let mut result = Vec::new();
-    for line in cleandata {
-        if line.trim().is_empty() {
-            continue;
+    fn finalize(&mut self, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        if self.obj.is_empty() {
+            return Ok(None);
         }
-        let parts = shell_split(line);
-        if parts.len() < 16 {
-            continue;
-        }
-        let mut obj = Map::new();
-        let filename = parts[15..].join(" ");
-        obj.insert("file".to_string(), Value::String(filename));
-        obj.insert(
-            "unix_device".to_string(),
-            convert_to_int(&parts[0])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert(
-            "inode".to_string(),
-            convert_to_int(&parts[1])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert("flags".to_string(), Value::String(parts[2].clone()));
-        obj.insert(
-            "links".to_string(),
-            convert_to_int(&parts[3])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert("user".to_string(), Value::String(parts[4].clone()));
-        obj.insert("group".to_string(), Value::String(parts[5].clone()));
-        obj.insert(
-            "rdev".to_string(),
-            convert_to_int(&parts[6])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert(
-            "size".to_string(),
-            convert_to_int(&parts[7])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        parse_time_field(&parts[8], &mut obj, "access_time");
-        parse_time_field(&parts[9], &mut obj, "modify_time");
-        parse_time_field(&parts[10], &mut obj, "change_time");
-        parse_time_field(&parts[11], &mut obj, "birth_time");
-        obj.insert(
-            "block_size".to_string(),
-            convert_to_int(&parts[12])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert(
-            "blocks".to_string(),
-            convert_to_int(&parts[13])
-                .map(Value::from)
-                .unwrap_or(Value::Null),
-        );
-        obj.insert("unix_flags".to_string(), Value::String(parts[14].clone()));
-        result.push(obj);
+        Ok(Some(std::mem::take(&mut self.obj)))
     }
-    result
 }
 
 #[cfg(test)]

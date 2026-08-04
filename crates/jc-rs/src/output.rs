@@ -272,7 +272,37 @@ pub fn print_output(
     scheme: &ColorScheme,
     unbuffer: bool,
 ) {
-    let text = if yaml {
+    let text = render_output(value, pretty, yaml, use_color, scheme);
+
+    let stdout = io::stdout();
+    let mut handle = stdout.lock();
+    let write_result = if unbuffer {
+        writeln!(handle, "{}", text).and_then(|_| handle.flush())
+    } else {
+        writeln!(handle, "{}", text)
+    };
+
+    if let Err(e) = write_result {
+        if e.kind() == io::ErrorKind::BrokenPipe {
+            // Ignore broken pipe — this is normal when piping to head/less
+        } else {
+            eprintln!("jc-rs: error writing output: {}", e);
+        }
+    }
+}
+
+/// Serialize one value exactly as `print_output` would, without writing it.
+///
+/// The streaming path needs the text rather than the side effect: it owns a
+/// buffered writer so that a long run does not pay a syscall per record.
+pub fn render_output(
+    value: &Value,
+    pretty: bool,
+    yaml: bool,
+    use_color: bool,
+    scheme: &ColorScheme,
+) -> String {
+    if yaml {
         match serde_yaml::to_string(value) {
             Ok(s) => {
                 // serde_yaml adds a leading "---\n" — strip it to match jc behavior
@@ -293,22 +323,6 @@ pub fn print_output(
             colorize_json(&json_str, scheme)
         } else {
             json_str
-        }
-    };
-
-    let stdout = io::stdout();
-    let mut handle = stdout.lock();
-    let write_result = if unbuffer {
-        writeln!(handle, "{}", text).and_then(|_| handle.flush())
-    } else {
-        writeln!(handle, "{}", text)
-    };
-
-    if let Err(e) = write_result {
-        if e.kind() == io::ErrorKind::BrokenPipe {
-            // Ignore broken pipe — this is normal when piping to head/less
-        } else {
-            eprintln!("jc-rs: error writing output: {}", e);
         }
     }
 }

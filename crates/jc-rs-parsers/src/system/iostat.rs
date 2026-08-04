@@ -41,14 +41,14 @@ impl Parser for IostatParser {
     }
 }
 
-fn normalize_iostat_header(line: &str) -> String {
+pub(crate) fn normalize_iostat_header(line: &str) -> String {
     line.replace('%', "percent_")
         .replace('/', "_")
         .replace('-', "_")
         .to_lowercase()
 }
 
-fn create_obj_list(section_lines: &str, section_name: &str) -> Vec<Map<String, Value>> {
+pub(crate) fn create_obj_list(section_lines: &str, section_name: &str) -> Vec<Map<String, Value>> {
     let raw = simple_table_parse(section_lines);
     let float_list = &[
         "percent_user",

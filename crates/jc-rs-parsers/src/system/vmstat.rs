@@ -2,7 +2,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::{convert_to_int, parse_timestamp};
 use regex::Regex;
@@ -69,37 +69,41 @@ fn opt_str(s: Option<&&str>) -> Value {
     }
 }
 
-pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
-    let mut raw_output: Vec<Map<String, Value>> = Vec::new();
-    let mut procs: Option<bool> = None; // Some(true) = procs mode detected
-    let mut disk: Option<bool> = None; // Some(true) = disk mode detected
-    let mut buff_cache: Option<bool> = None; // true = buff/cache mode, false = inact/active mode
-    let mut tstamp = false;
-    let mut tz: Option<String> = None;
+/// `vmstat` announces its layout in a header and then streams rows under it, so
+/// the session only has to remember which layout it saw.
+#[derive(Default)]
+pub(crate) struct VmstatSession {
+    procs: Option<bool>,
+    disk: Option<bool>,
+    buff_cache: Option<bool>,
+    tstamp: bool,
+    tz: Option<String>,
+}
 
-    for line in input.lines() {
+impl LineParser for VmstatSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
         if line.trim().is_empty() {
-            continue;
+            return Ok(None);
         }
 
         // Detect output type
-        if procs.is_none() && disk.is_none() && procs_header_re().is_match(line) {
-            procs = Some(true);
-            tstamp = line.contains("-timestamp-");
-            continue;
+        if self.procs.is_none() && self.disk.is_none() && procs_header_re().is_match(line) {
+            self.procs = Some(true);
+            self.tstamp = line.contains("-timestamp-");
+            return Ok(None);
         }
 
-        if procs.is_none() && disk.is_none() && disk_header_re().is_match(line) {
-            disk = Some(true);
-            tstamp = line.contains("-timestamp-");
-            continue;
+        if self.procs.is_none() && self.disk.is_none() && disk_header_re().is_match(line) {
+            self.disk = Some(true);
+            self.tstamp = line.contains("-timestamp-");
+            return Ok(None);
         }
 
         // Skip header rows
-        if (procs.is_some() || disk.is_some())
+        if (self.procs.is_some() || self.disk.is_some())
             && (procs_header_re().is_match(line) || disk_header_re().is_match(line))
         {
-            continue;
+            return Ok(None);
         }
 
         // Detect buff/cache vs inact/active column header
@@ -108,11 +112,11 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
             && line.contains("buff")
             && line.contains("cache")
         {
-            buff_cache = Some(true);
-            if tstamp {
-                tz = line.split_whitespace().last().map(|s| s.to_string());
+            self.buff_cache = Some(true);
+            if self.tstamp {
+                self.tz = line.split_whitespace().last().map(|s| s.to_string());
             }
-            continue;
+            return Ok(None);
         }
 
         if line.contains("swpd")
@@ -120,34 +124,34 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
             && line.contains("inact")
             && line.contains("active")
         {
-            buff_cache = Some(false);
-            if tstamp {
-                tz = line.split_whitespace().last().map(|s| s.to_string());
+            self.buff_cache = Some(false);
+            if self.tstamp {
+                self.tz = line.split_whitespace().last().map(|s| s.to_string());
             }
-            continue;
+            return Ok(None);
         }
 
         // Disk header row
         if line.contains("total") && line.contains("merged") && line.contains("sectors") {
-            if tstamp {
-                tz = line.split_whitespace().last().map(|s| s.to_string());
+            if self.tstamp {
+                self.tz = line.split_whitespace().last().map(|s| s.to_string());
             }
-            continue;
+            return Ok(None);
         }
 
         // Data line parsing
-        if procs.is_some() {
+        if self.procs.is_some() {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() < 17 {
-                continue;
+                return Ok(None);
             }
-            let ts_val = if tstamp && parts.len() > 17 {
+            let ts_val = if self.tstamp && parts.len() > 17 {
                 // timestamp may have a space (e.g., "2021-09-16 20:33:13")
                 Some(parts[17..].join(" "))
             } else {
                 None
             };
-            let bc = buff_cache.unwrap_or(true);
+            let bc = self.buff_cache.unwrap_or(true);
             let p = &parts;
 
             let mut record = Map::new();
@@ -194,12 +198,13 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
             );
             record.insert(
                 "timezone".to_string(),
-                tz.as_deref()
+                self.tz
+                    .as_deref()
                     .map(|s| Value::String(s.to_string()))
                     .unwrap_or(Value::Null),
             );
             if let Some(ref ts) = ts_val {
-                let ts_with_tz = match &tz {
+                let ts_with_tz = match &self.tz {
                     Some(t) => format!("{} {}", ts, t),
                     None => ts.clone(),
                 };
@@ -219,15 +224,15 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
                         .unwrap_or(Value::Null),
                 );
             }
-            raw_output.push(record);
+            return Ok(Some(record));
         }
 
-        if disk.is_some() {
+        if self.disk.is_some() {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if parts.len() < 11 {
-                continue;
+                return Ok(None);
             }
-            let ts_val: Option<String> = if tstamp && parts.len() > 11 {
+            let ts_val: Option<String> = if self.tstamp && parts.len() > 11 {
                 Some(parts[11..].join(" "))
             } else {
                 None
@@ -255,12 +260,13 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
             );
             record.insert(
                 "timezone".to_string(),
-                tz.as_deref()
+                self.tz
+                    .as_deref()
                     .map(|s| Value::String(s.to_string()))
                     .unwrap_or(Value::Null),
             );
             if let Some(ref ts) = ts_val {
-                let ts_with_tz = match &tz {
+                let ts_with_tz = match &self.tz {
                     Some(t) => format!("{} {}", ts, t),
                     None => ts.clone(),
                 };
@@ -280,11 +286,18 @@ pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
                         .unwrap_or(Value::Null),
                 );
             }
-            raw_output.push(record);
+            return Ok(Some(record));
         }
+        Ok(None)
     }
+}
 
-    raw_output
+pub fn parse_vmstat(input: &str) -> Vec<Map<String, Value>> {
+    let mut session = VmstatSession::default();
+    input
+        .lines()
+        .filter_map(|line| session.parse_line(line, true).ok().flatten())
+        .collect()
 }
 
 #[cfg(test)]

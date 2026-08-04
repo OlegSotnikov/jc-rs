@@ -3,7 +3,9 @@
 use super::cef::parse_cef_line;
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::{Parser, StreamingParser};
+use jc_rs_core::traits::{
+    FnSession, LineParser, Parser, Record, StreamingParser, parse_via_session,
+};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
 struct CefSParser;
@@ -29,27 +31,26 @@ impl Parser for CefSParser {
     }
 
     fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
-        let mut records = Vec::new();
-        for line in input.lines() {
-            if line.trim().is_empty() {
-                continue;
-            }
-            match self.parse_line(line, quiet)? {
-                Some(ParseOutput::Object(map)) => records.push(map),
-                _ => {}
-            }
-        }
-        Ok(ParseOutput::Array(records))
+        parse_via_session(self, input, quiet)
+    }
+
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
     }
 }
 
 impl StreamingParser for CefSParser {
-    fn parse_line(&self, line: &str, _quiet: bool) -> Result<Option<ParseOutput>, ParseError> {
-        if line.trim().is_empty() {
-            return Ok(None);
-        }
-        Ok(Some(ParseOutput::Object(parse_cef_line(line))))
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(FnSession::new(cef_line))
     }
+}
+
+/// Every CEF line stands alone, so the session carries no state.
+fn cef_line(line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+    if line.trim().is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(parse_cef_line(line)))
 }
 
 static INSTANCE: CefSParser = CefSParser;

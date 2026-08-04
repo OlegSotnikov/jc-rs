@@ -2,7 +2,7 @@
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::Parser;
+use jc_rs_core::traits::{LineParser, Parser, Record};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::{convert_to_float, convert_to_int, simple_table_parse};
 use serde_json::{Map, Value};
@@ -53,69 +53,71 @@ fn normalize_pidstat_header(header: &str) -> String {
         .to_lowercase()
 }
 
-pub fn parse_pidstat(input: &str) -> Vec<Map<String, Value>> {
-    let int_list = &[
-        "time",
-        "uid",
-        "pid",
-        "cpu",
-        "vsz",
-        "rss",
-        "stksize",
-        "stkref",
-        "usr_ms",
-        "system_ms",
-        "guest_ms",
-    ];
+const INT_LIST: &[&str] = &[
+    "time",
+    "uid",
+    "pid",
+    "cpu",
+    "vsz",
+    "rss",
+    "stksize",
+    "stkref",
+    "usr_ms",
+    "system_ms",
+    "guest_ms",
+];
 
-    let float_list = &[
-        "percent_usr",
-        "percent_system",
-        "percent_guest",
-        "percent_cpu",
-        "minflt_s",
-        "majflt_s",
-        "percent_mem",
-        "kb_rd_s",
-        "kb_wr_s",
-        "kb_ccwr_s",
-        "cswch_s",
-        "nvcswch_s",
-        "percent_wait",
-    ];
+const FLOAT_LIST: &[&str] = &[
+    "percent_usr",
+    "percent_system",
+    "percent_guest",
+    "percent_cpu",
+    "minflt_s",
+    "majflt_s",
+    "percent_mem",
+    "kb_rd_s",
+    "kb_wr_s",
+    "kb_ccwr_s",
+    "cswch_s",
+    "nvcswch_s",
+    "percent_wait",
+];
 
-    let mut raw_output: Vec<Map<String, Value>> = Vec::new();
-    let mut table_lines: Vec<String> = Vec::new();
-    let mut header_found = false;
+/// `pidstat -h` restates its `#` header before each sample. The session keeps
+/// the current header so a row can be converted the moment it lands, instead of
+/// buffering a whole sample the way the batch parser used to.
+#[derive(Default)]
+pub(crate) struct PidstatSession {
+    header: Option<String>,
+}
 
-    let data_lines: Vec<&str> = input.lines().filter(|l| !l.trim().is_empty()).collect();
+impl LineParser for PidstatSession {
+    fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+        if line.trim().is_empty() {
+            return Ok(None);
+        }
 
-    for line in &data_lines {
         if line.starts_with('#') {
-            header_found = true;
-            // Flush pending table
-            if table_lines.len() > 1 {
-                let table_str = table_lines.join("\n");
-                let rows = simple_table_parse(&table_str);
-                raw_output.extend(process_pidstat_rows(rows, int_list, float_list));
-            }
-            table_lines = vec![normalize_pidstat_header(line)];
-            continue;
+            self.header = Some(normalize_pidstat_header(line));
+            return Ok(None);
         }
 
-        if header_found {
-            table_lines.push(line.to_string());
-        }
-    }
+        let Some(header) = self.header.as_deref() else {
+            return Ok(None);
+        };
 
-    // Flush remaining
-    if table_lines.len() > 1 {
-        let table_str = table_lines.join("\n");
-        let rows = simple_table_parse(&table_str);
-        raw_output.extend(process_pidstat_rows(rows, int_list, float_list));
+        let table = format!("{}\n{}", header, line);
+        let rows = process_pidstat_rows(simple_table_parse(&table), INT_LIST, FLOAT_LIST);
+        Ok(rows.into_iter().next())
     }
+}
 
-    raw_output
+pub fn parse_pidstat(input: &str) -> Vec<Map<String, Value>> {
+    let mut session = PidstatSession::default();
+    input
+        .lines()
+        .filter_map(|line| session.parse_line(line, true).ok().flatten())
+        .collect()
 }
 
 fn process_pidstat_rows(

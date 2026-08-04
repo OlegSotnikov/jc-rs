@@ -2,13 +2,13 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 804,
-  "mismatch": 106,
+  "match": 808,
+  "mismatch": 102,
   "error": 24,
   "oracle_reject": 9
  },
  "tested": 934,
- "match_rate": 86.08,
+ "match_rate": 86.51,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -264,8 +264,7 @@
   },
   "ls_s": {
    "total": 11,
-   "match": 7,
-   "mismatch": 4
+   "match": 11
   },
   "lsattr": {
    "total": 4,
@@ -840,34 +839,6 @@
   }
  },
  "failures": [
-  {
-   "platform": "centos-7.7",
-   "base": "ls-alh-streaming",
-   "parser": "ls_s",
-   "status": "mismatch",
-   "diff_count": 4,
-   "kinds": {
-    "missing_key": 4
-   },
-   "sample": [
-    {
-     "path": "$[3].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[4].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[5].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[18].size",
-     "kind": "missing_key"
-    }
-   ]
-  },
   {
    "platform": "centos-7.7",
    "base": "route-6-n",
@@ -3699,38 +3670,6 @@
   },
   {
    "platform": "osx-10.14.6",
-   "base": "ls-alh-streaming",
-   "parser": "ls_s",
-   "status": "mismatch",
-   "diff_count": 34,
-   "kinds": {
-    "missing_key": 34
-   },
-   "sample": [
-    {
-     "path": "$[0].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[4].size",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "osx-10.14.6",
    "base": "ping-ip-unreachable-streaming",
    "parser": "ping_s",
    "status": "mismatch",
@@ -3841,70 +3780,6 @@
      "kind": "type_mismatch",
      "expected": "7018",
      "actual": "None"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-18.04",
-   "base": "ls-alh-streaming",
-   "parser": "ls_s",
-   "status": "mismatch",
-   "diff_count": 23,
-   "kinds": {
-    "missing_key": 23
-   },
-   "sample": [
-    {
-     "path": "$[0].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].size",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[4].size",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-18.04",
-   "base": "ls-l-iso-streaming",
-   "parser": "ls_s",
-   "status": "mismatch",
-   "diff_count": 1762,
-   "kinds": {
-    "missing_key": 1762
-   },
-   "sample": [
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].epoch_utc",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch_utc",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
     }
    ]
   },

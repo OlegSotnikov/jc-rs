@@ -26,12 +26,12 @@ static CSV_INFO: ParserInfo = ParserInfo {
 };
 
 /// Strip UTF-8 BOM from input if present.
-fn strip_bom(input: &str) -> &str {
+pub(crate) fn strip_bom(input: &str) -> &str {
     input.strip_prefix('\u{FEFF}').unwrap_or(input)
 }
 
 /// Detect the delimiter by checking the first line for common delimiters.
-fn detect_delimiter(input: &str) -> u8 {
+pub(crate) fn detect_delimiter(input: &str) -> u8 {
     let first_line = input.lines().next().unwrap_or("");
     // Count candidates; prefer pipe if found (since pipe files always have it),
     // then tab, then comma.
@@ -52,7 +52,7 @@ fn detect_delimiter(input: &str) -> u8 {
 /// The csv spec requires quotes to start immediately after the delimiter.
 /// Some CSV files have spaces between the delimiter and the quote — we normalize
 /// those by stripping leading whitespace from unquoted fields only.
-fn normalize_csv_line(line: &str, delimiter: u8) -> String {
+pub(crate) fn normalize_csv_line(line: &str, delimiter: u8) -> String {
     let delim_char = delimiter as char;
     let mut result = String::with_capacity(line.len());
     let mut in_quotes = false;

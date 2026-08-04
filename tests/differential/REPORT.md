@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 804 |
-| Mismatch | 106 |
+| Match | 808 |
+| Mismatch | 102 |
 | Error | 24 |
-| **Match rate** | **86.08%** |
+| **Match rate** | **86.51%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -34,7 +34,6 @@ Everything else is listed below rather than dropped.
 | `git_ls_remote` | 2 | 1 | 1 | 0 |
 | `iptables` | 12 | 11 | 1 | 0 |
 | `iwconfig` | 4 | 3 | 1 | 0 |
-| `ls_s` | 11 | 7 | 4 | 0 |
 | `lsattr` | 4 | 3 | 1 | 0 |
 | `m3u` | 2 | 1 | 1 | 0 |
 | `mdadm` | 40 | 7 | 33 | 0 |
@@ -64,7 +63,6 @@ Everything else is listed below rather than dropped.
 
 | Parser | Fixture | Status | Detail |
 |---|---|---|---|
-| `ls_s` | centos-7.7/ls-alh-streaming | mismatch | 4 diffs: 4× missing_key |
 | `route` | centos-7.7/route-6-n | mismatch | 1 diffs: 1× array_length |
 | `route` | centos-7.7/route-6 | mismatch | 1 diffs: 1× array_length |
 | `rsync_s` | centos-7.7/rsync-i-logfile-streaming | mismatch | 118 diffs: 1× array_length, 66× missing_key, 19× extra_key, 32× value_mismatch |
@@ -197,12 +195,9 @@ For details use the  |
 | `proc` | linux-proc/pid_stat_w_space_and_nl_in_comm | error | exit 100: jc-rs: error - proc parser could not parse the input data.
 If this is the correct parser, try setting the locale to C (LC_ALL=C).
 For details use the  |
-| `ls_s` | osx-10.14.6/ls-alh-streaming | mismatch | 34 diffs: 34× missing_key |
 | `ping_s` | osx-10.14.6/ping-ip-unreachable-streaming | mismatch | 54 diffs: 6× missing_key, 36× extra_key, 12× value_mismatch |
 | `rsync_s` | osx-10.14.6/rsync-i-vvv-logfile-nochange-streaming | mismatch | 106 diffs: 1× array_length, 39× missing_key, 31× extra_key, 35× value_mismatch |
 | `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |
-| `ls_s` | ubuntu-18.04/ls-alh-streaming | mismatch | 23 diffs: 23× missing_key |
-| `ls_s` | ubuntu-18.04/ls-l-iso-streaming | mismatch | 1762 diffs: 1762× missing_key |
 | `stat_s` | ubuntu-18.04/stat-streaming | mismatch | 510 diffs: 510× value_mismatch |
 | `stat` | ubuntu-18.04/stat | mismatch | 510 diffs: 510× value_mismatch |
 | `timedatectl` | ubuntu-18.04/timedatectl | mismatch | 1 diffs: 1× value_mismatch |

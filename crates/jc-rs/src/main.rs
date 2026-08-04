@@ -17,7 +17,7 @@ use jc_rs_core::find_parser;
 use jc_rs_core::registry::all_parsers;
 use jc_rs_core::types::{ParseOutput, Tag};
 use serde_json::{Map, Value};
-use std::io::{self, Read};
+use std::io::{self, BufRead, Read};
 use std::process;
 
 use args::parse_args;
@@ -319,6 +319,120 @@ fn parse_slice(s: &str) -> Result<(Option<i64>, Option<i64>), String> {
     Ok((start, end))
 }
 
+// ─── Streaming runtime ───────────────────────────────────────────────────────
+
+/// Drive a streaming parser and print records as they appear.
+///
+/// `captured` is `Some` only for magic syntax, where the command has already
+/// run and its output is in memory; otherwise the lines come from stdin as they
+/// arrive, which is the whole point of the streaming path.
+fn run_streaming_parser(
+    parser: &dyn jc_rs_core::StreamingParser,
+    args: &args::Args,
+    use_color: bool,
+    scheme: &ColorScheme,
+    captured: Option<(String, Option<Vec<String>>, i32)>,
+) -> i32 {
+    let (captured_input, magic_words, magic_returncode) = match captured {
+        Some((input, words, code)) => (Some(input), words, code),
+        None => (None, None, 0),
+    };
+
+    let mut meta_info = MetaInfo::new_now(parser.info().name);
+    if let Some(ref slice_s) = args.slice_str
+        && let Ok((start, end)) = parse_slice(slice_s)
+    {
+        meta_info.slice_start = start;
+        meta_info.slice_end = end;
+    }
+    meta_info.magic_command = magic_words;
+    if meta_info.magic_command.is_some() {
+        meta_info.magic_command_exit = Some(magic_returncode);
+    }
+
+    let opts = streaming::StreamingOptions {
+        pretty: args.pretty,
+        yaml: args.yaml,
+        use_color,
+        scheme,
+        unbuffer: args.unbuffer,
+        meta_out: args.meta_out,
+        meta_info: &meta_info,
+        ignore_exceptions: args.ignore_exceptions,
+    };
+
+    let slice = args.slice_str.as_deref().map(parse_slice).transpose();
+    let (start, end) = match slice {
+        Ok(s) => s.unwrap_or((None, None)),
+        Err(e) => {
+            eprintln!("jc-rs: warning - {}", e);
+            (None, None)
+        }
+    };
+
+    let lines: Box<dyn Iterator<Item = Result<String, io::Error>>> = match captured_input {
+        Some(input) => Box::new(
+            input
+                .lines()
+                .map(|l| Ok(l.to_string()))
+                .collect::<Vec<_>>()
+                .into_iter(),
+        ),
+        None => Box::new(io::BufReader::new(io::stdin()).lines()),
+    };
+
+    let result = streaming::run_streaming(parser, &opts, slice_lines(lines, start, end));
+
+    match result {
+        Ok(_) => EXIT_OK + magic_returncode,
+        Err(e) => {
+            eprintln!(
+                "jc-rs: error - {} parser could not parse the input data: {}\n\
+                 Use the -qq option to ignore streaming parser errors.",
+                parser.info().name,
+                e
+            );
+            EXIT_ERROR + magic_returncode
+        }
+    }
+}
+
+/// Apply a line slice to a stream, lazily when it can be.
+///
+/// A negative index is only meaningful relative to the end of the input, so it
+/// forces the whole stream into memory -- exactly the trade jc documents in
+/// `utils.line_slice`. Positive slices stay lazy and keep streaming live.
+fn slice_lines(
+    lines: impl Iterator<Item = Result<String, io::Error>> + 'static,
+    start: Option<i64>,
+    end: Option<i64>,
+) -> Box<dyn Iterator<Item = Result<String, io::Error>>> {
+    if start.is_none() && end.is_none() {
+        return Box::new(lines);
+    }
+
+    if start.unwrap_or(0) >= 0 && end.unwrap_or(0) >= 0 {
+        let skip = start.unwrap_or(0).max(0) as usize;
+        return match end {
+            Some(e) => Box::new(lines.skip(skip).take((e as usize).saturating_sub(skip))),
+            None => Box::new(lines.skip(skip)),
+        };
+    }
+
+    let all: Vec<Result<String, io::Error>> = lines.collect();
+    let len = all.len() as i64;
+    let normalize = |idx: i64| -> usize {
+        if idx < 0 {
+            (len + idx).max(0) as usize
+        } else {
+            (idx as usize).min(all.len())
+        }
+    };
+    let s = start.map(normalize).unwrap_or(0);
+    let e = end.map(normalize).unwrap_or(all.len());
+    Box::new(all.into_iter().take(e).skip(s))
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 fn run() -> i32 {
@@ -452,6 +566,14 @@ fn run() -> i32 {
                     eprintln!("jc-rs: error - Missing piped data. Use \"jc-rs -h\" for help.");
                     return EXIT_ERROR;
                 }
+
+                // A streaming parser must never see `read_to_string`: on a live
+                // pipe that call returns when the writer closes, which for
+                // `tail -f` is never. Hand it stdin a line at a time instead.
+                if let Some(streaming) = p.as_streaming() {
+                    return run_streaming_parser(streaming, &args, use_color, &scheme, None);
+                }
+
                 let mut buf = String::new();
                 if let Err(e) = io::stdin().read_to_string(&mut buf) {
                     eprintln!("jc-rs: error - Failed to read stdin: {}", e);
@@ -483,12 +605,20 @@ fn run() -> i32 {
     }
 
     // ── Streaming parser path ─────────────────────────────────────────────────
-    // Streaming parsers implement Parser::parse() which calls parse_line()
-    // internally for each line and returns ParseOutput::Array. We use the
-    // standard parse path below which works for both streaming and non-streaming
-    // parsers. True line-by-line streaming (unbuffered output per line) would
-    // require runtime downcasting which isn't possible with dyn Parser.
-    // This behavior matches jc when all stdin is available at once.
+    // Standard mode already took this branch above, before reading stdin. Magic
+    // syntax gets here with the command's output already captured, so there is
+    // nothing left to stream -- but it still goes through the streaming runtime
+    // so that the output shape (NDJSON, per-record meta) does not depend on how
+    // the parser was selected.
+    if let Some(streaming) = parser.as_streaming() {
+        return run_streaming_parser(
+            streaming,
+            &args,
+            use_color,
+            &scheme,
+            Some((input_data, magic_command_words, magic_returncode)),
+        );
+    }
 
     // ── Standard parse path ───────────────────────────────────────────────────
     // Apply slice to input BEFORE parsing

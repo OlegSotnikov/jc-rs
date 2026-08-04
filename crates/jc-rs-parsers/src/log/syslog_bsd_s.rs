@@ -3,7 +3,9 @@
 use super::syslog_bsd::parse_syslog_bsd_line;
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::{Parser, StreamingParser};
+use jc_rs_core::traits::{
+    FnSession, LineParser, Parser, Record, StreamingParser, parse_via_session,
+};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
 struct SyslogBsdSParser;
@@ -29,27 +31,26 @@ impl Parser for SyslogBsdSParser {
     }
 
     fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
-        let mut records = Vec::new();
-        for line in input.lines() {
-            if line.trim().is_empty() {
-                continue;
-            }
-            match self.parse_line(line, quiet)? {
-                Some(ParseOutput::Object(map)) => records.push(map),
-                _ => {}
-            }
-        }
-        Ok(ParseOutput::Array(records))
+        parse_via_session(self, input, quiet)
+    }
+
+    fn as_streaming(&self) -> Option<&dyn StreamingParser> {
+        Some(self)
     }
 }
 
 impl StreamingParser for SyslogBsdSParser {
-    fn parse_line(&self, line: &str, _quiet: bool) -> Result<Option<ParseOutput>, ParseError> {
-        if line.trim().is_empty() {
-            return Ok(None);
-        }
-        Ok(Some(ParseOutput::Object(parse_syslog_bsd_line(line))))
+    fn session(&self) -> Box<dyn LineParser> {
+        Box::new(FnSession::new(syslog_bsd_line))
     }
+}
+
+/// Every BSD syslog line stands alone, so the session carries no state.
+fn syslog_bsd_line(line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
+    if line.trim().is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(parse_syslog_bsd_line(line)))
 }
 
 static INSTANCE: SyslogBsdSParser = SyslogBsdSParser;
@@ -70,14 +71,9 @@ mod tests {
 
     #[test]
     fn test_syslog_bsd_s_parse_line() {
-        let p = SyslogBsdSParser;
+        let mut session = SyslogBsdSParser.session();
         let line = "<34>Oct 11 22:14:15 mymachine su: msg";
-        let result = p.parse_line(line, false).unwrap().unwrap();
-        match result {
-            ParseOutput::Object(map) => {
-                assert_eq!(map["priority"], serde_json::json!(34));
-            }
-            _ => panic!("expected object"),
-        }
+        let record = session.parse_line(line, false).unwrap().unwrap();
+        assert_eq!(record["priority"], serde_json::json!(34));
     }
 }
