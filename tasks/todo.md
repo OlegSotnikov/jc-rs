@@ -39,15 +39,27 @@ per-fixture breakdown.
 - [x] **Fix: `ping_s` summary dropped `time_ms`** (parsed into state, never
       serialised). 13 → 32 matching fixtures.
 
+- [x] **CI/CD on GitHub Actions.** `ci.yml` (fmt, clippy, build on three OSes,
+      fixture-sync check, test ratchet, full differential with the report as a
+      job summary, crate packaging), `release.yml` (five targets, musl for
+      Linux, completions, `jc` alias, checksums, scratch Docker image),
+      `publish-crates.yml` (crates.io in dependency order). Two ratchets keep
+      the signal honest: `ci/known-failures.txt` fails on new failures *and* on
+      known ones that start passing, and the differential has a
+      `--fail-under 86.0` floor.
+- [x] Fixes found while wiring CI: the streaming meta key was `_jc_meta`
+      everywhere except the streaming path, which emitted `_cj_meta`; the zsh
+      completion hint still wrote `_cj`; four clippy findings and a removed lint
+      in the allow-list. The whole tree is now `cargo fmt` clean and passes
+      `clippy -D warnings`.
+
 ## Blocked
 
-- [ ] **Push to GitHub.** `github.com/OlegSotnikov/jc-rs` exists and is empty,
-      but the token in `~/sysadmin/secrets/github.env` is dead
-      (`401 Bad credentials`, recorded in that directory's README on
-      2026-07-29) and `~/.ssh/aula_github_mirror` is rejected. Needs a fresh PAT
-      with `repo` + `workflow` scope written into `GITHUB_TOKEN`, and
-      `GITHUB_USER` corrected from `x-access-token` to `OlegSotnikov`. Until
-      then everything is committed locally on `master` only.
+- [ ] **Two repository secrets are missing**, so the corresponding jobs degrade
+      to a dry run instead of publishing:
+      `CARGO_REGISTRY_TOKEN` (crates.io) and `DOCKERHUB_USERNAME` +
+      `DOCKERHUB_TOKEN` (the `appmasterio` namespace). Add them under
+      Settings → Secrets and variables → Actions.
 
 ## Next, in order
 

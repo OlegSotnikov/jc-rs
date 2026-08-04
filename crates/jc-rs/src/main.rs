@@ -90,7 +90,7 @@ fn options_text() -> String {
         ("-y,  --yaml-out", "YAML output"),
         (
             "-Z,  --zsh-comp",
-            "gen Zsh completion: jc-rs -Z > \"${fpath[1]}/_cj\"",
+            "gen Zsh completion: jc-rs -Z > \"${fpath[1]}/_jc-rs\"",
         ),
     ];
     let pad = 22usize;
@@ -215,7 +215,7 @@ fn print_version() {
     );
 }
 
-fn about_cj() -> Value {
+fn about_info() -> Value {
     let parsers: Vec<Value> = all_parsers()
         .map(|p| {
             let info = p.info();
@@ -337,7 +337,7 @@ fn run() -> i32 {
     }
 
     if args.about {
-        let val = about_cj();
+        let val = about_info();
         print_output(
             &val,
             args.pretty,

@@ -1,0 +1,31 @@
+# Unit tests that are expected to fail right now, one name per line.
+#
+# These went red the moment tests/fixtures/ became a verbatim mirror of jc's
+# corpus. They had been passing against an imported fixture copy that carried
+# the implementation's own output, so each entry here is a real defect in the
+# parser, not a flaky test.
+#
+# The rules, enforced by ci/run-tests.sh:
+#   * a failure NOT in this list fails the build — that is a regression
+#   * a test in this list that starts PASSING also fails the build — fix the
+#     parser, then delete its line here, in the same commit
+#   * never edit a fixture to make one of these pass; `make check-fixtures`
+#     will catch it and it is the exact mistake that produces a fake 100%
+#
+# Progress: this file should only ever get shorter. It is the M3 worklist.
+
+disk::mdadm::tests::test_mdadm_examine_raid1_ok
+disk::mdadm::tests::test_mdadm_query_raid1_ok
+disk::tune2fs::tests::test_tune2fs
+log::git_log::tests::test_git_log_blank_author_fix
+log::git_log::tests::test_git_log_default
+log::git_log::tests::test_git_log_hash_in_message
+log::git_log::tests::test_git_log_is_hash_regex
+log::git_log::tests::test_git_log_medium
+log::git_log_s::tests::test_git_log_s_golden
+network::ethtool::tests::test_ethtool_module_info_golden
+network::iw_scan::tests::test_iw_scan_centos_golden
+network::route::tests::test_route_centos_6n_golden
+network::route_print::tests::test_route_print_win10_golden
+network::route_print::tests::test_route_print_win2016_golden
+network::tracepath::tests::test_tracepath_centos_golden

@@ -62,7 +62,7 @@ pub trait Parser: Send + Sync {
 /// # Streaming protocol
 ///
 /// When `quiet` is `false` and a line fails to parse, the streaming runtime
-/// should emit an error object with `_cj_meta.success = false` and continue
+/// should emit an error object with `_jc_meta.success = false` and continue
 /// processing. When `quiet` is `true` (analogous to jc's
 /// `ignore_exceptions`), errors are silently skipped.
 pub trait StreamingParser: Parser {

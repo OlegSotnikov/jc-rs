@@ -97,7 +97,7 @@ pub fn sparse_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
         .map(|l| format!("{:<width$}", l, width = max_len))
         .collect();
 
-    let header_text = format!("{} ", &padded[0]);
+    let header_text = format!("{} ", padded[0]);
     let header_list: Vec<&str> = header_text.split_whitespace().collect();
 
     if header_list.is_empty() {

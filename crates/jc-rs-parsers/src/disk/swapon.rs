@@ -61,10 +61,9 @@ fn parse_size(s: &str) -> Option<i64> {
         (n, 1024i64 * 1024)
     } else if let Some(n) = s.strip_suffix('K') {
         (n, 1024i64)
-    } else if let Some(n) = s.strip_suffix('T') {
-        (n, 1024i64 * 1024 * 1024 * 1024)
     } else {
-        return None;
+        let n = s.strip_suffix('T')?;
+        (n, 1024i64 * 1024 * 1024 * 1024)
     };
 
     // Parse the numeric part (may be float like "1.5G")

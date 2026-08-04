@@ -156,10 +156,9 @@ fn parse_adapter_header(line: &str) -> Option<(String, String, String)> {
         ("PPP".to_string(), rest.to_string())
     } else if let Some(rest) = line_no_colon.strip_prefix("Tunnel adapter ") {
         ("Tunnel".to_string(), rest.to_string())
-    } else if let Some(rest) = line_no_colon.strip_prefix("Wireless LAN adapter ") {
-        ("Wireless LAN".to_string(), rest.to_string())
     } else {
-        return None;
+        let rest = line_no_colon.strip_prefix("Wireless LAN adapter ")?;
+        ("Wireless LAN".to_string(), rest.to_string())
     };
 
     Some((line_no_colon.to_string(), adapter_type, name))

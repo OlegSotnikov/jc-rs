@@ -3,3 +3,7 @@
 *.swo
 *~
 .DS_Store
+
+# Agent working notes — briefing for whoever picks this up next.
+# Deliberately not committed: it is scaffolding, not product.
+.agent/
