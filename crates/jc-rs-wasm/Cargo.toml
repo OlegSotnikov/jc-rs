@@ -28,8 +28,8 @@ wasm-opt = [
 ]
 
 [dependencies]
-jc-rs-core = { path = "../jc-rs-core", version = "0.0.0" }
-jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.0.0" }
+jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
+jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.1.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 wasm-bindgen = "0.2"

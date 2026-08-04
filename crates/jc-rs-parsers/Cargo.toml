@@ -11,8 +11,8 @@ keywords = ["json", "parser", "cli", "sysadmin"]
 categories = ["encoding", "command-line-utilities", "parser-implementations"]
 
 [dependencies]
-jc-rs-core = { path = "../jc-rs-core", version = "0.0.0" }
-jc-rs-utils = { path = "../jc-rs-utils", version = "0.0.0" }
+jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
+jc-rs-utils = { path = "../jc-rs-utils", version = "0.1.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

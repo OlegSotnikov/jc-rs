@@ -9,12 +9,11 @@ $ df -h   | jc-rs --df
 $ dig example.com | jc-rs -p --dig
 ```
 
-> **Status: pre-release.**
 > Compatibility with jc: **100%** (934 of 934 oracle-valid fixture pairs).
 > The code this started from measured 80.0%. The number comes from
 > `make differential` and is published whatever it says — see
 > [tests/differential/REPORT.md](tests/differential/REPORT.md).
-> CI fails below 100%.
+> CI fails below 100%, so it cannot quietly drift.
 
 ---
 
