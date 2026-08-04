@@ -120,15 +120,15 @@ fn make_error_object(error: &str, line: &str) -> Value {
     meta.insert("line".to_string(), Value::String(line.to_string()));
 
     let mut obj = Map::new();
-    obj.insert("_cj_meta".to_string(), Value::Object(meta));
+    obj.insert("_jc_meta".to_string(), Value::Object(meta));
     Value::Object(obj)
 }
 
-/// Add `_cj_meta.success` to a streaming output value.
+/// Add `_jc_meta.success` to a streaming output value.
 fn add_streaming_success(val: &mut Value, success: bool, error: Option<&str>) {
     if let Value::Object(map) = val {
         let entry = map
-            .entry("_cj_meta".to_string())
+            .entry("_jc_meta".to_string())
             .or_insert_with(|| Value::Object(Map::new()));
         if let Value::Object(meta_map) = entry {
             meta_map.insert("success".to_string(), Value::Bool(success));

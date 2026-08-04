@@ -2,47 +2,118 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
-    branches: [main, master]
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
 jobs:
-  ci:
-    name: CI (${{ matrix.os }})
+  lint:
+    name: fmt + clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+
+  build:
+    name: build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --workspace
+      - name: smoke test the binary
+        shell: bash
+        run: |
+          printf 'Filesystem      Size  Used Avail Use%% Mounted on\n/dev/sda1        20G  4.7G   15G  25%% /\n' \
+            | ./target/release/jc-rs --df -p
 
+  fixtures:
+    name: fixtures match jc
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      # tests/fixtures/ must stay a verbatim copy of the pinned jc corpus.
+      # Editing a fixture to make a parser pass is how a project ends up
+      # claiming compatibility it does not have.
+      - run: make check-fixtures
 
-      - name: Install stable Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
+  test:
+    name: unit tests (ratchet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Fails on NEW failures and on known failures that started passing.
+      # See ci/known-failures.txt for why the suite is not simply green.
+      - run: ./ci/run-tests.sh
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
+  differential:
+    name: differential vs jc corpus
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
         with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: install the oracle's optional deps
+        # jc's xml/yaml/plist parsers need these; without them ~30 fixtures
+        # land in oracle_reject instead of being tested.
+        run: pip install --quiet xmltodict ruamel.yaml pygments
+      - run: cargo build --release -p jc-rs
+      - name: run the full corpus
+        # Ratchet: the floor is the current rate. Raise it in the same commit
+        # that improves it. Never lower it.
+        run: python3 tests/differential/validate.py --fail-under 86.0
+      - name: publish the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-report
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+            tests/differential/REPORT.md
+            tests/differential/report.json
+      - name: summary
+        if: always()
+        run: cat tests/differential/REPORT.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Check formatting
-        run: cargo fmt --all --check
-
-      - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
-
-      - name: Tests
-        run: cargo test --all
+  package:
+    name: crates package cleanly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Catches the manifest problems that only surface at publish time:
+      # missing description/licence, or files the build needs that sit outside
+      # the crate directory. The dependent crates cannot be verified until
+      # jc-rs-core is on crates.io, hence --no-verify on those.
+      - run: cargo package -p jc-rs-core
+      - run: cargo package -p jc-rs-utils --no-verify
+      - run: cargo package -p jc-rs-parsers --no-verify
+      - run: cargo package -p jc-rs --no-verify

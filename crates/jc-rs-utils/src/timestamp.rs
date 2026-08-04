@@ -407,11 +407,36 @@ mod tests {
 
     #[test]
     fn test_parse_utc_iso() {
-        // ISO Format with Z (UTC)
+        // `naive` and `utc` are two different readings of the same wall clock
+        // and are equal only where the local offset is zero. jc, under its own
+        // TZ=PST8PDT, reports:
+        //
+        //   >>> t = jc.utils.timestamp('2003-10-11T22:14:15.003Z', None)
+        //   >>> t.naive, t.utc
+        //   (1065935655, 1065910455)
+        //
+        // naive reads 22:14:15 as local time, utc reads it as UTC; the 25200 s
+        // gap is PDT's offset. An earlier version of this test asserted the two
+        // were equal, which is what a UTC-everywhere implementation produces —
+        // and that bug put every *_epoch field in the corpus out by the offset.
         let r = parse_timestamp("2003-10-11T22:14:15.003Z", None);
-        assert!(r.naive_epoch.is_some());
-        assert!(r.utc_epoch.is_some());
-        assert_eq!(r.naive_epoch, r.utc_epoch);
+        assert_eq!(r.utc_epoch, Some(1065910455));
+        assert_eq!(
+            r.naive_epoch.expect("naive epoch") - r.utc_epoch.expect("utc epoch"),
+            local_utc_offset_at(1065910455),
+            "naive must be the local-time reading of the same wall clock"
+        );
+    }
+
+    /// Seconds that local time is ahead of UTC at the given instant, so the
+    /// test states the relationship rather than hard-coding one timezone.
+    fn local_utc_offset_at(epoch: i64) -> i64 {
+        use chrono::Offset;
+        let dt = DateTime::from_timestamp(epoch, 0).expect("valid epoch");
+        -(Local
+            .offset_from_utc_datetime(&dt.naive_utc())
+            .fix()
+            .local_minus_utc() as i64)
     }
 
     #[test]

@@ -375,7 +375,7 @@ fn sparse_table_parse(lines: &[String]) -> Vec<Map<String, Value>> {
         .map(|l| format!("{:<width$}", l, width = max_len))
         .collect();
 
-    let header_text = format!("{} ", &data[0]);
+    let header_text = format!("{} ", data[0]);
     let header_list: Vec<&str> = header_text.split_whitespace().collect();
 
     if header_list.is_empty() {

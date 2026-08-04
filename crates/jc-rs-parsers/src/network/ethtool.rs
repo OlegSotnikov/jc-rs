@@ -32,10 +32,9 @@ fn speed_to_bps(s: &str) -> Option<i64> {
     if s == "Unknown!" || s == "unknown" || s.is_empty() {
         return None;
     }
-    let (num_str, unit) = if let Some(pos) = s.find(|c: char| c.is_alphabetic()) {
+    let (num_str, unit) = {
+        let pos = s.find(|c: char| c.is_alphabetic())?;
         (&s[..pos], &s[pos..])
-    } else {
-        return None;
     };
     let num: f64 = num_str.parse().ok()?;
     let multiplier: f64 = match unit.to_lowercase().as_str() {

@@ -170,7 +170,10 @@ pub fn fish_completion() -> String {
     let option_completions: Vec<String> = options
         .iter()
         .map(|(short, long, desc)| {
-            format!("complete -c jc-rs -s '{}' -l '{}' -d '{}'", short, long, desc)
+            format!(
+                "complete -c jc-rs -s '{}' -l '{}' -d '{}'",
+                short, long, desc
+            )
         })
         .collect();
 

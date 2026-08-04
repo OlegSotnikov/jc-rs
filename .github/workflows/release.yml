@@ -2,8 +2,12 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (must already exist)'
+        required: true
 
 permissions:
   contents: write
@@ -12,19 +16,42 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  completions:
+    name: shell completions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p jc-rs
+      - name: generate
+        run: |
+          mkdir -p completions
+          ./target/release/jc-rs --bash-comp > completions/jc-rs.bash
+          ./target/release/jc-rs --zsh-comp  > completions/_jc-rs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: completions
+          path: completions/
+
   build:
-    name: Build (${{ matrix.target }})
+    name: ${{ matrix.target }}
+    needs: [completions]
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - target: x86_64-unknown-linux-gnu
+          # musl, not gnu: the point of this project is a binary that runs in a
+          # scratch container and on a box with an older libc than the runner's.
+          - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
-            archive: tar.gz
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
-            archive: tar.gz
             cross: true
+            archive: tar.gz
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+            archive: tar.gz
           - target: x86_64-apple-darwin
             os: macos-latest
             archive: tar.gz
@@ -34,62 +61,121 @@ jobs:
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             archive: zip
-
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install stable Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
 
-      - name: Install cross
+      - name: install cross
         if: matrix.cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
+        run: cargo install cross --locked --git https://github.com/cross-rs/cross
 
-      - name: Build
+      - name: build
+        shell: bash
         run: |
           if [ "${{ matrix.cross }}" = "true" ]; then
             cross build --release --target ${{ matrix.target }} -p jc-rs
           else
             cargo build --release --target ${{ matrix.target }} -p jc-rs
           fi
-        shell: bash
 
-      - name: Package (unix)
-        if: matrix.archive == 'tar.gz'
-        run: |
-          cd target/${{ matrix.target }}/release
-          tar czf ../../../jc-rs-${{ github.ref_name }}-${{ matrix.target }}.tar.gz jc-rs
-        shell: bash
-
-      - name: Package (windows)
-        if: matrix.archive == 'zip'
-        run: |
-          cd target/${{ matrix.target }}/release
-          7z a ../../../jc-rs-${{ github.ref_name }}-${{ matrix.target }}.zip jc-rs.exe
-        shell: bash
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: jc-rs-${{ matrix.target }}
-          path: jc-rs-${{ github.ref_name }}-${{ matrix.target }}.*
+          name: completions
+          path: completions
+
+      - name: assemble archive
+        shell: bash
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          stage="jc-rs-${TAG}-${{ matrix.target }}"
+          mkdir -p "$stage"
+          cp LICENSE README.md "$stage/"
+          cp -r completions "$stage/completions"
+
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            cp "target/${{ matrix.target }}/release/jc-rs.exe" "$stage/"
+            7z a "${stage}.zip" "$stage" >/dev/null
+          else
+            cp "target/${{ matrix.target }}/release/jc-rs" "$stage/"
+            # A `jc` alias for anyone who wants existing scripts untouched.
+            # Shipped, never installed by default: it would shadow the Python
+            # jc in PATH, and that is not this project's call to make.
+            cp "target/${{ matrix.target }}/release/jc-rs" "$stage/jc"
+            tar czf "${stage}.tar.gz" "$stage"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.target }}
+          path: |
+            jc-rs-*.tar.gz
+            jc-rs-*.zip
 
   release:
-    name: Create Release
-    needs: build
+    name: publish release
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
+          pattern: dist-*
           merge-multiple: true
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: checksums
+        run: sha256sum jc-rs-* > SHA256SUMS && cat SHA256SUMS
+      - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
-          files: jc-rs-*
+          files: |
+            jc-rs-*
+            SHA256SUMS
+
+  docker:
+    name: docker image
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: are Docker Hub credentials configured?
+        id: creds
+        env:
+          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+            echo "DOCKERHUB_TOKEN is not set — skipping the image." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.creds.outputs.have == 'true'
+        with:
+          name: dist-x86_64-unknown-linux-musl
+      - name: unpack the static binary
+        if: steps.creds.outputs.have == 'true'
+        run: |
+          set -euo pipefail
+          tar xzf jc-rs-*-x86_64-unknown-linux-musl.tar.gz
+          mv jc-rs-*/jc-rs ./jc-rs
+          chmod +x jc-rs
+      - uses: docker/login-action@v3
+        if: steps.creds.outputs.have == 'true'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        if: steps.creds.outputs.have == 'true'
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            appmasterio/jc-rs:${{ github.event.inputs.tag || github.ref_name }}
+            appmasterio/jc-rs:latest
