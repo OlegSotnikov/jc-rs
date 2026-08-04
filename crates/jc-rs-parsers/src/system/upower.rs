@@ -44,10 +44,8 @@ impl Parser for UpowerParser {
 fn normalize_key(s: &str) -> String {
     s.trim()
         .to_lowercase()
-        .replace('-', "_")
-        .replace(' ', "_")
-        .replace('(', "")
-        .replace(')', "")
+        .replace(['-', ' '], "_")
+        .replace(['(', ')'], "")
 }
 
 fn parse_upower(input: &str) -> Vec<Map<String, Value>> {
@@ -121,10 +119,11 @@ fn parse_upower(input: &str) -> Vec<Map<String, Value>> {
         // History section headers (2-space indent, no colon in key part)
         if line.starts_with("  History (charge):") || line.starts_with("  History (rate):") {
             // Flush previous history
-            if let Some(ref mut dev) = device_obj {
-                if !history_key.is_empty() && !history_list.is_empty() {
-                    dev.insert(history_key.clone(), Value::Array(history_list.clone()));
-                }
+            if let Some(ref mut dev) = device_obj
+                && !history_key.is_empty()
+                && !history_list.is_empty()
+            {
+                dev.insert(history_key.clone(), Value::Array(history_list.clone()));
             }
             history_list.clear();
 
@@ -146,10 +145,10 @@ fn parse_upower(input: &str) -> Vec<Map<String, Value>> {
                 let key = normalize_key(&line[..colon_pos]);
                 let val = line[colon_pos + 1..].trim().to_string();
 
-                if let Some(ref mut dev) = device_obj {
-                    if let Some(Value::Object(detail)) = dev.get_mut("detail") {
-                        detail.insert(key, Value::String(val));
-                    }
+                if let Some(ref mut dev) = device_obj
+                    && let Some(Value::Object(detail)) = dev.get_mut("detail")
+                {
+                    detail.insert(key, Value::String(val));
                 }
             }
             continue;
@@ -213,7 +212,7 @@ fn process_device(dev: &mut Map<String, Value>) {
     // Process updated field: extract time string and seconds_ago
     if let Some(Value::String(updated)) = dev.get("updated").cloned() {
         // Format: "Thu 11 Mar 2021 06:28:08 PM UTC (441975 seconds ago)"
-        let cleaned = updated.replace('(', "").replace(')', "");
+        let cleaned = updated.replace(['(', ')'], "");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
         if parts.len() >= 3 {
             // Last 3 tokens are: <N> seconds ago
@@ -293,10 +292,10 @@ fn process_device(dev: &mut Map<String, Value>) {
         }
 
         // Convert "none" warning_level to null
-        if let Some(Value::String(s)) = detail.get("warning_level").cloned() {
-            if s == "none" {
-                detail.insert("warning_level".to_string(), Value::Null);
-            }
+        if let Some(Value::String(s)) = detail.get("warning_level").cloned()
+            && s == "none"
+        {
+            detail.insert("warning_level".to_string(), Value::Null);
         }
 
         // Process energy fields: "22.3998 Wh" -> float + unit key
@@ -350,20 +349,20 @@ fn process_device(dev: &mut Map<String, Value>) {
         if let Some(Value::Array(hist)) = dev.get_mut(*hist_key) {
             for item in hist.iter_mut() {
                 if let Value::Object(h) = item {
-                    if let Some(Value::String(t)) = h.get("time").cloned() {
-                        if let Ok(n) = t.parse::<i64>() {
-                            h.insert("time".to_string(), Value::Number(n.into()));
-                        }
+                    if let Some(Value::String(t)) = h.get("time").cloned()
+                        && let Ok(n) = t.parse::<i64>()
+                    {
+                        h.insert("time".to_string(), Value::Number(n.into()));
                     }
-                    if let Some(Value::String(p)) = h.get("percent_charged").cloned() {
-                        if let Ok(f) = p.parse::<f64>() {
-                            h.insert(
-                                "percent_charged".to_string(),
-                                serde_json::Number::from_f64(f)
-                                    .map(Value::Number)
-                                    .unwrap_or(Value::String(p)),
-                            );
-                        }
+                    if let Some(Value::String(p)) = h.get("percent_charged").cloned()
+                        && let Ok(f) = p.parse::<f64>()
+                    {
+                        h.insert(
+                            "percent_charged".to_string(),
+                            serde_json::Number::from_f64(f)
+                                .map(Value::Number)
+                                .unwrap_or(Value::String(p)),
+                        );
                     }
                 }
             }

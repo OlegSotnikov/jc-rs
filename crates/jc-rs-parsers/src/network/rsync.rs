@@ -77,16 +77,6 @@ fn parse_file_line(meta: &str, name: &str) -> Map<String, Value> {
         ("+", None),
     ];
 
-    fn bool_flag(c: char) -> Option<Option<bool>> {
-        match c {
-            'c' => Some(Some(true)),
-            's' | 't' | 'p' | 'o' | 'g' | 'a' | 'x' => Some(Some(true)),
-            '.' => Some(Some(false)),
-            '+' | ' ' | '?' => Some(None),
-            _ => None,
-        }
-    }
-
     fn flag_bool(c: char, true_char: char) -> Value {
         match c {
             _ if c == true_char => Value::Bool(true),
@@ -317,7 +307,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "bytes_sec".to_string(),
                     parse_size_to_float(caps.get(3).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -333,7 +323,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "speedup".to_string(),
                     parse_size_to_float(caps.get(2).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -357,7 +347,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "bytes_sec".to_string(),
                     parse_size_to_float(caps.get(3).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -373,7 +363,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "speedup".to_string(),
                     parse_size_to_float(caps.get(2).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -479,7 +469,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "bytes_sec".to_string(),
                     parse_size_to_float(caps.get(6).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -499,7 +489,7 @@ impl Parser for RsyncParser {
                 summary_partial.insert(
                     "speedup".to_string(),
                     parse_size_to_float(caps.get(5).map_or("", |m| m.as_str()))
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );

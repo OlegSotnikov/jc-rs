@@ -65,7 +65,7 @@ impl Parser for ProcNetIgmpParser {
                 if let Some(mut dev) = current_device.take() {
                     dev.insert(
                         "groups".to_string(),
-                        Value::Array(current_groups.drain(..).collect()),
+                        Value::Array(std::mem::take(&mut current_groups)),
                     );
                     results.push(dev);
                 }
@@ -94,7 +94,7 @@ impl Parser for ProcNetIgmpParser {
         if let Some(mut dev) = current_device.take() {
             dev.insert(
                 "groups".to_string(),
-                Value::Array(current_groups.drain(..).collect()),
+                Value::Array(std::mem::take(&mut current_groups)),
             );
             results.push(dev);
         }

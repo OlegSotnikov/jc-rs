@@ -238,7 +238,7 @@ impl Parser for ClfParser {
         let records: Vec<Map<String, Value>> = input
             .lines()
             .filter(|l| !l.trim().is_empty())
-            .map(|l| parse_clf_line(l))
+            .map(parse_clf_line)
             .collect();
 
         Ok(ParseOutput::Array(records))
@@ -260,10 +260,7 @@ mod tests {
         let parser = ClfParser;
         let result = parser.parse(input, false).unwrap();
         match result {
-            ParseOutput::Array(arr) => arr
-                .into_iter()
-                .map(|m| serde_json::Value::Object(m))
-                .collect(),
+            ParseOutput::Array(arr) => arr.into_iter().map(serde_json::Value::Object).collect(),
             _ => panic!("expected array"),
         }
     }

@@ -59,7 +59,7 @@ fn parse_systemctl_ls(input: &str) -> Vec<Map<String, Value>> {
     let mut col_starts: Vec<usize> = Vec::new();
     let mut search_from = 0usize;
     for h in &headers {
-        if let Some(pos) = header_lower[search_from..].find(h.as_ref() as &str) {
+        if let Some(pos) = header_lower[search_from..].find(h as &str) {
             col_starts.push(search_from + pos);
             search_from = search_from + pos + h.len();
         }

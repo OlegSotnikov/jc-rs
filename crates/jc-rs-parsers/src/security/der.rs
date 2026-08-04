@@ -472,34 +472,34 @@ pub fn parse_spki(data: &[u8]) -> Map<String, Value> {
         let key_bytes = if items[1].value.len() > 1 {
             &items[1].value[1..] // skip unused bits byte
         } else {
-            &items[1].value[..]
+            items[1].value
         };
 
         let algo_str = algo.get("algorithm").and_then(|v| v.as_str()).unwrap_or("");
 
         if algo_str == "rsa" {
             // RSA public key: SEQUENCE { INTEGER modulus, INTEGER exponent }
-            if let Some((seq_tlv, _)) = parse_tlv(key_bytes) {
-                if seq_tlv.tag == TAG_SEQUENCE {
-                    let rsa_items = parse_sequence_items(seq_tlv.value);
-                    if rsa_items.len() >= 2 {
-                        // Strip leading 0x00 sign byte before hex encoding (jc behavior)
-                        let modulus_bytes =
-                            if !rsa_items[0].value.is_empty() && rsa_items[0].value[0] == 0 {
-                                &rsa_items[0].value[1..]
-                            } else {
-                                rsa_items[0].value
-                            };
-                        let modulus_hex = bytes_to_hex(modulus_bytes);
-                        let exponent = parse_big_int_as_u64(rsa_items[1].value);
+            if let Some((seq_tlv, _)) = parse_tlv(key_bytes)
+                && seq_tlv.tag == TAG_SEQUENCE
+            {
+                let rsa_items = parse_sequence_items(seq_tlv.value);
+                if rsa_items.len() >= 2 {
+                    // Strip leading 0x00 sign byte before hex encoding (jc behavior)
+                    let modulus_bytes =
+                        if !rsa_items[0].value.is_empty() && rsa_items[0].value[0] == 0 {
+                            &rsa_items[0].value[1..]
+                        } else {
+                            rsa_items[0].value
+                        };
+                    let modulus_hex = bytes_to_hex(modulus_bytes);
+                    let exponent = parse_big_int_as_u64(rsa_items[1].value);
 
-                        let mut pk = Map::new();
-                        pk.insert("modulus".to_string(), Value::String(modulus_hex));
-                        if let Some(exp) = exponent {
-                            pk.insert("public_exponent".to_string(), Value::Number(exp.into()));
-                        }
-                        result.insert("public_key".to_string(), Value::Object(pk));
+                    let mut pk = Map::new();
+                    pk.insert("modulus".to_string(), Value::String(modulus_hex));
+                    if let Some(exp) = exponent {
+                        pk.insert("public_exponent".to_string(), Value::Number(exp.into()));
                     }
+                    result.insert("public_key".to_string(), Value::Object(pk));
                 }
             }
         } else {
@@ -660,15 +660,14 @@ pub fn parse_extensions(data: &[u8]) -> Vec<Value> {
         ext_obj.insert("extn_value".to_string(), extn_value.clone());
 
         // Add _iso sibling for invalidity_date
-        if ext_id == "invalidity_date" {
-            if let Value::Number(n) = &extn_value {
-                if let Some(epoch) = n.as_i64() {
-                    ext_obj.insert(
-                        "extn_value_iso".to_string(),
-                        Value::String(epoch_to_iso(epoch)),
-                    );
-                }
-            }
+        if ext_id == "invalidity_date"
+            && let Value::Number(n) = &extn_value
+            && let Some(epoch) = n.as_i64()
+        {
+            ext_obj.insert(
+                "extn_value_iso".to_string(),
+                Value::String(epoch_to_iso(epoch)),
+            );
         }
 
         result.push(Value::Object(ext_obj));
@@ -682,254 +681,250 @@ fn parse_extension_value(ext_id: &str, data: &[u8]) -> Value {
     match ext_id {
         "basic_constraints" => {
             // SEQUENCE { OPTIONAL BOOLEAN ca, OPTIONAL INTEGER pathLen }
-            if let Some((seq_tlv, _)) = parse_tlv(data) {
-                if seq_tlv.tag == TAG_SEQUENCE {
-                    let items = parse_sequence_items(seq_tlv.value);
-                    let mut bc = Map::new();
-                    let mut ca = false;
-                    let mut path_len = Value::Null;
+            if let Some((seq_tlv, _)) = parse_tlv(data)
+                && seq_tlv.tag == TAG_SEQUENCE
+            {
+                let items = parse_sequence_items(seq_tlv.value);
+                let mut bc = Map::new();
+                let mut ca = false;
+                let mut path_len = Value::Null;
 
-                    for item in &items {
-                        if item.tag == TAG_BOOLEAN {
-                            ca = !item.value.is_empty() && item.value[0] != 0;
-                        } else if item.tag == TAG_INTEGER {
-                            if let Some(n) = parse_big_int_as_u64(item.value) {
-                                path_len = Value::Number(n.into());
-                            }
-                        }
+                for item in &items {
+                    if item.tag == TAG_BOOLEAN {
+                        ca = !item.value.is_empty() && item.value[0] != 0;
+                    } else if item.tag == TAG_INTEGER
+                        && let Some(n) = parse_big_int_as_u64(item.value)
+                    {
+                        path_len = Value::Number(n.into());
                     }
-                    bc.insert("ca".to_string(), Value::Bool(ca));
-                    bc.insert("path_len_constraint".to_string(), path_len);
-                    return Value::Object(bc);
                 }
+                bc.insert("ca".to_string(), Value::Bool(ca));
+                bc.insert("path_len_constraint".to_string(), path_len);
+                return Value::Object(bc);
             }
             Value::Null
         }
         "key_usage" => {
             // BIT STRING with named bits
-            if let Some((bs_tlv, _)) = parse_tlv(data) {
-                if bs_tlv.tag == TAG_BITSTRING && bs_tlv.value.len() >= 2 {
-                    let unused_bits = bs_tlv.value[0] as usize;
-                    let bits = &bs_tlv.value[1..];
-                    let usage_names = [
-                        "digital_signature",
-                        "non_repudiation",
-                        "key_encipherment",
-                        "data_encipherment",
-                        "key_agreement",
-                        "key_cert_sign",
-                        "crl_sign",
-                        "encipher_only",
-                        "decipher_only",
-                    ];
-                    let mut usages = Vec::new();
-                    let total_bits = bits.len() * 8 - unused_bits;
-                    for (i, name) in usage_names.iter().enumerate() {
-                        if i >= total_bits {
-                            break;
-                        }
-                        let byte_idx = i / 8;
-                        let bit_idx = 7 - (i % 8);
-                        if byte_idx < bits.len() && (bits[byte_idx] >> bit_idx) & 1 == 1 {
-                            usages.push(name.to_string());
-                        }
+            if let Some((bs_tlv, _)) = parse_tlv(data)
+                && bs_tlv.tag == TAG_BITSTRING
+                && bs_tlv.value.len() >= 2
+            {
+                let unused_bits = bs_tlv.value[0] as usize;
+                let bits = &bs_tlv.value[1..];
+                let usage_names = [
+                    "digital_signature",
+                    "non_repudiation",
+                    "key_encipherment",
+                    "data_encipherment",
+                    "key_agreement",
+                    "key_cert_sign",
+                    "crl_sign",
+                    "encipher_only",
+                    "decipher_only",
+                ];
+                let mut usages = Vec::new();
+                let total_bits = bits.len() * 8 - unused_bits;
+                for (i, name) in usage_names.iter().enumerate() {
+                    if i >= total_bits {
+                        break;
                     }
-                    // Sort alphabetically to match jc's output order
-                    usages.sort_unstable();
-                    let usages: Vec<Value> = usages.into_iter().map(Value::String).collect();
-                    return Value::Array(usages);
+                    let byte_idx = i / 8;
+                    let bit_idx = 7 - (i % 8);
+                    if byte_idx < bits.len() && (bits[byte_idx] >> bit_idx) & 1 == 1 {
+                        usages.push(name.to_string());
+                    }
                 }
+                // Sort alphabetically to match jc's output order
+                usages.sort_unstable();
+                let usages: Vec<Value> = usages.into_iter().map(Value::String).collect();
+                return Value::Array(usages);
             }
             Value::Array(Vec::new())
         }
         "extended_key_usage" => {
             // SEQUENCE OF OID
-            if let Some((seq_tlv, _)) = parse_tlv(data) {
-                if seq_tlv.tag == TAG_SEQUENCE {
-                    let items = parse_sequence_items(seq_tlv.value);
-                    let usages: Vec<Value> = items
-                        .iter()
-                        .filter(|i| i.tag == 0x06)
-                        .map(|i| {
-                            let oid = parse_oid(i.value);
-                            let name = eku_oid_to_name(&oid);
-                            if name.is_empty() {
-                                Value::String(oid)
-                            } else {
-                                Value::String(name.to_string())
-                            }
-                        })
-                        .collect();
-                    return Value::Array(usages);
-                }
+            if let Some((seq_tlv, _)) = parse_tlv(data)
+                && seq_tlv.tag == TAG_SEQUENCE
+            {
+                let items = parse_sequence_items(seq_tlv.value);
+                let usages: Vec<Value> = items
+                    .iter()
+                    .filter(|i| i.tag == 0x06)
+                    .map(|i| {
+                        let oid = parse_oid(i.value);
+                        let name = eku_oid_to_name(&oid);
+                        if name.is_empty() {
+                            Value::String(oid)
+                        } else {
+                            Value::String(name.to_string())
+                        }
+                    })
+                    .collect();
+                return Value::Array(usages);
             }
             Value::Array(Vec::new())
         }
         "key_identifier" => {
             // OCTET STRING
-            if let Some((oct_tlv, _)) = parse_tlv(data) {
-                if oct_tlv.tag == TAG_OCTETSTRING {
-                    return Value::String(bytes_to_hex(oct_tlv.value));
-                }
+            if let Some((oct_tlv, _)) = parse_tlv(data)
+                && oct_tlv.tag == TAG_OCTETSTRING
+            {
+                return Value::String(bytes_to_hex(oct_tlv.value));
             }
             Value::String(bytes_to_hex(data))
         }
         "authority_key_identifier" => {
             // SEQUENCE { [0] keyIdentifier OPTIONAL, [1] authorityCertIssuer OPTIONAL, [2] authorityCertSerialNumber OPTIONAL }
-            if let Some((seq_tlv, _)) = parse_tlv(data) {
-                if seq_tlv.tag == TAG_SEQUENCE {
-                    let items = parse_sequence_items(seq_tlv.value);
-                    let mut aki = Map::new();
-                    aki.insert("key_identifier".to_string(), Value::Null);
-                    aki.insert("authority_cert_issuer".to_string(), Value::Null);
-                    aki.insert("authority_cert_serial_number".to_string(), Value::Null);
+            if let Some((seq_tlv, _)) = parse_tlv(data)
+                && seq_tlv.tag == TAG_SEQUENCE
+            {
+                let items = parse_sequence_items(seq_tlv.value);
+                let mut aki = Map::new();
+                aki.insert("key_identifier".to_string(), Value::Null);
+                aki.insert("authority_cert_issuer".to_string(), Value::Null);
+                aki.insert("authority_cert_serial_number".to_string(), Value::Null);
 
-                    for item in &items {
-                        let tag_class = item.tag & 0xC0;
-                        let tag_num = item.tag & 0x1F;
-                        if tag_class == 0x80 || tag_class == 0xA0 {
-                            // Context-specific
-                            if tag_num == 0 {
-                                aki.insert(
-                                    "key_identifier".to_string(),
-                                    Value::String(bytes_to_hex(item.value)),
-                                );
-                            }
+                for item in &items {
+                    let tag_class = item.tag & 0xC0;
+                    let tag_num = item.tag & 0x1F;
+                    if tag_class == 0x80 || tag_class == 0xA0 {
+                        // Context-specific
+                        if tag_num == 0 {
+                            aki.insert(
+                                "key_identifier".to_string(),
+                                Value::String(bytes_to_hex(item.value)),
+                            );
                         }
                     }
-                    return Value::Object(aki);
                 }
+                return Value::Object(aki);
             }
             Value::Null
         }
         "subject_alt_name" => {
             // SEQUENCE OF GeneralName
-            if let Some((seq_tlv, _)) = parse_tlv(data) {
-                if seq_tlv.tag == TAG_SEQUENCE {
-                    let names: Vec<Value> = parse_sequence_items(seq_tlv.value)
-                        .iter()
-                        .filter_map(|item| {
-                            let tag_num = item.tag & 0x1F;
-                            match tag_num {
-                                1 => {
-                                    // Email: no prefix, use \xNN escapes for invalid UTF-8 bytes
-                                    Some(Value::String(bytes_to_python_repr(item.value)))
-                                }
-                                2 => Some(Value::String(format!(
-                                    "dns:{}",
-                                    String::from_utf8_lossy(item.value)
-                                ))),
-                                7 => {
-                                    // IP address
-                                    if item.value.len() == 4 {
-                                        Some(Value::String(format!(
-                                            "ip:{}.{}.{}.{}",
-                                            item.value[0],
-                                            item.value[1],
-                                            item.value[2],
-                                            item.value[3]
-                                        )))
-                                    } else {
-                                        Some(Value::String(format!(
-                                            "ip:{}",
-                                            bytes_to_hex(item.value)
-                                        )))
-                                    }
-                                }
-                                _ => None,
+            if let Some((seq_tlv, _)) = parse_tlv(data)
+                && seq_tlv.tag == TAG_SEQUENCE
+            {
+                let names: Vec<Value> = parse_sequence_items(seq_tlv.value)
+                    .iter()
+                    .filter_map(|item| {
+                        let tag_num = item.tag & 0x1F;
+                        match tag_num {
+                            1 => {
+                                // Email: no prefix, use \xNN escapes for invalid UTF-8 bytes
+                                Some(Value::String(bytes_to_python_repr(item.value)))
                             }
-                        })
-                        .collect();
-                    return Value::Array(names);
-                }
+                            2 => Some(Value::String(format!(
+                                "dns:{}",
+                                String::from_utf8_lossy(item.value)
+                            ))),
+                            7 => {
+                                // IP address
+                                if item.value.len() == 4 {
+                                    Some(Value::String(format!(
+                                        "ip:{}.{}.{}.{}",
+                                        item.value[0], item.value[1], item.value[2], item.value[3]
+                                    )))
+                                } else {
+                                    Some(Value::String(format!("ip:{}", bytes_to_hex(item.value))))
+                                }
+                            }
+                            _ => None,
+                        }
+                    })
+                    .collect();
+                return Value::Array(names);
             }
             Value::Array(Vec::new())
         }
         "crl_reason" => {
             // ENUMERATED - decode to reason name string
-            if let Some((enum_tlv, _)) = parse_tlv(data) {
-                if enum_tlv.tag == 0x0A && !enum_tlv.value.is_empty() {
-                    let reason_code = enum_tlv.value[0];
-                    let reason_name = match reason_code {
-                        0 => "unspecified",
-                        1 => "key_compromise",
-                        2 => "ca_compromise",
-                        3 => "affiliation_changed",
-                        4 => "superseded",
-                        5 => "cessation_of_operation",
-                        6 => "certificate_hold",
-                        8 => "remove_from_crl",
-                        9 => "privilege_withdrawn",
-                        10 => "aa_compromise",
-                        _ => "unspecified",
-                    };
-                    return Value::String(reason_name.to_string());
-                }
+            if let Some((enum_tlv, _)) = parse_tlv(data)
+                && enum_tlv.tag == 0x0A
+                && !enum_tlv.value.is_empty()
+            {
+                let reason_code = enum_tlv.value[0];
+                let reason_name = match reason_code {
+                    0 => "unspecified",
+                    1 => "key_compromise",
+                    2 => "ca_compromise",
+                    3 => "affiliation_changed",
+                    4 => "superseded",
+                    5 => "cessation_of_operation",
+                    6 => "certificate_hold",
+                    8 => "remove_from_crl",
+                    9 => "privilege_withdrawn",
+                    10 => "aa_compromise",
+                    _ => "unspecified",
+                };
+                return Value::String(reason_name.to_string());
             }
             Value::String(bytes_to_hex(data))
         }
         "crl_number" => {
             // INTEGER - decode as integer value
-            if let Some((int_tlv, _)) = parse_tlv(data) {
-                if int_tlv.tag == TAG_INTEGER {
-                    // Strip leading zero sign byte
-                    let d = if !int_tlv.value.is_empty() && int_tlv.value[0] == 0 {
-                        &int_tlv.value[1..]
-                    } else {
-                        int_tlv.value
-                    };
-                    if d.len() <= 8 {
-                        let mut n = 0u64;
-                        for &b in d {
-                            n = (n << 8) | b as u64;
-                        }
-                        return Value::Number(n.into());
+            if let Some((int_tlv, _)) = parse_tlv(data)
+                && int_tlv.tag == TAG_INTEGER
+            {
+                // Strip leading zero sign byte
+                let d = if !int_tlv.value.is_empty() && int_tlv.value[0] == 0 {
+                    &int_tlv.value[1..]
+                } else {
+                    int_tlv.value
+                };
+                if d.len() <= 8 {
+                    let mut n = 0u64;
+                    for &b in d {
+                        n = (n << 8) | b as u64;
                     }
+                    return Value::Number(n.into());
                 }
             }
             Value::String(bytes_to_hex(data))
         }
         "invalidity_date" => {
             // GeneralizedTime - decode as epoch integer + add _iso sibling via separate handling
-            if let Some((time_tlv, _)) = parse_tlv(data) {
-                if time_tlv.tag == TAG_GENERALIZEDTIME {
-                    if let Some(epoch) = parse_time(time_tlv.tag, time_tlv.value) {
-                        return Value::Number(epoch.into());
-                    }
-                }
+            if let Some((time_tlv, _)) = parse_tlv(data)
+                && time_tlv.tag == TAG_GENERALIZEDTIME
+                && let Some(epoch) = parse_time(time_tlv.tag, time_tlv.value)
+            {
+                return Value::Number(epoch.into());
             }
             Value::String(bytes_to_hex(data))
         }
         "netscape_certificate_type" => {
             // BIT STRING with named bits
-            if let Some((bs_tlv, _)) = parse_tlv(data) {
-                if bs_tlv.tag == TAG_BITSTRING && bs_tlv.value.len() >= 2 {
-                    let unused_bits = bs_tlv.value[0] as usize;
-                    let bits = &bs_tlv.value[1..];
-                    let cert_type_names = [
-                        "ssl_client",
-                        "ssl_server",
-                        "smime",
-                        "object_signing",
-                        "reserved",
-                        "ssl_ca",
-                        "smime_ca",
-                        "object_signing_ca",
-                    ];
-                    let mut types = Vec::new();
-                    let total_bits = bits.len() * 8 - unused_bits;
-                    for (i, name) in cert_type_names.iter().enumerate() {
-                        if i >= total_bits {
-                            break;
-                        }
-                        let byte_idx = i / 8;
-                        let bit_idx = 7 - (i % 8);
-                        if byte_idx < bits.len() && (bits[byte_idx] >> bit_idx) & 1 == 1 {
-                            types.push(Value::String(name.to_string()));
-                        }
+            if let Some((bs_tlv, _)) = parse_tlv(data)
+                && bs_tlv.tag == TAG_BITSTRING
+                && bs_tlv.value.len() >= 2
+            {
+                let unused_bits = bs_tlv.value[0] as usize;
+                let bits = &bs_tlv.value[1..];
+                let cert_type_names = [
+                    "ssl_client",
+                    "ssl_server",
+                    "smime",
+                    "object_signing",
+                    "reserved",
+                    "ssl_ca",
+                    "smime_ca",
+                    "object_signing_ca",
+                ];
+                let mut types = Vec::new();
+                let total_bits = bits.len() * 8 - unused_bits;
+                for (i, name) in cert_type_names.iter().enumerate() {
+                    if i >= total_bits {
+                        break;
                     }
-                    return Value::Array(types);
+                    let byte_idx = i / 8;
+                    let bit_idx = 7 - (i % 8);
+                    if byte_idx < bits.len() && (bits[byte_idx] >> bit_idx) & 1 == 1 {
+                        types.push(Value::String(name.to_string()));
+                    }
                 }
+                return Value::Array(types);
             }
             Value::Array(Vec::new())
         }

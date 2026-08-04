@@ -128,9 +128,9 @@ mod tests {
         let fixture_json = include_str!("../../../../tests/fixtures/ubuntu-18.04/pip-list.json");
 
         let parser = PipListParser;
-        let result = parser.parse(&fixture_out, false).unwrap();
+        let result = parser.parse(fixture_out, false).unwrap();
         let expected: serde_json::Value =
-            serde_json::from_str(&fixture_json).expect("invalid fixture JSON");
+            serde_json::from_str(fixture_json).expect("invalid fixture JSON");
 
         let got = serde_json::to_value(&result).unwrap();
         assert_eq!(got, expected, "pip_list fixture mismatch");

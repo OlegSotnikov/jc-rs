@@ -263,17 +263,16 @@ impl Parser for SshConfParser {
             }
 
             // Handle modified fields (+/- prefix)
-            if modified.contains(key.as_str()) {
-                if let Some(first_char) = val.chars().next() {
-                    if modifiers.contains(&first_char) {
-                        host.insert(key.clone(), Value::String(val[1..].to_string()));
-                        host.insert(
-                            format!("{}_strategy", key),
-                            Value::String(first_char.to_string()),
-                        );
-                        continue;
-                    }
-                }
+            if modified.contains(key.as_str())
+                && let Some(first_char) = val.chars().next()
+                && modifiers.contains(&first_char)
+            {
+                host.insert(key.clone(), Value::String(val[1..].to_string()));
+                host.insert(
+                    format!("{}_strategy", key),
+                    Value::String(first_char.to_string()),
+                );
+                continue;
             }
 
             host.insert(key, Value::String(val.to_string()));

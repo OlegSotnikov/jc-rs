@@ -26,7 +26,7 @@ static INFO: ParserInfo = ParserInfo {
 pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
     let mut obj = Map::new();
     let mut account_origin: Option<String> = None;
-    let mut domain: Option<String> = None;
+    let domain: Option<String> = None;
     let mut comment: Option<String> = None;
     let mut groups: Vec<Value> = Vec::new();
     let mut members: Vec<Value> = Vec::new();
@@ -109,15 +109,13 @@ pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
     }
 
     // Finalize detail mode result
-    if in_group_detail {
-        if let Some(name) = current_group {
-            let members_arr = Value::Array(members);
-            let group_obj = serde_json::json!({
-                "name": name,
-                "members": members_arr
-            });
-            groups.push(group_obj);
-        }
+    if in_group_detail && let Some(name) = current_group {
+        let members_arr = Value::Array(members);
+        let group_obj = serde_json::json!({
+            "name": name,
+            "members": members_arr
+        });
+        groups.push(group_obj);
     }
 
     obj.insert(
@@ -164,7 +162,6 @@ inventory::submit! {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use jc_rs_core::registry::find_parser;
     use jc_rs_core::types::ParseOutput;
 

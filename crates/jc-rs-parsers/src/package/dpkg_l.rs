@@ -109,22 +109,22 @@ fn process_codes(entry: &mut Map<String, Value>) {
         let codes_lower = codes.to_lowercase();
         let mut chars = codes_lower.chars();
 
-        if let Some(desired_ch) = chars.next() {
-            if let Some((_, val)) = desired_map.iter().find(|(k, _)| *k == desired_ch) {
-                entry.insert("desired".to_string(), Value::String(val.to_string()));
-            }
+        if let Some(desired_ch) = chars.next()
+            && let Some((_, val)) = desired_map.iter().find(|(k, _)| *k == desired_ch)
+        {
+            entry.insert("desired".to_string(), Value::String(val.to_string()));
         }
 
-        if let Some(status_ch) = chars.next() {
-            if let Some((_, val)) = status_map.iter().find(|(k, _)| *k == status_ch) {
-                entry.insert("status".to_string(), Value::String(val.to_string()));
-            }
+        if let Some(status_ch) = chars.next()
+            && let Some((_, val)) = status_map.iter().find(|(k, _)| *k == status_ch)
+        {
+            entry.insert("status".to_string(), Value::String(val.to_string()));
         }
 
-        if let Some(err_ch) = chars.next() {
-            if let Some((_, val)) = err_map.iter().find(|(k, _)| *k == err_ch) {
-                entry.insert("error".to_string(), Value::String(val.to_string()));
-            }
+        if let Some(err_ch) = chars.next()
+            && let Some((_, val)) = err_map.iter().find(|(k, _)| *k == err_ch)
+        {
+            entry.insert("error".to_string(), Value::String(val.to_string()));
         }
     }
 }

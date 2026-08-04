@@ -27,9 +27,7 @@ static NMCLI_PARSER: NmcliParser = NmcliParser;
 inventory::submit! { ParserEntry::new(&NMCLI_PARSER) }
 
 fn normalize_key(key: &str) -> String {
-    key.replace(' ', "_")
-        .replace('.', "_")
-        .replace('[', "_")
+    key.replace([' ', '.', '['], "_")
         .replace(']', "")
         .replace('-', "_")
         .replace("GENERAL_", "")
@@ -57,12 +55,11 @@ fn try_numeric(v: &Value) -> Value {
             return Value::Number(n.into());
         }
         // Try float (only if has dot)
-        if s.contains('.') {
-            if let Ok(f) = s.parse::<f64>() {
-                if let Some(n) = serde_json::Number::from_f64(f) {
-                    return Value::Number(n);
-                }
-            }
+        if s.contains('.')
+            && let Ok(f) = s.parse::<f64>()
+            && let Some(n) = serde_json::Number::from_f64(f)
+        {
+            return Value::Number(n);
         }
     }
     v.clone()
@@ -111,11 +108,11 @@ fn extract_paren_text(s: &str) -> Option<&str> {
 
 /// Strip trailing parenthetical: "-1 (default)" → "-1"
 fn remove_paren_text(s: &str) -> &str {
-    if let Some(pos) = s.rfind('(') {
-        if s.ends_with(')') {
-            let trimmed = s[..pos].trim_end();
-            return trimmed;
-        }
+    if let Some(pos) = s.rfind('(')
+        && s.ends_with(')')
+    {
+        let trimmed = s[..pos].trim_end();
+        return trimmed;
     }
     s
 }
@@ -123,16 +120,16 @@ fn remove_paren_text(s: &str) -> &str {
 /// Insert key+value into item, with parenthetical text handling
 fn insert_kv(item: &mut Map<String, Value>, key_n: String, value_n: Value) {
     // Check for parenthetical text in the value
-    if let Some(s) = value_n.as_str() {
-        if let Some(text) = extract_paren_text(s) {
-            let text = text.to_string();
-            // Strip paren from base value and try numeric
-            let base = remove_paren_text(s);
-            let base_val = try_numeric(&Value::String(base.to_string()));
-            item.insert(key_n.clone(), base_val);
-            item.insert(key_n + "_text", Value::String(text));
-            return;
-        }
+    if let Some(s) = value_n.as_str()
+        && let Some(text) = extract_paren_text(s)
+    {
+        let text = text.to_string();
+        // Strip paren from base value and try numeric
+        let base = remove_paren_text(s);
+        let base_val = try_numeric(&Value::String(base.to_string()));
+        item.insert(key_n.clone(), base_val);
+        item.insert(key_n + "_text", Value::String(text));
+        return;
     }
     item.insert(key_n, value_n);
 }
@@ -155,17 +152,17 @@ fn parse_device_show(data: &str) -> Vec<Map<String, Value>> {
         let value_n = normalize_value(value);
 
         if !item.is_empty() && key_n.contains("device") {
-            if let Some(s) = value_n.as_str() {
-                if s != current_item {
-                    raw_output.push(item.clone());
-                    item = Map::new();
-                    current_item = s.to_string();
-                }
-            }
-        } else if item.is_empty() {
-            if let Some(s) = value_n.as_str() {
+            if let Some(s) = value_n.as_str()
+                && s != current_item
+            {
+                raw_output.push(item.clone());
+                item = Map::new();
                 current_item = s.to_string();
             }
+        } else if item.is_empty()
+            && let Some(s) = value_n.as_str()
+        {
+            current_item = s.to_string();
         }
 
         let final_value = if key_n.contains("_route_")
@@ -369,8 +366,7 @@ fn parse_table_format(data: &str) -> Vec<Map<String, Value>> {
             header_line[start..end]
                 .trim()
                 .to_lowercase()
-                .replace(' ', "_")
-                .replace('-', "_")
+                .replace([' ', '-'], "_")
         })
         .collect();
 
@@ -402,15 +398,15 @@ fn parse_table_format(data: &str) -> Vec<Map<String, Value>> {
     result
 }
 
-fn apply_numeric_conversion(items: &mut Vec<Map<String, Value>>) {
+fn apply_numeric_conversion(items: &mut [Map<String, Value>]) {
     for item in items.iter_mut() {
         let keys: Vec<String> = item.keys().cloned().collect();
         for key in keys {
-            if let Some(v) = item.get(&key) {
-                if let Some(s) = v.as_str() {
-                    let converted = try_numeric(&Value::String(s.to_string()));
-                    item.insert(key, converted);
-                }
+            if let Some(v) = item.get(&key)
+                && let Some(s) = v.as_str()
+            {
+                let converted = try_numeric(&Value::String(s.to_string()));
+                item.insert(key, converted);
             }
         }
     }

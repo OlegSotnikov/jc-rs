@@ -119,31 +119,31 @@ fn parse_network_cards(data: &str) -> Vec<Value> {
         let line_trimmed = line.trim();
 
         // Check for [N]: pattern
-        if let Some(bracket_end) = line_trimmed.find("]:") {
-            if line_trimmed.starts_with('[') {
-                let _num_str = &line_trimmed[1..bracket_end];
-                let val = line_trimmed[bracket_end + 2..].trim();
+        if let Some(bracket_end) = line_trimmed.find("]:")
+            && line_trimmed.starts_with('[')
+        {
+            let _num_str = &line_trimmed[1..bracket_end];
+            let val = line_trimmed[bracket_end + 2..].trim();
 
-                if is_ip && cur_value_pos > nic_value_pos {
-                    // IP address entry
-                    if let Some(ref mut nic) = cur_nic {
-                        if let Some(Value::Array(ips)) = nic.get_mut("ip_addresses") {
-                            ips.push(Value::String(val.to_string()));
-                        }
-                    }
-                } else {
-                    // New NIC
-                    if let Some(nic) = cur_nic.take() {
-                        result.push(Value::Object(nic));
-                    }
-                    let mut new_nic = default_nic();
-                    new_nic.insert("name".to_string(), Value::String(val.to_string()));
-                    nic_value_pos = cur_value_pos;
-                    cur_nic = Some(new_nic);
-                    is_ip = false;
+            if is_ip && cur_value_pos > nic_value_pos {
+                // IP address entry
+                if let Some(ref mut nic) = cur_nic
+                    && let Some(Value::Array(ips)) = nic.get_mut("ip_addresses")
+                {
+                    ips.push(Value::String(val.to_string()));
                 }
-                continue;
+            } else {
+                // New NIC
+                if let Some(nic) = cur_nic.take() {
+                    result.push(Value::Object(nic));
+                }
+                let mut new_nic = default_nic();
+                new_nic.insert("name".to_string(), Value::String(val.to_string()));
+                nic_value_pos = cur_value_pos;
+                cur_nic = Some(new_nic);
+                is_ip = false;
             }
+            continue;
         }
 
         // Key: Value lines
@@ -262,19 +262,19 @@ fn post_process(out: &mut Map<String, Value>) {
     ];
 
     for key in &int_mb_keys {
-        if let Some(Value::String(s)) = out.get(*key).cloned() {
-            if let Some(n) = convert_to_int_mb(&s) {
-                out.insert(key.to_string(), Value::Number(n.into()));
-            }
+        if let Some(Value::String(s)) = out.get(*key).cloned()
+            && let Some(n) = convert_to_int_mb(&s)
+        {
+            out.insert(key.to_string(), Value::Number(n.into()));
         }
     }
 
     // Convert empty strings to null
     for val in out.values_mut() {
-        if let Value::String(s) = val {
-            if s.is_empty() {
-                *val = Value::Null;
-            }
+        if let Value::String(s) = val
+            && s.is_empty()
+        {
+            *val = Value::Null;
         }
     }
 
@@ -289,10 +289,10 @@ fn post_process(out: &mut Map<String, Value>) {
                 // Convert empty strings to null
                 let keys: Vec<String> = nic.keys().cloned().collect();
                 for k in keys {
-                    if let Some(Value::String(s)) = nic.get(&k) {
-                        if s.is_empty() {
-                            nic.insert(k, Value::Null);
-                        }
+                    if let Some(Value::String(s)) = nic.get(&k)
+                        && s.is_empty()
+                    {
+                        nic.insert(k, Value::Null);
                     }
                 }
             }

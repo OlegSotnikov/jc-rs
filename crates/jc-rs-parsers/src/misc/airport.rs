@@ -32,10 +32,7 @@ inventory::submit! {
 
 /// Normalize a key: lowercase, spaces → _, dots → _
 fn normalize_key(key: &str) -> String {
-    key.trim()
-        .to_lowercase()
-        .replace(' ', "_")
-        .replace('.', "_")
+    key.trim().to_lowercase().replace([' ', '.'], "_")
 }
 
 impl Parser for AirportParser {

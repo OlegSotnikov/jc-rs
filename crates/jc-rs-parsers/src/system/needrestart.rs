@@ -93,11 +93,11 @@ fn parse_needrestart(input: &str) -> Map<String, Value> {
         if let Some(val) = out.remove(*raw_key) {
             if *raw_key == "needrestart_ksta" {
                 // Convert to integer
-                if let Value::String(s) = &val {
-                    if let Ok(n) = s.parse::<i64>() {
-                        final_out.insert(new_key.to_string(), Value::Number(n.into()));
-                        continue;
-                    }
+                if let Value::String(s) = &val
+                    && let Ok(n) = s.parse::<i64>()
+                {
+                    final_out.insert(new_key.to_string(), Value::Number(n.into()));
+                    continue;
                 }
             }
             final_out.insert(new_key.to_string(), val);

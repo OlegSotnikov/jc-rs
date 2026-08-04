@@ -43,10 +43,10 @@ impl Parser for ArpParser {
         let mut cleandata: Vec<&str> = input.lines().filter(|l| !l.trim().is_empty()).collect();
 
         // Remove trailing "Entries: N" line if present (arp -v)
-        if let Some(last) = cleandata.last() {
-            if last.starts_with("Entries:") {
-                cleandata.pop();
-            }
+        if let Some(last) = cleandata.last()
+            && last.starts_with("Entries:")
+        {
+            cleandata.pop();
         }
 
         if cleandata.is_empty() {
@@ -140,10 +140,10 @@ fn parse_bsd_a_style(lines: &[&str]) -> Result<ParseOutput, ParseError> {
         // Check for "expires in N seconds" field
         if let Some(exp_idx) = parts.iter().position(|&p| p == "expires") {
             // "expires in 942 seconds" — number is 2 positions after "expires"
-            if let Some(exp_val) = parts.get(exp_idx + 2) {
-                if let Ok(n) = exp_val.parse::<i64>() {
-                    obj.insert("expires".to_string(), Value::Number(n.into()));
-                }
+            if let Some(exp_val) = parts.get(exp_idx + 2)
+                && let Ok(n) = exp_val.parse::<i64>()
+            {
+                obj.insert("expires".to_string(), Value::Number(n.into()));
             }
         }
 

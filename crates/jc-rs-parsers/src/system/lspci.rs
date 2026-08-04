@@ -146,14 +146,14 @@ fn is_pure_hex_id(s: &str) -> bool {
 
 fn extract_bracket_id(s: &str) -> Option<String> {
     // Look for " [xxxx]" at the end
-    if let Some(open) = s.rfind('[') {
-        if let Some(close) = s.rfind(']') {
-            if close == s.len() - 1 && close > open {
-                let id = &s[open + 1..close];
-                if id.len() == 4 && id.chars().all(|c| c.is_ascii_hexdigit()) {
-                    return Some(id.to_string());
-                }
-            }
+    if let Some(open) = s.rfind('[')
+        && let Some(close) = s.rfind(']')
+        && close == s.len() - 1
+        && close > open
+    {
+        let id = &s[open + 1..close];
+        if id.len() == 4 && id.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Some(id.to_string());
         }
     }
     None
@@ -163,10 +163,10 @@ fn process_device(mut device: Map<String, Value>) -> Map<String, Value> {
     let mut additions: Vec<(String, Value)> = Vec::new();
 
     for field in INT_FIELDS {
-        if let Some(Value::String(s)) = device.get(*field) {
-            if let Ok(n) = i64::from_str_radix(s, 16) {
-                additions.push((format!("{}_int", field), Value::Number(n.into())));
-            }
+        if let Some(Value::String(s)) = device.get(*field)
+            && let Ok(n) = i64::from_str_radix(s, 16)
+        {
+            additions.push((format!("{}_int", field), Value::Number(n.into())));
         }
     }
 

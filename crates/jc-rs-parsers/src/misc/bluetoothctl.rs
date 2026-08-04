@@ -147,10 +147,10 @@ fn parse_controller(lines: &mut Vec<&str>) -> Option<Map<String, Value>> {
                     "discovering".to_string(),
                     Value::String(m.as_str().to_string()),
                 );
-            } else if let Some(m) = caps.name("uuid") {
-                if let Some(Value::Array(uuids)) = ctrl.get_mut("uuids") {
-                    uuids.push(Value::String(m.as_str().to_string()));
-                }
+            } else if let Some(m) = caps.name("uuid")
+                && let Some(Value::Array(uuids)) = ctrl.get_mut("uuids")
+            {
+                uuids.push(Value::String(m.as_str().to_string()));
             }
         } else {
             // Line doesn't match any pattern → stop
@@ -368,9 +368,9 @@ impl Parser for BluetoothctlParser {
             }
 
             let element = if is_controller {
-                parse_controller(&mut line_stack).map(|m| m)
+                parse_controller(&mut line_stack)
             } else {
-                parse_device(&mut line_stack, quiet).map(|m| m)
+                parse_device(&mut line_stack, quiet)
             };
 
             if let Some(obj) = element {

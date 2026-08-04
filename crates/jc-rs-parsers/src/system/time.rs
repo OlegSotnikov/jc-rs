@@ -75,9 +75,7 @@ pub fn parse_time(input: &str) -> Map<String, Value> {
                 if line.contains("elapsed") {
                     // Line 0: user/system/elapsed/cpu/avgtext/avgdata/maxresident
                     let new_line = line
-                        .replace('+', " ")
-                        .replace('(', " ")
-                        .replace(')', " ")
+                        .replace(['+', '(', ')'], " ")
                         .replace("user", " ")
                         .replace("system", " ")
                         .replace("elapsed", " ")
@@ -122,9 +120,7 @@ pub fn parse_time(input: &str) -> Map<String, Value> {
                 } else {
                     // Line 1: inputs/outputs/major/minor/pagefaults/swaps
                     let new_line = line
-                        .replace('+', " ")
-                        .replace('(', " ")
-                        .replace(')', " ")
+                        .replace(['+', '(', ')'], " ")
                         .replace("inputs", " ")
                         .replace("outputs", " ")
                         .replace("major", " ")
@@ -202,10 +198,8 @@ pub fn parse_time(input: &str) -> Map<String, Value> {
                         .trim()
                         .to_lowercase()
                         .replace(' ', "_")
-                        .replace('(', "")
-                        .replace(')', "")
-                        .replace('/', "_")
-                        .replace(':', "_")
+                        .replace(['(', ')'], "")
+                        .replace(['/', ':'], "_")
                         .replace("_kbytes", "")
                         .replace("_seconds", "")
                         .replace("socket_", "")
@@ -332,7 +326,7 @@ fn process_time(raw: Map<String, Value>) -> Map<String, Value> {
                         .unwrap_or(Value::Null)
                 } else if float_list.contains(&key.as_str()) {
                     convert_to_float(s)
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null)
                 } else {

@@ -144,20 +144,7 @@ fn strip_tree_chars(s: &str) -> String {
 }
 
 fn normalize_header(h: &str) -> String {
-    h.to_lowercase()
-        .replace(':', "_")
-        .replace('-', "_")
-        .replace("maj_min", "maj_min")
-}
-
-/// Extract a substring from a line using character (not byte) positions.
-fn substr_by_chars(line: &str, start: usize, end: usize) -> String {
-    line.chars()
-        .skip(start)
-        .take(end.saturating_sub(start))
-        .collect::<String>()
-        .trim()
-        .to_string()
+    h.to_lowercase().replace([':', '-'], "_")
 }
 
 /// Adjust column end position using character indices (move left until whitespace).
@@ -183,11 +170,8 @@ fn parse_lsblk(input: &str) -> Vec<Map<String, Value>> {
     let header_line = lines[0];
 
     // Normalize header like jc: lowercase, replace ':' and '-' with '_'
-    let normalized_header: String = header_line
-        .to_lowercase()
-        .replace(':', "_")
-        .replace('-', "_");
-    let norm_header_chars: Vec<char> = normalized_header.chars().collect();
+    let normalized_header: String = header_line.to_lowercase().replace([':', '-'], "_");
+    let _norm_header_chars: Vec<char> = normalized_header.chars().collect();
 
     // Build column names and col_ends from the normalized header.
     // col_ends[i] = position of " next_col_name " in the normalized header (= col_starts[i+1]-1).

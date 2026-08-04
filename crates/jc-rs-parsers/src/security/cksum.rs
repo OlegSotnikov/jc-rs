@@ -60,12 +60,12 @@ impl Parser for CksumParser {
             // filename is the rest after splitting on whitespace twice
             let rest = line
                 .trim_start()
-                .splitn(2, char::is_whitespace)
-                .nth(1)
+                .split_once(char::is_whitespace)
+                .map(|x| x.1)
                 .unwrap_or("")
                 .trim_start()
-                .splitn(2, char::is_whitespace)
-                .nth(1)
+                .split_once(char::is_whitespace)
+                .map(|x| x.1)
                 .unwrap_or("");
 
             let mut obj = Map::new();

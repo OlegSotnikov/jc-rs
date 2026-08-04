@@ -8,6 +8,7 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 
 pub struct PingParser;
 
@@ -29,6 +30,16 @@ static INFO: ParserInfo = ParserInfo {
 static PING_PARSER: PingParser = PingParser;
 
 inventory::submit! { ParserEntry::new(&PING_PARSER) }
+
+static RTT_4_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"rtt min/avg/max/mdev\s*=\s*([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+)\s*ms")
+        .expect("valid rtt pattern")
+});
+
+static RTT_3_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"round-trip min/avg/max\s*=\s*([\d.]+)/([\d.]+)/([\d.]+)\s*ms")
+        .expect("valid round-trip pattern")
+});
 
 fn str_to_int(s: &str) -> Value {
     s.parse::<i64>()
@@ -77,8 +88,8 @@ fn parse_linux(input: &str) -> Map<String, Value> {
         let pat_line = lines.remove(0);
         pattern = Some(
             pat_line
-                .splitn(2, ':')
-                .nth(1)
+                .split_once(':')
+                .map(|x| x.1)
                 .unwrap_or("")
                 .trim()
                 .to_string(),
@@ -110,7 +121,7 @@ fn parse_linux(input: &str) -> Map<String, Value> {
                 line.contains(" (")
             };
 
-            let cleaned = line.replace('(', " ").replace(')', " ");
+            let cleaned = line.replace(['(', ')'], " ");
             let parts: Vec<&str> = cleaned.split_whitespace().collect();
 
             // After replacing ( and ) with spaces:
@@ -185,49 +196,41 @@ fn parse_linux(input: &str) -> Map<String, Value> {
                 obj.insert("time_ms".to_string(), str_to_float(&m));
             }
             // Try 4-part rtt (Linux): rtt min/avg/max/mdev = ...
-            if let Ok(re) =
-                Regex::new(r"rtt min/avg/max/mdev\s*=\s*([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+)\s*ms")
-            {
-                if let Some(caps) = re.captures(line) {
-                    obj.insert(
-                        "round_trip_ms_min".to_string(),
-                        str_to_float(caps.get(1).map_or("", |m| m.as_str())),
-                    );
-                    obj.insert(
-                        "round_trip_ms_avg".to_string(),
-                        str_to_float(caps.get(2).map_or("", |m| m.as_str())),
-                    );
-                    obj.insert(
-                        "round_trip_ms_max".to_string(),
-                        str_to_float(caps.get(3).map_or("", |m| m.as_str())),
-                    );
-                    obj.insert(
-                        "round_trip_ms_stddev".to_string(),
-                        str_to_float(caps.get(4).map_or("", |m| m.as_str())),
-                    );
-                }
+            if let Some(caps) = RTT_4_RE.captures(line) {
+                obj.insert(
+                    "round_trip_ms_min".to_string(),
+                    str_to_float(caps.get(1).map_or("", |m| m.as_str())),
+                );
+                obj.insert(
+                    "round_trip_ms_avg".to_string(),
+                    str_to_float(caps.get(2).map_or("", |m| m.as_str())),
+                );
+                obj.insert(
+                    "round_trip_ms_max".to_string(),
+                    str_to_float(caps.get(3).map_or("", |m| m.as_str())),
+                );
+                obj.insert(
+                    "round_trip_ms_stddev".to_string(),
+                    str_to_float(caps.get(4).map_or("", |m| m.as_str())),
+                );
             }
             // Try 3-part round-trip (Alpine/BusyBox): round-trip min/avg/max = ...
-            if !obj.contains_key("round_trip_ms_min") {
-                if let Ok(re) =
-                    Regex::new(r"round-trip min/avg/max\s*=\s*([\d.]+)/([\d.]+)/([\d.]+)\s*ms")
-                {
-                    if let Some(caps) = re.captures(line) {
-                        obj.insert(
-                            "round_trip_ms_min".to_string(),
-                            str_to_float(caps.get(1).map_or("", |m| m.as_str())),
-                        );
-                        obj.insert(
-                            "round_trip_ms_avg".to_string(),
-                            str_to_float(caps.get(2).map_or("", |m| m.as_str())),
-                        );
-                        obj.insert(
-                            "round_trip_ms_max".to_string(),
-                            str_to_float(caps.get(3).map_or("", |m| m.as_str())),
-                        );
-                        obj.insert("round_trip_ms_stddev".to_string(), Value::Null);
-                    }
-                }
+            if !obj.contains_key("round_trip_ms_min")
+                && let Some(caps) = RTT_3_RE.captures(line)
+            {
+                obj.insert(
+                    "round_trip_ms_min".to_string(),
+                    str_to_float(caps.get(1).map_or("", |m| m.as_str())),
+                );
+                obj.insert(
+                    "round_trip_ms_avg".to_string(),
+                    str_to_float(caps.get(2).map_or("", |m| m.as_str())),
+                );
+                obj.insert(
+                    "round_trip_ms_max".to_string(),
+                    str_to_float(caps.get(3).map_or("", |m| m.as_str())),
+                );
+                obj.insert("round_trip_ms_stddev".to_string(), Value::Null);
             }
             continue;
         }
@@ -272,7 +275,7 @@ fn parse_linux(input: &str) -> Map<String, Value> {
                 responses.push(Value::Object(resp));
                 continue;
             }
-            let cleaned = line.replace('(', " ").replace(')', " ").replace('=', " ");
+            let cleaned = line.replace(['(', ')', '='], " ");
             let has_ts = cleaned.starts_with('[');
 
             let (bts, rip, iseq, t2l, tms) = if ipv4 && !has_hostname {
@@ -411,7 +414,13 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
 
     for line in lines.iter().filter(|l| !l.trim().is_empty()) {
         if line.starts_with("PATTERN:") {
-            pattern = Some(line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string());
+            pattern = Some(
+                line.split_once(':')
+                    .map(|x| x.1)
+                    .unwrap_or("")
+                    .trim()
+                    .to_string(),
+            );
             continue;
         }
 
@@ -439,7 +448,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
         }
 
         if line.starts_with("PING6(") {
-            let cleaned = line.replace('(', " ").replace(')', " ").replace('=', " ");
+            let cleaned = line.replace(['(', ')', '='], " ");
             let parts: Vec<&str> = cleaned.split_whitespace().collect();
             obj.insert(
                 "source_ip".to_string(),
@@ -476,7 +485,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
                 if line.contains(" duplicates,") {
                     obj.insert(
                         "packets_transmitted".to_string(),
-                        str_to_int(parts.get(0).copied().unwrap_or("")),
+                        str_to_int(parts.first().copied().unwrap_or("")),
                     );
                     obj.insert(
                         "packets_received".to_string(),
@@ -489,7 +498,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
                 } else {
                     obj.insert(
                         "packets_transmitted".to_string(),
-                        str_to_int(parts.get(0).copied().unwrap_or("")),
+                        str_to_int(parts.first().copied().unwrap_or("")),
                     );
                     obj.insert(
                         "packets_received".to_string(),
@@ -503,32 +512,32 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
             }
 
             // round trip line: "round-trip min/avg/max/stddev = 1.234/5.678/9.012/3.456 ms"
-            if line.contains('/') {
-                if let Some(eq_pos) = line.find('=') {
-                    let after = line[eq_pos + 1..].trim();
-                    let ms = after.trim_end_matches(" ms").trim_end_matches(" ms\n");
-                    let parts: Vec<&str> = ms.split('/').collect();
-                    if parts.len() >= 3 {
+            if line.contains('/')
+                && let Some(eq_pos) = line.find('=')
+            {
+                let after = line[eq_pos + 1..].trim();
+                let ms = after.trim_end_matches(" ms").trim_end_matches(" ms\n");
+                let parts: Vec<&str> = ms.split('/').collect();
+                if parts.len() >= 3 {
+                    obj.insert(
+                        "round_trip_ms_min".to_string(),
+                        str_to_float(parts[0].trim()),
+                    );
+                    obj.insert(
+                        "round_trip_ms_avg".to_string(),
+                        str_to_float(parts[1].trim()),
+                    );
+                    obj.insert(
+                        "round_trip_ms_max".to_string(),
+                        str_to_float(parts[2].trim()),
+                    );
+                    if parts.len() >= 4 {
                         obj.insert(
-                            "round_trip_ms_min".to_string(),
-                            str_to_float(parts[0].trim()),
+                            "round_trip_ms_stddev".to_string(),
+                            str_to_float(parts[3].trim()),
                         );
-                        obj.insert(
-                            "round_trip_ms_avg".to_string(),
-                            str_to_float(parts[1].trim()),
-                        );
-                        obj.insert(
-                            "round_trip_ms_max".to_string(),
-                            str_to_float(parts[2].trim()),
-                        );
-                        if parts.len() >= 4 {
-                            obj.insert(
-                                "round_trip_ms_stddev".to_string(),
-                                str_to_float(parts[3].trim()),
-                            );
-                        } else {
-                            obj.insert("round_trip_ms_stddev".to_string(), Value::Null);
-                        }
+                    } else {
+                        obj.insert("round_trip_ms_stddev".to_string(), Value::Null);
                     }
                 }
             }
@@ -583,7 +592,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
                 let mut resp = Map::new();
                 resp.insert("type".to_string(), Value::String(err.to_string()));
                 // bytes at index 0, response_ip at index 4 (hostname present)
-                if let Some(b) = parts.get(0) {
+                if let Some(b) = parts.first() {
                     resp.insert("bytes".to_string(), str_to_int(b));
                 }
                 if let Some(ip) = parts.get(4) {
@@ -601,7 +610,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
 
             // Normal reply or unparsable
             // Replace ':' and '=' with spaces (matching jc)
-            let modified = line.replace(':', " ").replace('=', " ");
+            let modified = line.replace([':', '='], " ");
             let parts: Vec<&str> = modified.split_whitespace().collect();
 
             // Try to parse as normal reply (needs at least 10 fields)
@@ -611,7 +620,7 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
                 resp.insert("type".to_string(), Value::String("reply".to_string()));
                 resp.insert(
                     "bytes".to_string(),
-                    str_to_int(parts.get(0).copied().unwrap_or("")),
+                    str_to_int(parts.first().copied().unwrap_or("")),
                 );
                 resp.insert(
                     "response_ip".to_string(),

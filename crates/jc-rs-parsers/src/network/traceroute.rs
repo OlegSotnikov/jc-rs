@@ -32,10 +32,6 @@ fn str_to_int_opt(s: &str) -> Option<i64> {
     s.parse::<i64>().ok()
 }
 
-fn str_to_float_opt(s: &str) -> Option<f64> {
-    s.parse::<f64>().ok()
-}
-
 #[derive(Debug, Clone)]
 struct Probe {
     annotation: Option<String>,
@@ -88,7 +84,7 @@ impl Probe {
         obj.insert(
             "rtt".to_string(),
             self.rtt
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -232,15 +228,13 @@ fn get_probes(hop_string: &str) -> Vec<Probe> {
                 };
 
                 // If last match was also RTT, carry ip/name/asn from last probe
-                if last_was_rtt {
-                    if let Some(ref lp) = last_probe {
-                        if probe.ip.is_none() {
-                            probe.ip = lp.ip.clone();
-                            probe.name = lp.name.clone();
-                        }
-                        if probe.asn.is_none() {
-                            probe.asn = lp.asn;
-                        }
+                if last_was_rtt && let Some(ref lp) = last_probe {
+                    if probe.ip.is_none() {
+                        probe.ip = lp.ip.clone();
+                        probe.name = lp.name.clone();
+                    }
+                    if probe.asn.is_none() {
+                        probe.asn = lp.asn;
                     }
                 }
 

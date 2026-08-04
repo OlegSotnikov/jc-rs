@@ -189,7 +189,7 @@ fn parse_kv_line_sparse(
     let key = key.to_string();
 
     // Extract val: content[val_boundary+1..desc_boundary], trimmed
-    let val = if val_boundary < desc_boundary && val_boundary + 1 <= padded.len() {
+    let val = if val_boundary < desc_boundary && val_boundary < padded.len() {
         let end = desc_boundary.min(padded.len());
         let start = (val_boundary + 1).min(end);
         let v = std::str::from_utf8(&padded[start..end])
@@ -232,15 +232,15 @@ fn parse_kv_line_sparse(
 /// Build a value object {"value": ..., "description": ...}
 fn make_value_obj(value: Option<String>, description: Option<String>) -> Map<String, Value> {
     let mut obj = Map::new();
-    if let Some(v) = value {
-        if !v.is_empty() {
-            obj.insert("value".to_string(), Value::String(v));
-        }
+    if let Some(v) = value
+        && !v.is_empty()
+    {
+        obj.insert("value".to_string(), Value::String(v));
     }
-    if let Some(d) = description {
-        if !d.is_empty() {
-            obj.insert("description".to_string(), Value::String(d));
-        }
+    if let Some(d) = description
+        && !d.is_empty()
+    {
+        obj.insert("description".to_string(), Value::String(d));
     }
     obj
 }
@@ -286,9 +286,7 @@ fn map_section_name(header: &str) -> Option<String> {
             let name = trimmed
                 .trim_end_matches(':')
                 .to_lowercase()
-                .replace(' ', "_")
-                .replace('-', "_")
-                .replace('/', "_");
+                .replace([' ', '-', '/'], "_");
             Some(name)
         }
     }
@@ -589,15 +587,15 @@ fn parse_device_descriptor(lines: &[&str], start: usize, out: &mut Map<String, V
         }
 
         // Regular key-value at indent 2
-        if indent == 2 {
-            if let Some((key, val, desc)) = parse_kv_line_sparse(line, false) {
-                let obj = make_value_obj(val, desc);
-                out.insert(key.clone(), Value::Object(obj));
-                last_key = key;
-                last_indent = indent;
-                i += 1;
-                continue;
-            }
+        if indent == 2
+            && let Some((key, val, desc)) = parse_kv_line_sparse(line, false)
+        {
+            let obj = make_value_obj(val, desc);
+            out.insert(key.clone(), Value::Object(obj));
+            last_key = key;
+            last_indent = indent;
+            i += 1;
+            continue;
         }
 
         // Attribute lines (indent > 2, more indented than the last field)
@@ -690,15 +688,15 @@ fn parse_configuration_descriptor(
         }
 
         // Regular key-value at indent 4
-        if indent == 4 {
-            if let Some((key, val, desc)) = parse_kv_line_sparse(line, false) {
-                let obj = make_value_obj(val, desc);
-                out.insert(key.clone(), Value::Object(obj));
-                last_key = key;
-                last_indent = indent;
-                i += 1;
-                continue;
-            }
+        if indent == 4
+            && let Some((key, val, desc)) = parse_kv_line_sparse(line, false)
+        {
+            let obj = make_value_obj(val, desc);
+            out.insert(key.clone(), Value::Object(obj));
+            last_key = key;
+            last_indent = indent;
+            i += 1;
+            continue;
         }
 
         // Attribute lines (indent > 4)
@@ -1006,15 +1004,15 @@ fn parse_generic_section(
         // as regular key-values (e.g. 'AudioStreaming Endpoint Descriptor:' becomes key='AudioStreaming').
         // Lines deeper than base_indent can become standalone keys when indent decreases after attributes
         // (e.g. bLockDelayUnits at indent 10 after Sampling Frequency at indent 12).
-        if indent >= base_indent {
-            if let Some((key, val, desc)) = parse_kv_line_sparse(line, wide) {
-                let obj = make_value_obj(val, desc);
-                out.insert(key.clone(), Value::Object(obj));
-                last_key = key;
-                last_indent = indent;
-                i += 1;
-                continue;
-            }
+        if indent >= base_indent
+            && let Some((key, val, desc)) = parse_kv_line_sparse(line, wide)
+        {
+            let obj = make_value_obj(val, desc);
+            out.insert(key.clone(), Value::Object(obj));
+            last_key = key;
+            last_indent = indent;
+            i += 1;
+            continue;
         }
 
         i += 1;
@@ -1059,15 +1057,15 @@ fn parse_hub_descriptor(lines: &[&str], start: usize, out: &mut Map<String, Valu
         }
 
         // Regular key-value at indent 2
-        if indent == 2 {
-            if let Some((key, val, desc)) = parse_kv_line_sparse(line, false) {
-                let obj = make_value_obj(val, desc);
-                out.insert(key.clone(), Value::Object(obj));
-                last_key = key;
-                last_indent = indent;
-                i += 1;
-                continue;
-            }
+        if indent == 2
+            && let Some((key, val, desc)) = parse_kv_line_sparse(line, false)
+        {
+            let obj = make_value_obj(val, desc);
+            out.insert(key.clone(), Value::Object(obj));
+            last_key = key;
+            last_indent = indent;
+            i += 1;
+            continue;
         }
 
         // Attribute lines
@@ -1172,14 +1170,14 @@ fn parse_flat_section(
             break;
         }
 
-        if indent == base_indent {
-            if let Some((key, val, desc)) = parse_kv_line_sparse(line, wide) {
-                let obj = make_value_obj(val, desc);
-                out.insert(key.clone(), Value::Object(obj));
-                last_key = key;
-                i += 1;
-                continue;
-            }
+        if indent == base_indent
+            && let Some((key, val, desc)) = parse_kv_line_sparse(line, wide)
+        {
+            let obj = make_value_obj(val, desc);
+            out.insert(key.clone(), Value::Object(obj));
+            last_key = key;
+            i += 1;
+            continue;
         }
 
         // Attribute lines

@@ -76,7 +76,7 @@ impl Parser for YamlParser {
 
         // Try multi-document parsing first
         let docs: Vec<serde_yaml::Value> = serde_yaml::Deserializer::from_str(input)
-            .map(|d| serde_yaml::Value::deserialize(d))
+            .map(serde_yaml::Value::deserialize)
             .collect::<Result<Vec<_>, _>>()
             .map_err(|e| ParseError::Generic(format!("YAML parse error: {e}")))?;
 

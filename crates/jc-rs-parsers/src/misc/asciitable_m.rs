@@ -4,6 +4,7 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 use std::sync::OnceLock;
 
 pub struct AsciitableMParser;
@@ -35,6 +36,9 @@ inventory::submit! {
 }
 
 static ANSI_RE: OnceLock<Regex> = OnceLock::new();
+
+static UNDERSCORES_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"__+").expect("valid pattern"));
 
 fn get_ansi_re() -> &'static Regex {
     ANSI_RE.get_or_init(|| Regex::new(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]").unwrap())
@@ -160,15 +164,7 @@ fn table_sniff(s: &str) -> &'static str {
 }
 
 fn normalize_col_sep(line: &str) -> String {
-    line.replace('│', "|")
-        .replace('┃', "|")
-        .replace('┆', "|")
-        .replace('┇', "|")
-        .replace('┊', "|")
-        .replace('┋', "|")
-        .replace('╎', "|")
-        .replace('╏', "|")
-        .replace('║', "|")
+    line.replace(['│', '┃', '┆', '┇', '┊', '┋', '╎', '╏', '║'], "|")
 }
 
 fn fixup_separators(line: &str) -> String {
@@ -340,10 +336,7 @@ fn collapse_headers(table: &[Vec<String>]) -> Vec<String> {
             if !header.is_empty() {
                 let combined = format!("{}_{}", prev, header);
                 // Remove consecutive underscores
-                let combined = Regex::new(r"__+")
-                    .unwrap()
-                    .replace_all(&combined, "_")
-                    .to_string();
+                let combined = UNDERSCORES_RE.replace_all(&combined, "_").to_string();
                 new_line.push(combined);
             } else {
                 new_line.push(prev.to_string());

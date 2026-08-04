@@ -89,10 +89,10 @@ impl Parser for ProcNetUnixParser {
                 "Inode".to_string(),
                 Value::Number(parts[6].parse::<i64>().unwrap_or(0).into()),
             );
-            if let Some(&path) = parts.get(7) {
-                if !path.is_empty() {
-                    map.insert("Path".to_string(), Value::String(path.to_string()));
-                }
+            if let Some(&path) = parts.get(7)
+                && !path.is_empty()
+            {
+                map.insert("Path".to_string(), Value::String(path.to_string()));
             }
             results.push(map);
         }

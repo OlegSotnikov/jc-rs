@@ -43,8 +43,7 @@ impl Parser for IostatParser {
 
 pub(crate) fn normalize_iostat_header(line: &str) -> String {
     line.replace('%', "percent_")
-        .replace('/', "_")
-        .replace('-', "_")
+        .replace(['/', '-'], "_")
         .to_lowercase()
 }
 
@@ -141,7 +140,7 @@ pub fn parse_iostat(input: &str) -> Vec<Map<String, Value>> {
             continue;
         }
 
-        if line.starts_with("avg-cpu:") {
+        if let Some(header_part) = line.strip_prefix("avg-cpu:") {
             // Flush pending sections
             if !cpu_lines.is_empty() {
                 let table_str = cpu_lines.join("\n");
@@ -156,7 +155,7 @@ pub fn parse_iostat(input: &str) -> Vec<Map<String, Value>> {
 
             section = "cpu";
             // Normalize header: strip "avg-cpu:" prefix, normalize
-            let header_part = &line[8..]; // after "avg-cpu:"
+            // after "avg-cpu:"
             let normalized = normalize_iostat_header(header_part).trim().to_string();
             cpu_lines.push(normalized);
             continue;

@@ -44,7 +44,7 @@ fn build_config_list(config_str: &str) -> Vec<Map<String, Value>> {
         }
 
         let stripped = line.trim();
-        let parts: Vec<&str> = stripped
+        let _parts: Vec<&str> = stripped
             .splitn(6, char::is_whitespace)
             .filter(|s| !s.is_empty())
             .collect();
@@ -296,10 +296,10 @@ impl Parser for ZpoolStatusParser {
         }
 
         // Flush last pool
-        if !pool_str.is_empty() {
-            if let Some(pool_obj) = parse_pool_block(&pool_str) {
-                result.push(pool_obj);
-            }
+        if !pool_str.is_empty()
+            && let Some(pool_obj) = parse_pool_block(&pool_str)
+        {
+            result.push(pool_obj);
         }
 
         Ok(ParseOutput::Array(result))

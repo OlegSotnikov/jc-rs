@@ -122,9 +122,8 @@ impl Parser for M3uParser {
                 continue;
             }
 
-            if line.starts_with("#EXTINF:") {
+            if let Some(extinf_value) = line.strip_prefix("#EXTINF:") {
                 // Parse the EXTINF line
-                let extinf_value = &line["#EXTINF:".len()..];
                 match parse_extinf(extinf_value) {
                     Some((runtime, display, extra_kv)) => {
                         // Convert runtime to int

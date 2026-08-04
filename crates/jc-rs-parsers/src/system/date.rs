@@ -58,7 +58,7 @@ static TZ_ABBR: &[&str] = &[
 ];
 
 fn find_timezone(data: &str) -> Option<String> {
-    let cleaned = data.replace('(', "").replace(')', "");
+    let cleaned = data.replace(['(', ')'], "");
     for term in cleaned.split_whitespace() {
         if TZ_ABBR.contains(&term) {
             return Some(term.to_string());
@@ -246,8 +246,8 @@ fn day_of_year_from(year: i32, month: u32, day: u32) -> u32 {
         31,
     ];
     let mut doy = day;
-    for m in 0..(month as usize - 1) {
-        doy += days_in_month[m];
+    for days in days_in_month.iter().take(month as usize - 1) {
+        doy += days;
     }
     doy
 }

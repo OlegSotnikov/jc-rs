@@ -22,7 +22,6 @@ const SNIFF_LIMIT: usize = 1024;
 /// A row is not always a line: a quoted field may span several, so the session
 /// accumulates until the quotes balance.
 pub(crate) struct DelimitedSession {
-    tsv: bool,
     implicit_header: bool,
     delimiter: Option<u8>,
     headers: Vec<String>,
@@ -36,7 +35,6 @@ pub(crate) struct DelimitedSession {
 impl DelimitedSession {
     pub(crate) fn new(tsv: bool, implicit_header: bool) -> Self {
         Self {
-            tsv,
             implicit_header,
             delimiter: tsv.then_some(b'\t'),
             headers: Vec::new(),

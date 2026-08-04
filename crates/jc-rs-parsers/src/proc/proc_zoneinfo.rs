@@ -67,20 +67,15 @@ impl Parser for ProcZoneinfoParser {
             // "Node N, zone   ZONENAME"
             if line.starts_with("Node ") {
                 // Finish previous pageset if any
-                if let Some(ps) = current_pageset.take() {
-                    if let Some(ref zone_name) = current_zone {
-                        if let Some(ref mut node) = current_node {
-                            if let Some(zone_val) = node.get_mut(zone_name) {
-                                if let Value::Object(zm) = zone_val {
-                                    if let Some(ps_arr) = zm.get_mut("pagesets") {
-                                        if let Value::Array(arr) = ps_arr {
-                                            arr.push(Value::Object(ps));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if let Some(ps) = current_pageset.take()
+                    && let Some(ref zone_name) = current_zone
+                    && let Some(ref mut node) = current_node
+                    && let Some(zone_val) = node.get_mut(zone_name)
+                    && let Value::Object(zm) = zone_val
+                    && let Some(ps_arr) = zm.get_mut("pagesets")
+                    && let Value::Array(arr) = ps_arr
+                {
+                    arr.push(Value::Object(ps));
                 }
 
                 // "Node 0, zone      DMA" — triggers a new node only when zone is "DMA"
@@ -126,14 +121,13 @@ impl Parser for ProcZoneinfoParser {
                     .unwrap_or("0")
                     .parse()
                     .unwrap_or(0);
-                if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                    if let Some(zone_val) = node.get_mut(zone_name) {
-                        if let Value::Object(zm) = zone_val {
-                            let mut pages_map: Map<String, Value> = Map::new();
-                            pages_map.insert("free".to_string(), Value::Number(free_val.into()));
-                            zm.insert("pages".to_string(), Value::Object(pages_map));
-                        }
-                    }
+                if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+                    && let Some(zone_val) = node.get_mut(zone_name)
+                    && let Value::Object(zm) = zone_val
+                {
+                    let mut pages_map: Map<String, Value> = Map::new();
+                    pages_map.insert("free".to_string(), Value::Number(free_val.into()));
+                    zm.insert("pages".to_string(), Value::Object(pages_map));
                 }
                 continue;
             }
@@ -142,12 +136,11 @@ impl Parser for ProcZoneinfoParser {
             if line.starts_with("  pagesets") {
                 section = Section::Pagesets;
                 // Initialise pagesets array in the current zone
-                if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                    if let Some(zone_val) = node.get_mut(zone_name) {
-                        if let Value::Object(zm) = zone_val {
-                            zm.insert("pagesets".to_string(), Value::Array(vec![]));
-                        }
-                    }
+                if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+                    && let Some(zone_val) = node.get_mut(zone_name)
+                    && let Value::Object(zm) = zone_val
+                {
+                    zm.insert("pagesets".to_string(), Value::Array(vec![]));
                 }
                 current_pageset = None;
                 continue;
@@ -165,10 +158,10 @@ impl Parser for ProcZoneinfoParser {
                     Some(s) => s.trim(),
                     None => continue,
                 };
-                if let Ok(n) = val_str.parse::<i64>() {
-                    if let Some(ref mut node) = current_node {
-                        node.insert(key.to_string(), Value::Number(n.into()));
-                    }
+                if let Ok(n) = val_str.parse::<i64>()
+                    && let Some(ref mut node) = current_node
+                {
+                    node.insert(key.to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
@@ -178,24 +171,20 @@ impl Parser for ProcZoneinfoParser {
                 let trimmed = line.trim();
 
                 // "        protection: (0, 2871, 3795, 3795, 3795)"
-                if trimmed.starts_with("protection:") {
-                    let rest = &trimmed["protection:".len()..];
-                    let cleaned = rest.replace('(', "").replace(')', "").replace(',', "");
+                if let Some(rest) = trimmed.strip_prefix("protection:") {
+                    let cleaned = rest.replace(['(', ')', ','], "");
                     let prot: Vec<Value> = cleaned
                         .split_whitespace()
                         .filter_map(|x| x.parse::<i64>().ok())
                         .map(|n| Value::Number(n.into()))
                         .collect();
-                    if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                        if let Some(zone_val) = node.get_mut(zone_name) {
-                            if let Value::Object(zm) = zone_val {
-                                if let Some(pages_val) = zm.get_mut("pages") {
-                                    if let Value::Object(pm) = pages_val {
-                                        pm.insert("protection".to_string(), Value::Array(prot));
-                                    }
-                                }
-                            }
-                        }
+                    if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+                        && let Some(zone_val) = node.get_mut(zone_name)
+                        && let Value::Object(zm) = zone_val
+                        && let Some(pages_val) = zm.get_mut("pages")
+                        && let Value::Object(pm) = pages_val
+                    {
+                        pm.insert("protection".to_string(), Value::Array(prot));
                     }
                     continue;
                 }
@@ -210,18 +199,14 @@ impl Parser for ProcZoneinfoParser {
                     Some(s) => s.trim(),
                     None => continue,
                 };
-                if let Ok(n) = val_str.parse::<i64>() {
-                    if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                        if let Some(zone_val) = node.get_mut(zone_name) {
-                            if let Value::Object(zm) = zone_val {
-                                if let Some(pages_val) = zm.get_mut("pages") {
-                                    if let Value::Object(pm) = pages_val {
-                                        pm.insert(key.to_string(), Value::Number(n.into()));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if let Ok(n) = val_str.parse::<i64>()
+                    && let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+                    && let Some(zone_val) = node.get_mut(zone_name)
+                    && let Value::Object(zm) = zone_val
+                    && let Some(pages_val) = zm.get_mut("pages")
+                    && let Value::Object(pm) = pages_val
+                {
+                    pm.insert(key.to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
@@ -233,18 +218,14 @@ impl Parser for ProcZoneinfoParser {
                 // "    cpu: N"
                 if trimmed.starts_with("cpu:") {
                     // Save previous pageset
-                    if let Some(ps) = current_pageset.take() {
-                        if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                            if let Some(zone_val) = node.get_mut(zone_name) {
-                                if let Value::Object(zm) = zone_val {
-                                    if let Some(ps_arr) = zm.get_mut("pagesets") {
-                                        if let Value::Array(arr) = ps_arr {
-                                            arr.push(Value::Object(ps));
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    if let Some(ps) = current_pageset.take()
+                        && let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+                        && let Some(zone_val) = node.get_mut(zone_name)
+                        && let Value::Object(zm) = zone_val
+                        && let Some(ps_arr) = zm.get_mut("pagesets")
+                        && let Value::Array(arr) = ps_arr
+                    {
+                        arr.push(Value::Object(ps));
                     }
                     // "cpu: N" → strip "cpu:" and parse int
                     let cpu_str = trimmed["cpu:".len()..].trim();
@@ -259,10 +240,10 @@ impl Parser for ProcZoneinfoParser {
                 if let Some(colon) = trimmed.find(':') {
                     let key = trimmed[..colon].trim().to_string();
                     let val_str = trimmed[colon + 1..].trim();
-                    if let Ok(n) = val_str.parse::<i64>() {
-                        if let Some(ref mut ps) = current_pageset {
-                            ps.insert(key, Value::Number(n.into()));
-                        }
+                    if let Ok(n) = val_str.parse::<i64>()
+                        && let Some(ref mut ps) = current_pageset
+                    {
+                        ps.insert(key, Value::Number(n.into()));
                     }
                 }
                 continue;
@@ -270,18 +251,14 @@ impl Parser for ProcZoneinfoParser {
         }
 
         // Flush last pageset and node
-        if let Some(ps) = current_pageset.take() {
-            if let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node) {
-                if let Some(zone_val) = node.get_mut(zone_name) {
-                    if let Value::Object(zm) = zone_val {
-                        if let Some(ps_arr) = zm.get_mut("pagesets") {
-                            if let Value::Array(arr) = ps_arr {
-                                arr.push(Value::Object(ps));
-                            }
-                        }
-                    }
-                }
-            }
+        if let Some(ps) = current_pageset.take()
+            && let (Some(zone_name), Some(node)) = (&current_zone, &mut current_node)
+            && let Some(zone_val) = node.get_mut(zone_name)
+            && let Value::Object(zm) = zone_val
+            && let Some(ps_arr) = zm.get_mut("pagesets")
+            && let Value::Array(arr) = ps_arr
+        {
+            arr.push(Value::Object(ps));
         }
         if let Some(node) = current_node.take() {
             results.push(node);

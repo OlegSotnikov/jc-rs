@@ -83,12 +83,10 @@ fn parse_w(input: &str) -> Vec<Map<String, Value>> {
 
         // Check if FROM column is blank in this line
         let mut insert_dash = false;
-        if has_from {
-            if let Some(col_pos) = from_col {
-                // Check character at from_col position
-                let ch = line.chars().nth(col_pos);
-                insert_dash = ch.map(|c| c.is_whitespace()).unwrap_or(true);
-            }
+        if has_from && let Some(col_pos) = from_col {
+            // Check character at from_col position
+            let ch = line.chars().nth(col_pos);
+            insert_dash = ch.map(|c| c.is_whitespace()).unwrap_or(true);
         }
 
         // Split line into at most n_headers parts (last captures "what" including spaces)
@@ -96,7 +94,7 @@ fn parse_w(input: &str) -> Vec<Map<String, Value>> {
         let tokens: Vec<&str> = line.split_whitespace().collect();
 
         // Build parts, potentially inserting "-" for blank from
-        let mut parts: Vec<String> = if insert_dash {
+        let parts: Vec<String> = if insert_dash {
             // Find where "from" is in headers
             let from_idx = headers.iter().position(|h| h == "from").unwrap_or(2);
             let mut p: Vec<String> = Vec::new();
@@ -157,10 +155,10 @@ fn parse_w(input: &str) -> Vec<Map<String, Value>> {
 fn process_w_record(mut record: Map<String, Value>) -> Map<String, Value> {
     let null_fields = ["user", "tty", "from", "login_at", "idle", "what"];
     for field in &null_fields {
-        if let Some(Value::String(s)) = record.get(*field) {
-            if s == "-" || s.is_empty() {
-                record.insert(field.to_string(), Value::Null);
-            }
+        if let Some(Value::String(s)) = record.get(*field)
+            && (s == "-" || s.is_empty())
+        {
+            record.insert(field.to_string(), Value::Null);
         }
     }
     record

@@ -35,7 +35,7 @@ impl Parser for ProcPidStatmParser {
     fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
         let field_names = ["size", "resident", "shared", "text", "lib", "data", "dt"];
 
-        let parts: Vec<&str> = input.trim().split_whitespace().collect();
+        let parts: Vec<&str> = input.split_whitespace().collect();
         if parts.len() < 7 {
             return Err(ParseError::Generic(
                 "Expected 7 fields in statm".to_string(),

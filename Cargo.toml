@@ -37,79 +37,19 @@ inherits = "release"
 debug = true
 strip = false
 
+# What is left of the bulk allow-list this project inherited. It carried ~80
+# clippy lints plus dead_code, unused_imports, unused_variables and unused_mut,
+# which between them hid 585 warnings -- including four regexes compiled inside
+# loops, fourteen unreachable functions and an entire duplicate parser that was
+# never registered. Those are fixed; these three are style, and each line here
+# is a debt with a number attached rather than a blanket.
 [workspace.lints.clippy]
-# Bulk-allow legacy patterns from jc port — clean up incrementally
-collapsible_if = "allow"
-collapsible_else_if = "allow"
-collapsible_match = "allow"
+# 47 sites: `if s.starts_with(p) { &s[n..] }` -> `strip_prefix`. Mechanical, but
+# each one needs reading to keep the branch structure honest.
 manual_strip = "allow"
-manual_split_once = "allow"
-redundant_closure = "allow"
-regex_creation_in_loops = "allow"
+# 7 sites: mostly `Vec<(String, Vec<Map<String, Value>>)>` in table parsers.
+# Wants type aliases.
 type_complexity = "allow"
-trim_split_whitespace = "allow"
-get_first = "allow"
-needless_late_init = "allow"
-assigning_clones = "allow"
-unused_io_amount = "allow"
-single_match = "allow"
-map_entry = "allow"
-let_and_return = "allow"
-identity_op = "allow"
-unnecessary_cast = "allow"
-approx_constant = "allow"
-map_identity = "allow"
+# 2 sites, both parsers where two input shapes legitimately produce the same
+# record and jc writes them out separately too.
 if_same_then_else = "allow"
-vec_init_then_push = "allow"
-useless_format = "allow"
-needless_range_loop = "allow"
-match_like_matches_macro = "allow"
-len_zero = "allow"
-manual_map = "allow"
-search_is_some = "allow"
-unnecessary_to_owned = "allow"
-manual_is_ascii_check = "allow"
-or_fun_call = "allow"
-clone_on_copy = "allow"
-derivable_impls = "allow"
-ptr_arg = "allow"
-wrong_self_convention = "allow"
-char_lit_as_u8 = "allow"
-needless_return = "allow"
-into_iter_on_ref = "allow"
-op_ref = "allow"
-manual_find = "allow"
-manual_range_contains = "allow"
-drain_collect = "allow"
-unnecessary_lazy_evaluations = "allow"
-iter_nth_zero = "allow"
-large_enum_variant = "allow"
-to_string_in_format_args = "allow"
-single_char_pattern = "allow"
-nonminimal_bool = "allow"
-collapsible_str_replace = "allow"
-manual_pattern_char_comparison = "allow"
-manual_unwrap_or_default = "allow"
-manual_unwrap_or = "allow"
-needless_borrow = "allow"
-no_effect_replace = "allow"
-unnecessary_map_or = "allow"
-redundant_slicing = "allow"
-needless_lifetimes = "allow"
-bool_comparison = "allow"
-useless_asref = "allow"
-int_plus_one = "allow"
-while_let_loop = "allow"
-while_let_on_iterator = "allow"
-needless_bool_assign = "allow"
-option_map_or_none = "allow"
-redundant_pattern_matching = "allow"
-no_effect = "allow"
-
-[workspace.lints.rust]
-non_snake_case = "allow"
-unused_variables = "allow"
-unused_imports = "allow"
-unused_mut = "allow"
-unused_assignments = "allow"
-dead_code = "allow"

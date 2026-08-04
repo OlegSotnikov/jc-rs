@@ -75,9 +75,7 @@ impl Parser for ProcMtrrParser {
             let after_base = &rest[base_start + 5..];
 
             // base is hex string up to space or '('
-            let base_end = after_base
-                .find(|c: char| c == ' ' || c == '(')
-                .unwrap_or(after_base.len());
+            let base_end = after_base.find([' ', '(']).unwrap_or(after_base.len());
             let base = &after_base[..base_end];
 
             // Extract base_mb from parenthetical

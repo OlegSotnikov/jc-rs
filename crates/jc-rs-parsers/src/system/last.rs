@@ -58,14 +58,14 @@ fn normalize_duration(dur: &str) -> String {
     if let Some(plus_pos) = dur.find('+') {
         let days_str = &dur[..plus_pos];
         let rest = &dur[plus_pos + 1..];
-        if let Ok(days) = days_str.parse::<i64>() {
-            if let Some(colon_pos) = rest.find(':') {
-                let hours_str = &rest[..colon_pos];
-                let minutes_str = &rest[colon_pos + 1..];
-                if let Ok(hours) = hours_str.parse::<i64>() {
-                    let total_hours = days * 24 + hours;
-                    return format!("{}:{}", total_hours, minutes_str);
-                }
+        if let Ok(days) = days_str.parse::<i64>()
+            && let Some(colon_pos) = rest.find(':')
+        {
+            let hours_str = &rest[..colon_pos];
+            let minutes_str = &rest[colon_pos + 1..];
+            if let Ok(hours) = hours_str.parse::<i64>() {
+                let total_hours = days * 24 + hours;
+                return format!("{}:{}", total_hours, minutes_str);
             }
         }
     }

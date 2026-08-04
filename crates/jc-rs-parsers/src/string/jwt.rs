@@ -57,15 +57,15 @@ impl Parser for JwtParser {
         let header_bytes = engine.decode(parts[0]).map_err(|e| {
             ParseError::InvalidInput(format!("invalid base64 in JWT header: {}", e))
         })?;
-        let header_str = String::from_utf8(header_bytes).map_err(|e| ParseError::Utf8(e))?;
-        let header: Value = serde_json::from_str(&header_str).map_err(|e| ParseError::Json(e))?;
+        let header_str = String::from_utf8(header_bytes).map_err(ParseError::Utf8)?;
+        let header: Value = serde_json::from_str(&header_str).map_err(ParseError::Json)?;
 
         // Decode payload
         let payload_bytes = engine.decode(parts[1]).map_err(|e| {
             ParseError::InvalidInput(format!("invalid base64 in JWT payload: {}", e))
         })?;
-        let payload_str = String::from_utf8(payload_bytes).map_err(|e| ParseError::Utf8(e))?;
-        let payload: Value = serde_json::from_str(&payload_str).map_err(|e| ParseError::Json(e))?;
+        let payload_str = String::from_utf8(payload_bytes).map_err(ParseError::Utf8)?;
+        let payload: Value = serde_json::from_str(&payload_str).map_err(ParseError::Json)?;
 
         // Decode signature — convert to colon-delimited hex
         let sig_bytes = engine.decode(parts[2]).map_err(|e| {

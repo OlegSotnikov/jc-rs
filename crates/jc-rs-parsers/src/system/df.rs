@@ -265,10 +265,10 @@ fn convert_df_value(key: &str, val: &str, posix_mode: bool) -> Value {
 
     // Block count fields: always plain integers
     let block_fields = ["1k_blocks", "1024_blocks", "512_blocks", "iused", "ifree"];
-    if block_fields.contains(&key) {
-        if let Ok(n) = val.parse::<i64>() {
-            return Value::Number(n.into());
-        }
+    if block_fields.contains(&key)
+        && let Ok(n) = val.parse::<i64>()
+    {
+        return Value::Number(n.into());
     }
 
     // Size fields: parse as integer first, then try human-readable conversion

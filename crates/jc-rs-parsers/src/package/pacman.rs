@@ -223,13 +223,12 @@ fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
 
             // Convert size fields and add _bytes (only if non-zero, matching jc's `if bts:`)
             for field in &size_fields {
-                if let Some(Value::String(s)) = entry.get(*field).cloned() {
-                    if let Some(bytes) = convert_size_to_int(&s, true) {
-                        if bytes != 0 {
-                            let bytes_key = format!("{}_bytes", field);
-                            entry.insert(bytes_key, Value::Number(bytes.into()));
-                        }
-                    }
+                if let Some(Value::String(s)) = entry.get(*field).cloned()
+                    && let Some(bytes) = convert_size_to_int(&s, true)
+                    && bytes != 0
+                {
+                    let bytes_key = format!("{}_bytes", field);
+                    entry.insert(bytes_key, Value::Number(bytes.into()));
                 }
             }
 
@@ -267,9 +266,9 @@ mod tests {
             include_str!("../../../../tests/fixtures/generic/pacman--si-graphicsmagick.json");
 
         let parser = PacmanParser;
-        let result = parser.parse(&fixture_out, false).unwrap();
+        let result = parser.parse(fixture_out, false).unwrap();
         let expected: serde_json::Value =
-            serde_json::from_str(&fixture_json).expect("invalid fixture JSON");
+            serde_json::from_str(fixture_json).expect("invalid fixture JSON");
 
         let got = serde_json::to_value(&result).unwrap();
 

@@ -37,12 +37,12 @@ fn parse_yes_no_enabled(s: &str) -> Option<bool> {
 /// Returns (address_without_status, status).
 fn parse_ipv6_addr(s: &str) -> (String, Option<String>) {
     let s = s.trim();
-    if let Some(paren_pos) = s.rfind('(') {
-        if s.ends_with(')') {
-            let addr = s[..paren_pos].trim().to_string();
-            let status = s[paren_pos + 1..s.len() - 1].to_string();
-            return (addr, Some(status));
-        }
+    if let Some(paren_pos) = s.rfind('(')
+        && s.ends_with(')')
+    {
+        let addr = s[..paren_pos].trim().to_string();
+        let status = s[paren_pos + 1..s.len() - 1].to_string();
+        return (addr, Some(status));
     }
     (s.to_string(), None)
 }
@@ -50,18 +50,18 @@ fn parse_ipv6_addr(s: &str) -> (String, Option<String>) {
 /// Parse an IPv4 address like "100.115.71.66(Preferred)" or "169.254.x.x(Autoconfiguration)".
 fn parse_ipv4_addr(s: &str) -> (String, Option<String>, bool) {
     let s = s.trim();
-    if let Some(paren_pos) = s.rfind('(') {
-        if s.ends_with(')') {
-            let addr = s[..paren_pos].trim().to_string();
-            let status_raw = &s[paren_pos + 1..s.len() - 1];
-            let autoconfigured = status_raw.to_lowercase().contains("autoconfiguration");
-            let status = if autoconfigured {
-                None // autoconfigured addresses may have no display status
-            } else {
-                Some(status_raw.to_string())
-            };
-            return (addr, status, autoconfigured);
-        }
+    if let Some(paren_pos) = s.rfind('(')
+        && s.ends_with(')')
+    {
+        let addr = s[..paren_pos].trim().to_string();
+        let status_raw = &s[paren_pos + 1..s.len() - 1];
+        let autoconfigured = status_raw.to_lowercase().contains("autoconfiguration");
+        let status = if autoconfigured {
+            None // autoconfigured addresses may have no display status
+        } else {
+            Some(status_raw.to_string())
+        };
+        return (addr, status, autoconfigured);
     }
     (s.to_string(), None, false)
 }
@@ -274,10 +274,8 @@ pub fn parse_ipconfig(input: &str) -> Map<String, Value> {
                     "WINS Proxy Enabled" => {
                         wins_proxy_enabled = parse_yes_no_enabled(&val_trimmed);
                     }
-                    "DNS Suffix Search List" => {
-                        if !val_trimmed.is_empty() {
-                            global_dns_suffix_list.push(Value::String(val_trimmed));
-                        }
+                    "DNS Suffix Search List" if !val_trimmed.is_empty() => {
+                        global_dns_suffix_list.push(Value::String(val_trimmed));
                     }
                     _ => {}
                 }
@@ -390,17 +388,12 @@ pub fn parse_ipconfig(input: &str) -> Map<String, Value> {
                     }
                     "Subnet Mask" => {
                         // Associate with last IPv4 address
-                        if let Some(ipv4_arr) = adapter.get_mut("ipv4_addresses") {
-                            if let Value::Array(arr) = ipv4_arr {
-                                if let Some(last) = arr.last_mut() {
-                                    if let Value::Object(obj) = last {
-                                        obj.insert(
-                                            "subnet_mask".to_string(),
-                                            Value::String(val_trimmed),
-                                        );
-                                    }
-                                }
-                            }
+                        if let Some(ipv4_arr) = adapter.get_mut("ipv4_addresses")
+                            && let Value::Array(arr) = ipv4_arr
+                            && let Some(last) = arr.last_mut()
+                            && let Value::Object(obj) = last
+                        {
+                            obj.insert("subnet_mask".to_string(), Value::String(val_trimmed));
                         }
                     }
                     "Default Gateway" => {
@@ -596,7 +589,6 @@ inventory::submit! {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use jc_rs_core::registry::find_parser;
     use jc_rs_core::types::ParseOutput;
 

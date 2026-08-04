@@ -200,7 +200,7 @@ mod tests {
             );
             if let Some(Value::Array(alts)) = obj.get("alternatives") {
                 assert_eq!(alts.len(), 2);
-                if let Some(Value::Object(alt)) = alts.get(0) {
+                if let Some(Value::Object(alt)) = alts.first() {
                     assert_eq!(
                         alt.get("alternative"),
                         Some(&Value::String("/bin/ed".to_string()))

@@ -55,4 +55,3 @@ pub mod vmstat;
 pub mod vmstat_s;
 pub mod w;
 pub mod wc;
-pub mod who;

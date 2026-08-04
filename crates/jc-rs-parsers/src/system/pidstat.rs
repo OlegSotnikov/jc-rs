@@ -47,8 +47,7 @@ impl Parser for PidstatParser {
 fn normalize_pidstat_header(header: &str) -> String {
     header
         .replace('#', " ")
-        .replace('-', "_")
-        .replace('/', "_")
+        .replace(['-', '/'], "_")
         .replace('%', "percent_")
         .to_lowercase()
 }
@@ -137,7 +136,7 @@ fn process_pidstat_rows(
                                 .unwrap_or(Value::Null)
                         } else if float_list.contains(&key.as_str()) {
                             convert_to_float(s)
-                                .and_then(|f| serde_json::Number::from_f64(f))
+                                .and_then(serde_json::Number::from_f64)
                                 .map(Value::Number)
                                 .unwrap_or(Value::Null)
                         } else {

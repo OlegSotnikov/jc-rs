@@ -74,23 +74,6 @@ fn parse_size(s: &str) -> Option<i64> {
     }
 }
 
-fn normalize_column_name(name: &str) -> &str {
-    let lower = name.to_lowercase();
-    match lower.as_str() {
-        "filename" | "name" => "name",
-        "type" => "type",
-        "size" => "size",
-        "used" => "used",
-        "prio" | "priority" => "priority",
-        "uuid" => "uuid",
-        "label" => "label",
-        _ => {
-            // This is a static lifetime issue, so we handle it differently below
-            "unknown"
-        }
-    }
-}
-
 fn parse_swapon(input: &str) -> Vec<Map<String, Value>> {
     let trimmed = input.trim();
     if trimmed.is_empty() {

@@ -129,9 +129,9 @@ mod tests {
         let fixture_json = include_str!("../../../../tests/fixtures/generic/postconf-M.json");
 
         let parser = PostconfParser;
-        let result = parser.parse(&fixture_out, false).unwrap();
+        let result = parser.parse(fixture_out, false).unwrap();
         let expected: serde_json::Value =
-            serde_json::from_str(&fixture_json).expect("invalid fixture JSON");
+            serde_json::from_str(fixture_json).expect("invalid fixture JSON");
 
         let got = serde_json::to_value(&result).unwrap();
         assert_eq!(got, expected, "postconf fixture mismatch");

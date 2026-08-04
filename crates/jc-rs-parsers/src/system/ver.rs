@@ -158,13 +158,12 @@ fn loose_parse(s: &str) -> Vec<String> {
         }
 
         let is_digit = ch.is_ascii_digit();
-        if let Some(prev) = prev_is_digit {
-            if prev != is_digit {
-                if !current.is_empty() {
-                    components.push(current.clone());
-                    current.clear();
-                }
-            }
+        if let Some(prev) = prev_is_digit
+            && prev != is_digit
+            && !current.is_empty()
+        {
+            components.push(current.clone());
+            current.clear();
         }
         current.push(ch);
         prev_is_digit = Some(is_digit);

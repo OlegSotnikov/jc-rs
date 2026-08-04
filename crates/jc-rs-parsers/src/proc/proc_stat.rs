@@ -64,10 +64,10 @@ impl Parser for ProcStatParser {
                     let name = parts[0];
                     let mut cpu_map = Map::new();
                     for (i, &field) in CPU_FIELDS.iter().enumerate() {
-                        if let Some(val_str) = parts.get(i + 1) {
-                            if let Ok(v) = val_str.parse::<i64>() {
-                                cpu_map.insert(field.to_string(), Value::Number(v.into()));
-                            }
+                        if let Some(val_str) = parts.get(i + 1)
+                            && let Ok(v) = val_str.parse::<i64>()
+                        {
+                            cpu_map.insert(field.to_string(), Value::Number(v.into()));
                         }
                     }
                     out.insert(name.to_string(), Value::Object(cpu_map));
@@ -81,34 +81,34 @@ impl Parser for ProcStatParser {
                     .collect();
                 out.insert("interrupts".to_string(), Value::Array(arr));
             } else if line.starts_with("ctxt ") {
-                if let Some(v) = line.split_whitespace().nth(1) {
-                    if let Ok(n) = v.parse::<i64>() {
-                        out.insert("context_switches".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(v) = line.split_whitespace().nth(1)
+                    && let Ok(n) = v.parse::<i64>()
+                {
+                    out.insert("context_switches".to_string(), Value::Number(n.into()));
                 }
             } else if line.starts_with("btime ") {
-                if let Some(v) = line.split_whitespace().nth(1) {
-                    if let Ok(n) = v.parse::<i64>() {
-                        out.insert("boot_time".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(v) = line.split_whitespace().nth(1)
+                    && let Ok(n) = v.parse::<i64>()
+                {
+                    out.insert("boot_time".to_string(), Value::Number(n.into()));
                 }
             } else if line.starts_with("processes ") {
-                if let Some(v) = line.split_whitespace().nth(1) {
-                    if let Ok(n) = v.parse::<i64>() {
-                        out.insert("processes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(v) = line.split_whitespace().nth(1)
+                    && let Ok(n) = v.parse::<i64>()
+                {
+                    out.insert("processes".to_string(), Value::Number(n.into()));
                 }
             } else if line.starts_with("procs_running ") {
-                if let Some(v) = line.split_whitespace().nth(1) {
-                    if let Ok(n) = v.parse::<i64>() {
-                        out.insert("processes_running".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(v) = line.split_whitespace().nth(1)
+                    && let Ok(n) = v.parse::<i64>()
+                {
+                    out.insert("processes_running".to_string(), Value::Number(n.into()));
                 }
             } else if line.starts_with("procs_blocked ") {
-                if let Some(v) = line.split_whitespace().nth(1) {
-                    if let Ok(n) = v.parse::<i64>() {
-                        out.insert("processes_blocked".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(v) = line.split_whitespace().nth(1)
+                    && let Ok(n) = v.parse::<i64>()
+                {
+                    out.insert("processes_blocked".to_string(), Value::Number(n.into()));
                 }
             } else if line.starts_with("softirq ") {
                 let parts: Vec<&str> = line.split_whitespace().collect();

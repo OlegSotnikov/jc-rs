@@ -1,9 +1,9 @@
 //! CSV file parser for files with no header row.
 
-use super::delimited::{DelimitedSession, parse_delimited};
+use super::delimited::parse_delimited;
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
-use jc_rs_core::traits::{LineParser, Parser, StreamingParser, parse_via_session};
+use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 
 pub struct CsvIhParser;

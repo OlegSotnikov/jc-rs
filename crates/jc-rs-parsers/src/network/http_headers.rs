@@ -247,7 +247,7 @@ fn parse_message(lines: &[&str]) -> Map<String, Value> {
 
     // Parse header lines
     let mut raw_headers: Vec<(String, String)> = Vec::new();
-    while let Some(&line) = iter.next() {
+    for &line in iter {
         let line = line.trim_end();
         if line.is_empty() {
             break;
@@ -311,18 +311,17 @@ fn parse_message(lines: &[&str]) -> Map<String, Value> {
             continue;
         }
         if INT_HEADERS.contains(&key.as_str()) {
-            if let Some(Value::String(s)) = obj.get(key) {
-                if let Ok(n) = s.trim().parse::<i64>() {
-                    obj.insert(key.clone(), Value::Number(n.into()));
-                }
+            if let Some(Value::String(s)) = obj.get(key)
+                && let Ok(n) = s.trim().parse::<i64>()
+            {
+                obj.insert(key.clone(), Value::Number(n.into()));
             }
         } else if FLOAT_HEADERS.contains(&key.as_str()) {
-            if let Some(Value::String(s)) = obj.get(key) {
-                if let Ok(f) = s.trim().parse::<f64>() {
-                    if let Some(n) = serde_json::Number::from_f64(f) {
-                        obj.insert(key.clone(), Value::Number(n));
-                    }
-                }
+            if let Some(Value::String(s)) = obj.get(key)
+                && let Ok(f) = s.trim().parse::<f64>()
+                && let Some(n) = serde_json::Number::from_f64(f)
+            {
+                obj.insert(key.clone(), Value::Number(n));
             }
         } else if DT_HEADERS.contains(&key.as_str()) {
             if let Some(Value::String(s)) = obj.get(key) {
@@ -331,16 +330,16 @@ fn parse_message(lines: &[&str]) -> Map<String, Value> {
                     obj.insert(format!("{}_epoch_utc", key), Value::Number(epoch.into()));
                 }
             }
-        } else if DT_OR_INT_HEADERS.contains(&key.as_str()) {
-            if let Some(Value::String(s)) = obj.get(key) {
-                let s = s.clone();
-                if let Some(epoch) = http_date_to_epoch_utc(&s) {
-                    obj.insert(format!("{}_epoch_utc", key), Value::Number(epoch.into()));
-                } else if s.trim().chars().all(|c| c.is_ascii_digit()) {
-                    if let Ok(n) = s.trim().parse::<i64>() {
-                        obj.insert(key.clone(), Value::Number(n.into()));
-                    }
-                }
+        } else if DT_OR_INT_HEADERS.contains(&key.as_str())
+            && let Some(Value::String(s)) = obj.get(key)
+        {
+            let s = s.clone();
+            if let Some(epoch) = http_date_to_epoch_utc(&s) {
+                obj.insert(format!("{}_epoch_utc", key), Value::Number(epoch.into()));
+            } else if s.trim().chars().all(|c| c.is_ascii_digit())
+                && let Ok(n) = s.trim().parse::<i64>()
+            {
+                obj.insert(key.clone(), Value::Number(n.into()));
             }
         }
     }
@@ -348,10 +347,10 @@ fn parse_message(lines: &[&str]) -> Map<String, Value> {
     // x-cache-hits: convert array string elements to integers
     if let Some(Value::Array(arr)) = obj.get_mut("x-cache-hits") {
         for v in arr.iter_mut() {
-            if let Value::String(s) = v {
-                if let Ok(n) = s.trim().parse::<i64>() {
-                    *v = Value::Number(n.into());
-                }
+            if let Value::String(s) = v
+                && let Ok(n) = s.trim().parse::<i64>()
+            {
+                *v = Value::Number(n.into());
             }
         }
     }

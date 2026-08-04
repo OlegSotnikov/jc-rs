@@ -39,20 +39,6 @@ fn parse_expiry(s: &str) -> jc_rs_utils::TimestampResult {
     jc_rs_utils::parse_timestamp(s.trim(), &[jc_rs_utils::timestamp::formats::F1760])
 }
 
-fn days_since_epoch(y: i64, m: i64, d: i64) -> Option<i64> {
-    // Days since 1970-01-01 using Gregorian calendar
-    let y = if m <= 2 { y - 1 } else { y };
-    let m = if m <= 2 { m + 9 } else { m - 3 };
-
-    let era = y.div_euclid(400);
-    let yoe = y.rem_euclid(400);
-    let doy = (153 * m + 2) / 5 + d - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    let day = era * 146097 + doe - 719468;
-
-    Some(day)
-}
-
 fn parse_iso(s: &str) -> String {
     // Convert "2023-05-11 01:33:10+00:00" to "2023-05-11T01:33:10+00:00"
     s.trim().replacen(' ', "T", 1)
@@ -128,7 +114,7 @@ impl Parser for CertbotParser {
                             cert.insert("domains".to_string(), Value::Array(domains));
                         }
                     } else if line.starts_with("    Expiry Date:") {
-                        if let Some(val) = line.splitn(2, ": ").nth(1) {
+                        if let Some(val) = line.split_once(": ").map(|x| x.1) {
                             // e.g. "2023-05-11 01:33:10+00:00 (VALID: 63 days)"
                             let parts: Vec<&str> = val.splitn(2, " (").collect();
                             let date_str = parts[0].trim();
@@ -171,13 +157,13 @@ impl Parser for CertbotParser {
                                 Value::String(val.trim().to_string()),
                             );
                         }
-                    } else if line.starts_with("    Private Key Path:") {
-                        if let Some(val) = line.split(": ").nth(1) {
-                            cert.insert(
-                                "private_key_path".to_string(),
-                                Value::String(val.trim().to_string()),
-                            );
-                        }
+                    } else if line.starts_with("    Private Key Path:")
+                        && let Some(val) = line.split(": ").nth(1)
+                    {
+                        cert.insert(
+                            "private_key_path".to_string(),
+                            Value::String(val.trim().to_string()),
+                        );
                     }
                 }
             } else {
@@ -192,10 +178,10 @@ impl Parser for CertbotParser {
                     if let Some(val) = line.split_whitespace().last() {
                         acct_dict.insert("url".to_string(), Value::String(val.to_string()));
                     }
-                } else if line.starts_with("  Email contact:") {
-                    if let Some(val) = line.split_whitespace().last() {
-                        acct_dict.insert("email".to_string(), Value::String(val.to_string()));
-                    }
+                } else if line.starts_with("  Email contact:")
+                    && let Some(val) = line.split_whitespace().last()
+                {
+                    acct_dict.insert("email".to_string(), Value::String(val.to_string()));
                 }
             }
         }

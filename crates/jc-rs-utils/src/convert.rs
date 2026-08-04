@@ -309,6 +309,8 @@ mod tests {
     }
 
     #[test]
+    // `3.14` here is test data, not an approximation of pi.
+    #[allow(clippy::approx_constant)]
     fn test_convert_to_float_basic() {
         assert_eq!(convert_to_float("3.14"), Some(3.14));
         assert_eq!(convert_to_float("abc"), None);

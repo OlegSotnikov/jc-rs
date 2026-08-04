@@ -6,6 +6,7 @@ use jc_rs_utils::sparse_table_parse;
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use std::sync::OnceLock;
 
 pub struct AsciitableParser;
@@ -37,6 +38,9 @@ inventory::submit! {
 }
 
 static ANSI_RE: OnceLock<Regex> = OnceLock::new();
+
+static PROBLEM_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\| ( +)([^|]+)").expect("valid pattern"));
 
 fn get_ansi_re() -> &'static Regex {
     ANSI_RE.get_or_init(|| Regex::new(r"(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]").unwrap())
@@ -175,15 +179,7 @@ fn snake_case_header(s: &str) -> String {
 }
 
 fn normalize_col_separators(line: &str) -> String {
-    line.replace('│', "|")
-        .replace('┃', "|")
-        .replace('┆', "|")
-        .replace('┇', "|")
-        .replace('┊', "|")
-        .replace('┋', "|")
-        .replace('╎', "|")
-        .replace('╏', "|")
-        .replace('║', "|")
+    line.replace(['│', '┃', '┆', '┇', '┊', '┋', '╎', '╏', '║'], "|")
 }
 
 fn normalize_rows(table: &str) -> Vec<String> {
@@ -203,9 +199,9 @@ fn normalize_rows(table: &str) -> Vec<String> {
 
             // Handle non-left-justified headers after separators
             // Find patterns like "| " followed by spaces and header text
-            let problem_re = Regex::new(r"\| ( +)([^|]+)").unwrap();
+
             let mut new_line = line.clone();
-            for cap in problem_re.captures_iter(&line) {
+            for cap in PROBLEM_RE.captures_iter(&line) {
                 let spaces = cap.get(1).map_or("", |m| m.as_str());
                 let header = cap.get(2).map_or("", |m| m.as_str());
                 let old = format!("| {}{}", spaces, header);
@@ -221,17 +217,7 @@ fn normalize_rows(table: &str) -> Vec<String> {
         } else {
             // Data row - remove column separators
             let line = normalize_col_separators(line);
-            let line = line
-                .replace('│', " ")
-                .replace('┃', " ")
-                .replace('┆', " ")
-                .replace('┇', " ")
-                .replace('┊', " ")
-                .replace('┋', " ")
-                .replace('╎', " ")
-                .replace('╏', " ")
-                .replace('║', " ")
-                .replace('|', " ");
+            let line = line.replace(['│', '┃', '┆', '┇', '┊', '┋', '╎', '╏', '║', '|'], " ");
             result.push(line);
         }
     }

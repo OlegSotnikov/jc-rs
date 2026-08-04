@@ -81,10 +81,10 @@ impl Parser for RouteParser {
         let mut lines: Vec<&str> = input.lines().collect();
 
         // Skip "Kernel IP routing table" or "Kernel IPv6 routing table" header line
-        if let Some(first) = lines.first() {
-            if first.contains("routing table") {
-                lines.remove(0);
-            }
+        if let Some(first) = lines.first()
+            && first.contains("routing table")
+        {
+            lines.remove(0);
         }
 
         if lines.is_empty() {
@@ -126,14 +126,14 @@ impl Parser for RouteParser {
             }
 
             // Add flags_pretty
-            if let Some(flags_val) = obj.get("flags") {
-                if let Some(flags_str) = flags_val.as_str() {
-                    let pretty: Vec<Value> = flags_str
-                        .chars()
-                        .filter_map(|c| flag_to_pretty(c).map(|s| Value::String(s.to_string())))
-                        .collect();
-                    obj.insert("flags_pretty".to_string(), Value::Array(pretty));
-                }
+            if let Some(flags_val) = obj.get("flags")
+                && let Some(flags_str) = flags_val.as_str()
+            {
+                let pretty: Vec<Value> = flags_str
+                    .chars()
+                    .filter_map(|c| flag_to_pretty(c).map(|s| Value::String(s.to_string())))
+                    .collect();
+                obj.insert("flags_pretty".to_string(), Value::Array(pretty));
             }
 
             result.push(obj);
