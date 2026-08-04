@@ -10,6 +10,14 @@ on:
         type: boolean
         default: true
 
+# Least privilege. id-token is what makes Trusted Publishing work: it lets the
+# job ask GitHub's OIDC provider for a signed statement of who it is, which
+# crates.io exchanges for a token that lives ~30 minutes. Nothing long-lived is
+# stored anywhere.
+permissions:
+  contents: read
+  id-token: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -17,49 +25,66 @@ jobs:
   publish:
     name: crates.io
     runs-on: ubuntu-latest
+    # Protected environment: publishing waits for a human, and any secret it
+    # needs lives here rather than at repository level, so no other workflow
+    # can reach it.
+    environment: crates-io
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      # Third-party actions are pinned to commit SHAs, not tags. A tag can be
+      # moved; in a job that can publish under our name, that is the whole farm.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
 
-      - name: is a registry token configured?
+      - name: mint a short-lived crates.io token
+        id: auth
+        if: github.event.inputs.dry_run != 'true'
+        continue-on-error: true
+        uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
+
+      - name: choose credentials
         id: creds
+        if: github.event.inputs.dry_run != 'true'
         env:
-          TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          OIDC: ${{ steps.auth.outputs.token }}
+          FALLBACK: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
-          if [ -n "$TOKEN" ]; then
-            echo "have=true" >> "$GITHUB_OUTPUT"
+          if [ -n "$OIDC" ]; then
+            echo "mode=oidc" >> "$GITHUB_OUTPUT"
+            echo "Using a Trusted Publishing token (expires in ~30 min)." >> "$GITHUB_STEP_SUMMARY"
+          elif [ -n "$FALLBACK" ]; then
+            echo "mode=token" >> "$GITHUB_OUTPUT"
+            echo "Falling back to CARGO_REGISTRY_TOKEN. Configure Trusted Publishing on crates.io and delete this secret." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "have=false" >> "$GITHUB_OUTPUT"
-            echo "CARGO_REGISTRY_TOKEN is not set — dry run only." >> "$GITHUB_STEP_SUMMARY"
+            echo "mode=none" >> "$GITHUB_OUTPUT"
+            echo "No crates.io credentials — nothing was published." >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      # Publish order is the dependency order and cannot be parallelised:
-      # utils needs core on the index before it will verify, parsers needs both,
-      # the CLI needs all three. Modern cargo blocks until each upload is
-      # queryable, so no manual sleeps.
+      # Publish order is the dependency order and cannot be parallelised: utils
+      # needs core on the index before it will verify, parsers needs both, the
+      # CLI needs all three. Modern cargo blocks until each upload is queryable,
+      # so no manual sleeps.
       - name: publish
-        if: steps.creds.outputs.have == 'true' && github.event.inputs.dry_run != 'true'
+        if: github.event.inputs.dry_run != 'true' && steps.creds.outputs.mode != 'none'
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
           for crate in jc-rs-core jc-rs-utils jc-rs-parsers jc-rs; do
             if cargo publish -p "$crate"; then
               echo "published $crate"
+            elif cargo search "$crate" --limit 1 | grep -q "^$crate = \"$version\""; then
+              # Re-running a release must not fail because one crate is already
+              # up at this version.
+              echo "$crate is already published at $version — continuing"
             else
-              # Re-running a release should not fail because one crate is
-              # already up at this version.
-              if cargo search "$crate" --limit 1 | grep -q "^$crate = \"${GITHUB_REF_NAME#v}\""; then
-                echo "$crate is already published at this version — continuing"
-              else
-                echo "publishing $crate failed"; exit 1
-              fi
+              echo "publishing $crate failed"; exit 1
             fi
           done
 
       - name: dry run
-        if: steps.creds.outputs.have != 'true' || github.event.inputs.dry_run == 'true'
+        if: github.event.inputs.dry_run == 'true' || steps.creds.outputs.mode == 'none'
         run: |
           set -euo pipefail
           # Only the root crate can be packaged in full before the first
