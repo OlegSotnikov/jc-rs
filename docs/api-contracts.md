@@ -1,6 +1,6 @@
-# cj API Contracts
+# jc-rs API Contracts
 
-This document defines all shared interfaces for the cj project. All crates (jc-rs, jc-rs-utils, jc-rs-parsers) must program against these contracts defined in jc-rs-core.
+This document defines all shared interfaces for the jc-rs project. All crates (jc-rs, jc-rs-utils, jc-rs-parsers) must program against these contracts defined in jc-rs-core.
 
 ## 1. Core Types (`jc_rs_core::types`)
 
@@ -110,7 +110,7 @@ pub enum CjError {
 
 **When to use each variant:**
 - `ParserNotFound`: the user specified a parser name that does not exist in the registry
-- `ParseFailed`: wrap a `ParseError` with the parser name for context; the CLI uses this to format `"cj: Error - <parser> parser could not parse the input data"`
+- `ParseFailed`: wrap a `ParseError` with the parser name for context; the CLI uses this to format `"jc-rs: Error - <parser> parser could not parse the input data"`
 - `Io`: any I/O error from stdin, file reads, or pipe operations
 - `SliceError`: invalid `--slice` syntax (e.g. `"abc:def"`) or out-of-range indices
 - `Other`: fallback for unexpected errors
@@ -184,8 +184,8 @@ static DF_INFO: ParserInfo = ParserInfo {
     argument: "--df",
     version: "1.0.0",
     description: "df command parser",
-    author: "cj contributors",
-    author_email: "cj@example.com",
+    author: "jc-rs contributors",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux, Platform::Darwin],
     tags: &[Tag::Command],
     magic_commands: &["df"],
@@ -284,7 +284,7 @@ The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
 
 6. Exit codes:
    - 0: success
-   - 100: cj error (parse failure, parser not found, etc.)
+   - 100: jc-rs error (parse failure, parser not found, etc.)
    - Other: passthrough from magic command execution
 ```
 
