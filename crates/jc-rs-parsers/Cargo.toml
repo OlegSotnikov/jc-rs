@@ -1,0 +1,32 @@
+[package]
+name = "jc-rs-parsers"
+version.workspace = true
+edition.workspace = true
+description = "Parser implementations for jc-rs (200+ parsers for CLI output, file formats, and strings)"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["json", "parser", "cli", "sysadmin"]
+categories = ["encoding", "command-line-utilities", "parser-implementations"]
+
+[dependencies]
+jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
+jc-rs-utils = { path = "../jc-rs-utils", version = "0.1.0" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+regex = "1"
+csv = "1"
+serde_yaml = "0.9"
+quick-xml = { version = "0.37", features = ["serialize"] }
+toml = "0.8"
+inventory = "0.3"
+ini = "1"
+plist = "1"
+url = "2"
+base64 = "0.22"
+percent-encoding = "2"
+chrono = { version = "0.4", features = ["serde"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,391 @@
+//! Parser for OpenVPN status log files.
+
+use jc_rs_core::error::ParseError;
+use jc_rs_core::registry::ParserEntry;
+use jc_rs_core::traits::Parser;
+use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
+use regex::Regex;
+use serde_json::{Map, Value};
+
+pub struct OpenvpnParser;
+
+static INFO: ParserInfo = ParserInfo {
+    name: "openvpn",
+    argument: "--openvpn",
+    version: "1.0.0",
+    description: "Converts openvpn-status.log file to JSON",
+    author: "jc-rs contributors",
+    author_email: "",
+    compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
+    tags: &[Tag::File],
+    magic_commands: &[],
+    streaming: false,
+    hidden: false,
+    deprecated: false,
+};
+
+static OPENVPN_PARSER: OpenvpnParser = OpenvpnParser;
+
+inventory::submit! {
+    ParserEntry::new(&OPENVPN_PARSER)
+}
+
+/// Split address into (address, prefix, port)
+/// Handles: "10.10.10.10:49502", "10.200.0.0/16", "2001:db8::1000/124",
+/// "22:1d:63:bf:62:38" (MAC), "10.10.10.10" (no port/prefix)
+fn split_addr(addr_str: &str) -> (String, Option<String>, Option<String>) {
+    // Check for MAC address pattern
+    let mac_re = Regex::new(r"^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$").unwrap();
+    if mac_re.is_match(addr_str) {
+        return (addr_str.to_string(), None, None);
+    }
+
+    let mut address = addr_str.to_string();
+    let mut prefix: Option<String> = None;
+    let port: Option<String>;
+
+    // Try splitting on '/' for prefix
+    if let Some(slash_pos) = address.rfind('/') {
+        let pref = address[slash_pos + 1..].to_string();
+        address = address[..slash_pos].to_string();
+        prefix = Some(pref);
+    }
+
+    // Try splitting IPv4 address with port (contains ':' and left side is valid IPv4)
+    if address.contains(':') {
+        // Check if it looks like IPv4:port
+        let ipv4_re = Regex::new(r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)$").unwrap();
+        if let Some(caps) = ipv4_re.captures(&address) {
+            let ip = caps[1].to_string();
+            let p = caps[2].to_string();
+            return (ip, prefix, Some(p));
+        }
+        // Otherwise assume IPv6
+        port = None;
+    } else {
+        port = None;
+    }
+
+    (address, prefix, port)
+}
+
+/// Parse date like "Thu Jun 18 04:23:03 2015" to epoch.
+/// This is a simplified parser for common OpenVPN date format.
+fn parse_openvpn_date(s: &str) -> Option<i64> {
+    let parts: Vec<&str> = s.split_whitespace().collect();
+    // Format: "Thu Jun 18 04:23:03 2015" or "Thu Oct 19 20:14:19 2017"
+    if parts.len() < 5 {
+        return None;
+    }
+
+    let month_str = parts[1];
+    let day: i64 = parts[2].parse().ok()?;
+    let time_str = parts[3];
+    let year: i64 = parts[4].parse().ok()?;
+
+    let month = match month_str {
+        "Jan" => 1i64,
+        "Feb" => 2,
+        "Mar" => 3,
+        "Apr" => 4,
+        "May" => 5,
+        "Jun" => 6,
+        "Jul" => 7,
+        "Aug" => 8,
+        "Sep" => 9,
+        "Oct" => 10,
+        "Nov" => 11,
+        "Dec" => 12,
+        _ => return None,
+    };
+
+    let time_parts: Vec<&str> = time_str.split(':').collect();
+    if time_parts.len() != 3 {
+        return None;
+    }
+    let hour: i64 = time_parts[0].parse().ok()?;
+    let minute: i64 = time_parts[1].parse().ok()?;
+    let second: i64 = time_parts[2].parse().ok()?;
+
+    let days = days_since_epoch(year, month, day)?;
+    Some(days * 86400 + hour * 3600 + minute * 60 + second)
+}
+
+fn days_since_epoch(y: i64, m: i64, d: i64) -> Option<i64> {
+    let y = if m <= 2 { y - 1 } else { y };
+    let m = if m <= 2 { m + 9 } else { m - 3 };
+    let era = y.div_euclid(400);
+    let yoe = y.rem_euclid(400);
+    let doy = (153 * m + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    Some(era * 146097 + doe - 719468)
+}
+
+impl Parser for OpenvpnParser {
+    fn info(&self) -> &'static ParserInfo {
+        &INFO
+    }
+
+    fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+        if input.trim().is_empty() {
+            return Ok(ParseOutput::Object(Map::new()));
+        }
+
+        let mut raw_output: Map<String, Value> = Map::new();
+        let mut clients: Vec<Value> = Vec::new();
+        let mut routing_table: Vec<Value> = Vec::new();
+        let mut global_stats: Map<String, Value> = Map::new();
+        let mut section = "";
+        let mut updated = String::new();
+
+        for line in input.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+
+            if line.starts_with("OpenVPN CLIENT LIST") {
+                section = "clients";
+                continue;
+            }
+            if line.starts_with("ROUTING TABLE") {
+                section = "routing";
+                continue;
+            }
+            if line.starts_with("GLOBAL STATS") {
+                section = "stats";
+                continue;
+            }
+            if line.starts_with("END") {
+                break;
+            }
+
+            if section == "clients" && line.starts_with("Updated,") {
+                updated = line.splitn(2, ',').nth(1).unwrap_or("").to_string();
+                continue;
+            }
+
+            if section == "clients" && line.starts_with("Common Name,Real Address,") {
+                continue;
+            }
+
+            if section == "clients" {
+                let parts: Vec<&str> = line.splitn(5, ',').collect();
+                if parts.len() < 5 {
+                    continue;
+                }
+                let c_name = parts[0];
+                let real_addr_raw = parts[1];
+                let r_bytes = parts[2];
+                let s_bytes = parts[3];
+                let connected = parts[4];
+
+                let (addr, addr_prefix, addr_port) = split_addr(real_addr_raw);
+
+                let mut client_obj: Map<String, Value> = Map::new();
+                client_obj.insert("common_name".to_string(), Value::String(c_name.to_string()));
+                client_obj.insert("real_address".to_string(), Value::String(addr));
+                if let Ok(n) = r_bytes.parse::<i64>() {
+                    client_obj.insert("bytes_received".to_string(), Value::Number(n.into()));
+                }
+                if let Ok(n) = s_bytes.parse::<i64>() {
+                    client_obj.insert("bytes_sent".to_string(), Value::Number(n.into()));
+                }
+                client_obj.insert(
+                    "connected_since".to_string(),
+                    Value::String(connected.to_string()),
+                );
+                client_obj.insert("updated".to_string(), Value::String(updated.clone()));
+
+                // prefix and port
+                client_obj.insert(
+                    "real_address_prefix".to_string(),
+                    addr_prefix
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+                client_obj.insert(
+                    "real_address_port".to_string(),
+                    addr_port
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+
+                // Epoch fields
+                if let Some(epoch) = parse_openvpn_date(connected) {
+                    client_obj.insert(
+                        "connected_since_epoch".to_string(),
+                        Value::Number(epoch.into()),
+                    );
+                }
+                if let Some(epoch) = parse_openvpn_date(&updated) {
+                    client_obj.insert("updated_epoch".to_string(), Value::Number(epoch.into()));
+                }
+
+                clients.push(Value::Object(client_obj));
+                continue;
+            }
+
+            if section == "routing" && line.starts_with("Virtual Address,Common Name,") {
+                continue;
+            }
+
+            if section == "routing" {
+                let parts: Vec<&str> = line.splitn(4, ',').collect();
+                if parts.len() < 4 {
+                    continue;
+                }
+                let mut virt_addr = parts[0].to_string();
+                let c_name = parts[1];
+                let real_addr_raw = parts[2];
+                let last_ref = parts[3];
+
+                // fixup: remove trailing "C" from virtual address
+                if virt_addr.ends_with('C') {
+                    virt_addr.pop();
+                }
+
+                let (virt_ip, virt_prefix, virt_port) = split_addr(&virt_addr);
+                let (real_addr, real_prefix, real_port) = split_addr(real_addr_raw);
+
+                let mut route_obj: Map<String, Value> = Map::new();
+                route_obj.insert("virtual_address".to_string(), Value::String(virt_ip));
+                route_obj.insert("common_name".to_string(), Value::String(c_name.to_string()));
+                route_obj.insert("real_address".to_string(), Value::String(real_addr));
+                route_obj.insert(
+                    "last_reference".to_string(),
+                    Value::String(last_ref.to_string()),
+                );
+
+                route_obj.insert(
+                    "virtual_address_prefix".to_string(),
+                    virt_prefix
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+                route_obj.insert(
+                    "virtual_address_port".to_string(),
+                    virt_port
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+                route_obj.insert(
+                    "real_address_prefix".to_string(),
+                    real_prefix
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+                route_obj.insert(
+                    "real_address_port".to_string(),
+                    real_port
+                        .as_deref()
+                        .and_then(|s| s.parse::<i64>().ok())
+                        .map(|n| Value::Number(n.into()))
+                        .unwrap_or(Value::Null),
+                );
+
+                if let Some(epoch) = parse_openvpn_date(last_ref) {
+                    route_obj.insert(
+                        "last_reference_epoch".to_string(),
+                        Value::Number(epoch.into()),
+                    );
+                }
+
+                routing_table.push(Value::Object(route_obj));
+                continue;
+            }
+
+            if section == "stats" && line.starts_with("Max bcast/mcast queue length") {
+                let val = line.splitn(2, ',').nth(1).unwrap_or("0").trim().to_string();
+                if let Ok(n) = val.parse::<i64>() {
+                    global_stats.insert(
+                        "max_bcast_mcast_queue_len".to_string(),
+                        Value::Number(n.into()),
+                    );
+                }
+                continue;
+            }
+        }
+
+        raw_output.insert("clients".to_string(), Value::Array(clients));
+        raw_output.insert("routing_table".to_string(), Value::Array(routing_table));
+        raw_output.insert("global_stats".to_string(), Value::Object(global_stats));
+
+        Ok(ParseOutput::Object(raw_output))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_openvpn_basic() {
+        let input = r#"OpenVPN CLIENT LIST
+Updated,Thu Jun 18 08:12:15 2015
+Common Name,Real Address,Bytes Received,Bytes Sent,Connected Since
+foo@example.com,10.10.10.10:49502,334948,1973012,Thu Jun 18 04:23:03 2015
+ROUTING TABLE
+Virtual Address,Common Name,Real Address,Last Ref
+192.168.255.118,baz@example.com,10.10.10.10:63414,Thu Jun 18 08:12:09 2015
+GLOBAL STATS
+Max bcast/mcast queue length,0
+END
+"#;
+        let parser = OpenvpnParser;
+        let result = parser.parse(input, false).unwrap();
+        if let ParseOutput::Object(obj) = result {
+            assert!(obj.contains_key("clients"));
+            assert!(obj.contains_key("routing_table"));
+            assert!(obj.contains_key("global_stats"));
+
+            if let Some(Value::Array(clients)) = obj.get("clients") {
+                assert_eq!(clients.len(), 1);
+                if let Value::Object(c) = &clients[0] {
+                    assert_eq!(
+                        c.get("common_name"),
+                        Some(&Value::String("foo@example.com".to_string()))
+                    );
+                    assert_eq!(
+                        c.get("real_address"),
+                        Some(&Value::String("10.10.10.10".to_string()))
+                    );
+                    assert_eq!(
+                        c.get("real_address_port"),
+                        Some(&Value::Number(49502i64.into()))
+                    );
+                }
+            }
+
+            if let Some(Value::Object(stats)) = obj.get("global_stats") {
+                assert_eq!(
+                    stats.get("max_bcast_mcast_queue_len"),
+                    Some(&Value::Number(0i64.into()))
+                );
+            }
+        } else {
+            panic!("Expected Object");
+        }
+    }
+
+    #[test]
+    fn test_openvpn_empty() {
+        let parser = OpenvpnParser;
+        let result = parser.parse("", false).unwrap();
+        if let ParseOutput::Object(obj) = result {
+            assert!(obj.is_empty());
+        } else {
+            panic!("Expected Object");
+        }
+    }
+}

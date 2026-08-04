@@ -1,0 +1,101 @@
+[workspace]
+members = [
+    "crates/jc-rs-core",
+    "crates/jc-rs-utils",
+    "crates/jc-rs-parsers",
+    "crates/jc-rs",
+    "crates/jc-rs-bench",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/OlegSotnikov/jc-rs"
+homepage = "https://jc-rs.com"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+inventory = "0.3"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[workspace.lints.clippy]
+# Bulk-allow legacy patterns from jc port — clean up incrementally
+collapsible_if = "allow"
+collapsible_else_if = "allow"
+collapsible_match = "allow"
+manual_strip = "allow"
+manual_split_once = "allow"
+redundant_closure = "allow"
+regex_creation_in_loops = "allow"
+type_complexity = "allow"
+trim_split_whitespace = "allow"
+get_first = "allow"
+needless_late_init = "allow"
+assigning_clones = "allow"
+unused_io_amount = "allow"
+single_match = "allow"
+map_entry = "allow"
+let_and_return = "allow"
+identity_op = "allow"
+unnecessary_cast = "allow"
+approx_constant = "allow"
+map_identity = "allow"
+if_same_then_else = "allow"
+vec_init_then_push = "allow"
+useless_format = "allow"
+needless_range_loop = "allow"
+match_like_matches_macro = "allow"
+len_zero = "allow"
+manual_map = "allow"
+search_is_some = "allow"
+unnecessary_to_owned = "allow"
+manual_is_ascii_check = "allow"
+or_fun_call = "allow"
+clone_on_copy = "allow"
+derivable_impls = "allow"
+ptr_arg = "allow"
+wrong_self_convention = "allow"
+char_lit_as_u8 = "allow"
+needless_return = "allow"
+into_iter_on_ref = "allow"
+op_ref = "allow"
+manual_find = "allow"
+manual_range_contains = "allow"
+drain_collect = "allow"
+unnecessary_lazy_evaluations = "allow"
+iter_nth_zero = "allow"
+large_enum_variant = "allow"
+to_string_in_format_args = "allow"
+single_char_pattern = "allow"
+nonminimal_bool = "allow"
+collapsible_str_replace = "allow"
+manual_pattern_char_comparison = "allow"
+manual_unwrap_or_default = "allow"
+manual_unwrap_or = "allow"
+needless_borrow = "allow"
+no_effect_replace = "allow"
+unnecessary_map_or = "allow"
+redundant_slicing = "allow"
+needless_lifetimes = "allow"
+bool_comparison = "allow"
+useless_asref = "allow"
+int_plus_one = "allow"
+while_let_loop = "allow"
+regex_macro = "allow"
+while_let_on_iterator = "allow"
+needless_bool_assign = "allow"
+option_map_or_none = "allow"
+redundant_pattern_matching = "allow"
+no_effect = "allow"
+
+[workspace.lints.rust]
+non_snake_case = "allow"
+unused_variables = "allow"
+unused_imports = "allow"
+unused_mut = "allow"
+unused_assignments = "allow"
+dead_code = "allow"

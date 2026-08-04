@@ -1,0 +1,4454 @@
+{
+ "jc_version": "1.25.7",
+ "summary": {
+  "oracle_ok": 934,
+  "match": 804,
+  "mismatch": 106,
+  "error": 24,
+  "oracle_reject": 9
+ },
+ "tested": 934,
+ "match_rate": 86.08,
+ "per_parser": {
+  "acpi": {
+   "total": 7,
+   "match": 7
+  },
+  "airport": {
+   "total": 1,
+   "match": 1
+  },
+  "airport_s": {
+   "total": 1,
+   "match": 1
+  },
+  "apt_cache_show": {
+   "total": 1,
+   "match": 1
+  },
+  "apt_get_sqq": {
+   "total": 1,
+   "match": 1
+  },
+  "arp": {
+   "total": 12,
+   "match": 12
+  },
+  "blkid": {
+   "total": 10,
+   "match": 10
+  },
+  "cbt": {
+   "total": 4,
+   "match": 3,
+   "mismatch": 1
+  },
+  "cef": {
+   "total": 1,
+   "match": 1
+  },
+  "cef_s": {
+   "total": 1,
+   "match": 1
+  },
+  "certbot": {
+   "total": 3,
+   "match": 1,
+   "mismatch": 2
+  },
+  "chage": {
+   "total": 1,
+   "match": 1
+  },
+  "cksum": {
+   "total": 2,
+   "match": 2
+  },
+  "crontab": {
+   "total": 3,
+   "match": 3
+  },
+  "crontab_u": {
+   "total": 5,
+   "match": 5
+  },
+  "csv": {
+   "total": 11,
+   "match": 11
+  },
+  "csv_ih": {
+   "total": 2,
+   "error": 2
+  },
+  "csv_ih_s": {
+   "total": 2,
+   "error": 2
+  },
+  "csv_s": {
+   "total": 11,
+   "match": 10,
+   "mismatch": 1
+  },
+  "curl_head": {
+   "total": 6,
+   "match": 6
+  },
+  "date": {
+   "total": 4,
+   "mismatch": 2,
+   "match": 2
+  },
+  "debconf_show": {
+   "total": 1,
+   "match": 1
+  },
+  "df": {
+   "total": 10,
+   "match": 10
+  },
+  "dig": {
+   "total": 24,
+   "match": 23,
+   "mismatch": 1
+  },
+  "dir": {
+   "total": 7,
+   "match": 7
+  },
+  "dmidecode": {
+   "total": 3,
+   "match": 3
+  },
+  "dpkg_l": {
+   "total": 3,
+   "match": 3
+  },
+  "du": {
+   "total": 4,
+   "match": 4
+  },
+  "efibootmgr": {
+   "total": 2,
+   "match": 2
+  },
+  "env": {
+   "total": 4,
+   "match": 3,
+   "mismatch": 1
+  },
+  "ethtool": {
+   "total": 5,
+   "match": 3,
+   "mismatch": 2
+  },
+  "file": {
+   "total": 3,
+   "match": 3
+  },
+  "find": {
+   "total": 2,
+   "match": 2
+  },
+  "findmnt": {
+   "total": 3,
+   "match": 3
+  },
+  "finger": {
+   "total": 3,
+   "match": 3
+  },
+  "free": {
+   "total": 6,
+   "match": 6
+  },
+  "fstab": {
+   "total": 2,
+   "match": 2
+  },
+  "git_log": {
+   "total": 19,
+   "mismatch": 10,
+   "match": 9
+  },
+  "git_log_s": {
+   "total": 19,
+   "mismatch": 10,
+   "match": 9
+  },
+  "git_ls_remote": {
+   "total": 2,
+   "mismatch": 1,
+   "match": 1
+  },
+  "gpg": {
+   "total": 1,
+   "match": 1
+  },
+  "group": {
+   "total": 3,
+   "match": 3
+  },
+  "gshadow": {
+   "total": 2,
+   "match": 2
+  },
+  "hash": {
+   "total": 1,
+   "match": 1
+  },
+  "hciconfig": {
+   "total": 4,
+   "match": 4
+  },
+  "history": {
+   "total": 2,
+   "match": 2
+  },
+  "host": {
+   "total": 2,
+   "match": 2
+  },
+  "hosts": {
+   "total": 2,
+   "match": 2
+  },
+  "http_headers": {
+   "total": 2,
+   "match": 2
+  },
+  "id": {
+   "total": 2,
+   "match": 2
+  },
+  "ifconfig": {
+   "total": 9,
+   "match": 9
+  },
+  "ini": {
+   "total": 5,
+   "match": 5
+  },
+  "iostat": {
+   "total": 14,
+   "match": 14
+  },
+  "iostat_s": {
+   "total": 14,
+   "match": 14
+  },
+  "ip_route": {
+   "total": 2,
+   "match": 2
+  },
+  "iptables": {
+   "total": 12,
+   "match": 11,
+   "mismatch": 1
+  },
+  "iwconfig": {
+   "total": 4,
+   "match": 3,
+   "mismatch": 1
+  },
+  "jobs": {
+   "total": 2,
+   "match": 2
+  },
+  "last": {
+   "total": 11,
+   "match": 11
+  },
+  "ls": {
+   "total": 35,
+   "match": 35
+  },
+  "ls_s": {
+   "total": 11,
+   "match": 7,
+   "mismatch": 4
+  },
+  "lsattr": {
+   "total": 4,
+   "match": 3,
+   "mismatch": 1
+  },
+  "lsb_release": {
+   "total": 1,
+   "match": 1
+  },
+  "lsblk": {
+   "total": 4,
+   "match": 4
+  },
+  "lsmod": {
+   "total": 2,
+   "match": 2
+  },
+  "lsof": {
+   "total": 4,
+   "match": 4
+  },
+  "lspci": {
+   "total": 3,
+   "match": 3
+  },
+  "lsusb": {
+   "total": 9,
+   "match": 9
+  },
+  "m3u": {
+   "total": 2,
+   "mismatch": 1,
+   "match": 1
+  },
+  "mdadm": {
+   "total": 40,
+   "match": 7,
+   "mismatch": 33
+  },
+  "mount": {
+   "total": 7,
+   "match": 7
+  },
+  "mpstat": {
+   "total": 4,
+   "match": 4
+  },
+  "mpstat_s": {
+   "total": 4,
+   "match": 4
+  },
+  "needrestart": {
+   "total": 3,
+   "match": 3
+  },
+  "netstat": {
+   "total": 37,
+   "match": 37
+  },
+  "nmcli": {
+   "total": 18,
+   "match": 18
+  },
+  "nsd_control": {
+   "total": 6,
+   "match": 6
+  },
+  "ntpq": {
+   "total": 6,
+   "match": 6
+  },
+  "openvpn": {
+   "total": 1,
+   "mismatch": 1
+  },
+  "os_release": {
+   "total": 2,
+   "match": 2
+  },
+  "pacman": {
+   "total": 3,
+   "match": 3
+  },
+  "passwd": {
+   "total": 3,
+   "match": 3
+  },
+  "path": {
+   "total": 4,
+   "match": 4
+  },
+  "path_list": {
+   "total": 7,
+   "match": 7
+  },
+  "pgpass": {
+   "total": 1,
+   "match": 1
+  },
+  "pidstat": {
+   "total": 4,
+   "match": 4
+  },
+  "pidstat_s": {
+   "total": 4,
+   "match": 4
+  },
+  "ping": {
+   "total": 40,
+   "match": 40
+  },
+  "ping_s": {
+   "total": 36,
+   "match": 32,
+   "mismatch": 4
+  },
+  "pip_list": {
+   "total": 5,
+   "match": 5
+  },
+  "pip_show": {
+   "total": 6,
+   "match": 6
+  },
+  "pkg_index_apk": {
+   "total": 2,
+   "mismatch": 1,
+   "match": 1
+  },
+  "pkg_index_deb": {
+   "total": 1,
+   "match": 1
+  },
+  "plist": {
+   "total": 4,
+   "mismatch": 2,
+   "match": 2
+  },
+  "postconf": {
+   "total": 1,
+   "match": 1
+  },
+  "proc": {
+   "total": 9,
+   "error": 9
+  },
+  "proc_buddyinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_consoles": {
+   "total": 2,
+   "match": 2
+  },
+  "proc_cpuinfo": {
+   "total": 2,
+   "match": 2
+  },
+  "proc_crypto": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_devices": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_diskstats": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_driver_rtc": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_filesystems": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_interrupts": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_iomem": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_ioports": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_loadavg": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_locks": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_meminfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_modules": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_mtrr": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_arp": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_dev": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_dev_mcast": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_if_inet6": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_igmp": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_igmp6": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_ipv6_route": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_netlink": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_netstat": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_packet": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_protocols": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_route": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_net_tcp": {
+   "total": 2,
+   "match": 2
+  },
+  "proc_net_unix": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pagetypeinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_partitions": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_fdinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_io": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_maps": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_mountinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_numa_maps": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_smaps": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_stat": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_statm": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_pid_status": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_slabinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_softirqs": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_stat": {
+   "total": 2,
+   "match": 2
+  },
+  "proc_swaps": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_uptime": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_version": {
+   "total": 3,
+   "match": 3
+  },
+  "proc_vmallocinfo": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_vmstat": {
+   "total": 1,
+   "match": 1
+  },
+  "proc_zoneinfo": {
+   "total": 2,
+   "match": 2
+  },
+  "ps": {
+   "total": 8,
+   "match": 8
+  },
+  "route": {
+   "total": 7,
+   "mismatch": 2,
+   "match": 5
+  },
+  "rpm_qi": {
+   "total": 1,
+   "match": 1
+  },
+  "rsync": {
+   "total": 13,
+   "match": 12,
+   "mismatch": 1
+  },
+  "rsync_s": {
+   "total": 13,
+   "mismatch": 7,
+   "match": 6
+  },
+  "sfdisk": {
+   "total": 14,
+   "match": 14
+  },
+  "shadow": {
+   "total": 2,
+   "match": 2
+  },
+  "srt": {
+   "total": 2,
+   "match": 2
+  },
+  "ss": {
+   "total": 4,
+   "match": 4
+  },
+  "stat": {
+   "total": 6,
+   "match": 5,
+   "mismatch": 1
+  },
+  "stat_s": {
+   "total": 5,
+   "mismatch": 2,
+   "match": 3
+  },
+  "swapon": {
+   "total": 2,
+   "match": 2
+  },
+  "sysctl": {
+   "total": 4,
+   "match": 4
+  },
+  "syslog": {
+   "total": 1,
+   "match": 1
+  },
+  "syslog_s": {
+   "total": 1,
+   "match": 1
+  },
+  "systemctl": {
+   "total": 2,
+   "match": 2
+  },
+  "systemctl_lj": {
+   "total": 1,
+   "match": 1
+  },
+  "systemctl_ls": {
+   "total": 2,
+   "match": 2
+  },
+  "systemctl_luf": {
+   "total": 2,
+   "match": 2
+  },
+  "time": {
+   "total": 7,
+   "match": 7
+  },
+  "timedatectl": {
+   "total": 4,
+   "mismatch": 3,
+   "match": 1
+  },
+  "toml": {
+   "total": 2,
+   "match": 2
+  },
+  "top": {
+   "total": 5,
+   "match": 5
+  },
+  "top_s": {
+   "total": 5,
+   "match": 5
+  },
+  "tracepath": {
+   "total": 1,
+   "mismatch": 1
+  },
+  "traceroute": {
+   "total": 11,
+   "match": 11
+  },
+  "traceroute_s": {
+   "total": 11,
+   "match": 9,
+   "mismatch": 2
+  },
+  "tsv": {
+   "total": 1,
+   "error": 1
+  },
+  "tsv_ih": {
+   "total": 2,
+   "error": 2
+  },
+  "tsv_ih_s": {
+   "total": 2,
+   "error": 2
+  },
+  "tsv_s": {
+   "total": 1,
+   "error": 1
+  },
+  "tune2fs": {
+   "total": 1,
+   "mismatch": 1
+  },
+  "typeset": {
+   "total": 5,
+   "error": 5
+  },
+  "udevadm": {
+   "total": 1,
+   "match": 1
+  },
+  "ufw": {
+   "total": 6,
+   "match": 1,
+   "mismatch": 5
+  },
+  "ufw_appinfo": {
+   "total": 6,
+   "match": 6
+  },
+  "uname": {
+   "total": 9,
+   "match": 9
+  },
+  "upower": {
+   "total": 6,
+   "match": 6
+  },
+  "uptime": {
+   "total": 4,
+   "match": 4
+  },
+  "vmstat": {
+   "total": 9,
+   "match": 9
+  },
+  "vmstat_s": {
+   "total": 9,
+   "match": 9
+  },
+  "w": {
+   "total": 5,
+   "match": 5
+  },
+  "wc": {
+   "total": 3,
+   "match": 3
+  },
+  "wg_show": {
+   "total": 2,
+   "match": 2
+  },
+  "who": {
+   "total": 8,
+   "match": 8
+  },
+  "x509_cert": {
+   "total": 3,
+   "match": 3
+  },
+  "x509_crl": {
+   "total": 1,
+   "match": 1
+  },
+  "x509_csr": {
+   "total": 2,
+   "match": 2
+  },
+  "xml": {
+   "total": 4,
+   "match": 3,
+   "mismatch": 1
+  },
+  "xrandr": {
+   "total": 1,
+   "match": 1
+  },
+  "yaml": {
+   "total": 2,
+   "match": 2
+  },
+  "zipinfo": {
+   "total": 3,
+   "match": 3
+  },
+  "zpool_iostat": {
+   "total": 2,
+   "match": 2
+  },
+  "zpool_status": {
+   "total": 5,
+   "match": 5
+  }
+ },
+ "failures": [
+  {
+   "platform": "centos-7.7",
+   "base": "ls-alh-streaming",
+   "parser": "ls_s",
+   "status": "mismatch",
+   "diff_count": 4,
+   "kinds": {
+    "missing_key": 4
+   },
+   "sample": [
+    {
+     "path": "$[3].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[4].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[5].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[18].size",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "route-6-n",
+   "parser": "route",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "array_length": 1
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 22,
+     "actual": 21
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "route-6",
+   "parser": "route",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "array_length": 1
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 22,
+     "actual": 21
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "rsync-i-logfile-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 118,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 66,
+    "extra_key": 19,
+    "value_mismatch": 32
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 56,
+     "actual": 55
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "rsync-i-v-logfile-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 123,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 69,
+    "extra_key": 21,
+    "value_mismatch": 32
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 56,
+     "actual": 55
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "rsync-i-vv-logfile-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 124,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 66,
+    "extra_key": 25,
+    "value_mismatch": 32
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 56,
+     "actual": 55
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "rsync-i-vvv-logfile-nochange-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 125,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 68,
+    "extra_key": 25,
+    "value_mismatch": 31
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 58,
+     "actual": 57
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "rsync-i-vvv-logfile-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 226,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 93,
+    "extra_key": 41,
+    "value_mismatch": 75,
+    "type_mismatch": 16
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 85,
+     "actual": 83
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "stat-streaming",
+   "parser": "stat_s",
+   "status": "mismatch",
+   "diff_count": 142,
+   "kinds": {
+    "value_mismatch": 142
+   },
+   "sample": [
+    {
+     "path": "$[4].file",
+     "kind": "value_mismatch",
+     "expected": "'/bin/apropos'",
+     "actual": "'/bin/apropos\u2019'"
+    },
+    {
+     "path": "$[4].link_to",
+     "kind": "value_mismatch",
+     "expected": "'whatis'",
+     "actual": "'\u2018whatis'"
+    },
+    {
+     "path": "$[10].file",
+     "kind": "value_mismatch",
+     "expected": "'/bin/audit2why'",
+     "actual": "'/bin/audit2why\u2019'"
+    },
+    {
+     "path": "$[10].link_to",
+     "kind": "value_mismatch",
+     "expected": "'audit2allow'",
+     "actual": "'\u2018audit2allow'"
+    },
+    {
+     "path": "$[15].file",
+     "kind": "value_mismatch",
+     "expected": "'/bin/awk'",
+     "actual": "'/bin/awk\u2019'"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "timedatectl",
+   "parser": "timedatectl",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.epoch_utc",
+     "kind": "value_mismatch",
+     "expected": "1583888001",
+     "actual": "1583913201"
+    }
+   ]
+  },
+  {
+   "platform": "centos-7.7",
+   "base": "tracepath",
+   "parser": "tracepath",
+   "status": "mismatch",
+   "diff_count": 24,
+   "kinds": {
+    "type_mismatch": 24
+   },
+   "sample": [
+    {
+     "path": "$.hops[4].host",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'no'"
+    },
+    {
+     "path": "$.hops[6].host",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'no'"
+    },
+    {
+     "path": "$.hops[7].host",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'no'"
+    },
+    {
+     "path": "$.hops[11].host",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'no'"
+    },
+    {
+     "path": "$.hops[12].host",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'no'"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "cbt-multiple-rows-raw",
+   "parser": "cbt",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "type_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$[0].cells",
+     "kind": "type_mismatch",
+     "expected": "[{'column_family': 'foo', 'column': 'bar', 'value': 'baz1', 'timestamp_iso': '2000-01-01T01:00:00', 'timestamp_epoch': 9",
+     "actual": "{'foo': {'bar': 'baz1'}}"
+    },
+    {
+     "path": "$[1].cells",
+     "kind": "type_mismatch",
+     "expected": "[{'column_family': 'foo', 'column': 'bar', 'value': 'baz2', 'timestamp_iso': '2000-01-01T01:00:00', 'timestamp_epoch': 9",
+     "actual": "{'foo': {'bar': 'baz2'}}"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "certbot-certs-cert-name",
+   "parser": "certbot",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "missing_key": 1
+   },
+   "sample": [
+    {
+     "path": "$.certificates",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "certbot-certs",
+   "parser": "certbot",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.certificates[0].expiration_date_epoch",
+     "kind": "value_mismatch",
+     "expected": "1683793990",
+     "actual": "1683768790"
+    },
+    {
+     "path": "$.certificates[1].expiration_date_epoch",
+     "kind": "value_mismatch",
+     "expected": "1686558930",
+     "actual": "1686533730"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "csv-doublequoted-streaming",
+   "parser": "csv_s",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$[1].B",
+     "kind": "value_mismatch",
+     "expected": "'this is a field with \" in it\"'",
+     "actual": "'this is a field with \" in it'"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "csv_ih-homes-streaming",
+   "parser": "csv_ih_s",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "csv_ih-homes",
+   "parser": "csv_ih",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "csv_ih-jagged-streaming",
+   "parser": "csv_ih_s",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "csv_ih-jagged",
+   "parser": "csv_ih",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "date-after-midnight",
+   "parser": "date",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.week_of_year",
+     "kind": "value_mismatch",
+     "expected": "12",
+     "actual": "11"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "date-before-midnight",
+   "parser": "date",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.week_of_year",
+     "kind": "value_mismatch",
+     "expected": "12",
+     "actual": "11"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "dig-answer-spaces",
+   "parser": "dig",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$[0].answer[0].data",
+     "kind": "value_mismatch",
+     "expected": "'Blocked - see https://www.spamcop.net/bl.shtml?w.z.y.x'",
+     "actual": "'\"Blocked - see https://www.spamcop.net/bl.shtml?w.z.y.x\"'"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "env-multiline-raw",
+   "parser": "env",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "type_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "type_mismatch",
+     "expected": "{'TERM_PROGRAM': 'Apple_Terminal', 'SHELL': '/bin/zsh', 'TERM': 'xterm-256color', 'TMPDIR': '/var/folders/8g/r6tdh9kj6z3",
+     "actual": "[{'name': 'TERM_PROGRAM', 'value': 'Apple_Terminal'}, {'name': 'SHELL', 'value': '/bin/zsh'}, {'name': 'TERM', 'value': "
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "ethtool--module-info-convert-units",
+   "parser": "ethtool",
+   "status": "mismatch",
+   "diff_count": 10,
+   "kinds": {
+    "extra_key": 5,
+    "missing_key": 5
+   },
+   "sample": [
+    {
+     "path": "$.br,_nominal",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin,_max",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin,_min",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin_max",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.br_margin_min",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "ethtool--module-info",
+   "parser": "ethtool",
+   "status": "mismatch",
+   "diff_count": 10,
+   "kinds": {
+    "extra_key": 5,
+    "missing_key": 5
+   },
+   "sample": [
+    {
+     "path": "$.br,_nominal",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin,_max",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin,_min",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.br_margin_max",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.br_margin_min",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-blank-author-fix-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 3,
+   "kinds": {
+    "value_mismatch": 3
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-blank-author-fix",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 3,
+   "kinds": {
+    "value_mismatch": 3
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller-shortstat-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller-shortstat",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller-stat-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller-stat",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-fuller",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-hash-in-message-fix-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1572291742",
+     "actual": "1572262942"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-hash-in-message-fix",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1572291742",
+     "actual": "1572262942"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-is-hash-regex-fix-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 3,
+   "kinds": {
+    "value_mismatch": 3
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1593814789",
+     "actual": "1593782389"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1597367062",
+     "actual": "1597341862"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1596145844",
+     "actual": "1596113444"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-is-hash-regex-fix",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 3,
+   "kinds": {
+    "value_mismatch": 3
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1593814789",
+     "actual": "1593782389"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1597367062",
+     "actual": "1597341862"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1596145844",
+     "actual": "1596113444"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium-shortstat-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium-shortstat",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium-stat-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium-stat",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-medium",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log-streaming",
+   "parser": "git_log_s",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-log",
+   "parser": "git_log",
+   "status": "mismatch",
+   "diff_count": 81,
+   "kinds": {
+    "value_mismatch": 81
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650474216",
+     "actual": "1650463416"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473419",
+     "actual": "1650462619"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650473082",
+     "actual": "1650462282"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650468386",
+     "actual": "1650457586"
+    },
+    {
+     "path": "$[4].epoch",
+     "kind": "value_mismatch",
+     "expected": "1650415455",
+     "actual": "1650404655"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "git-ls-remote-raw",
+   "parser": "git_ls_remote",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "type_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "type_mismatch",
+     "expected": "[{'reference': 'HEAD', 'commit': '214cd6b9e09603b3c4fa02203b24fb2bc3d4e338'}, {'reference': 'refs/heads/dev', 'commit': ",
+     "actual": "{'HEAD': '214cd6b9e09603b3c4fa02203b24fb2bc3d4e338', 'refs/heads/dev': 'b884f6aacca39e05994596d8fdfa7e7c4f1e0389', 'refs"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "iptables-no-jump2",
+   "parser": "iptables",
+   "status": "mismatch",
+   "diff_count": 5,
+   "kinds": {
+    "missing_key": 1,
+    "type_mismatch": 2,
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$[0].rules[0].destination",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].rules[0].opt",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'*'"
+    },
+    {
+     "path": "$[0].rules[0].out",
+     "kind": "value_mismatch",
+     "expected": "'*'",
+     "actual": "'0.0.0.0/0'"
+    },
+    {
+     "path": "$[0].rules[0].prot",
+     "kind": "value_mismatch",
+     "expected": "'all'",
+     "actual": "'--'"
+    },
+    {
+     "path": "$[0].rules[0].target",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'all'"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "iwconfig-raw",
+   "parser": "iwconfig",
+   "status": "mismatch",
+   "diff_count": 14,
+   "kinds": {
+    "type_mismatch": 14
+   },
+   "sample": [
+    {
+     "path": "$[0].bit_rate",
+     "kind": "type_mismatch",
+     "expected": "'6'",
+     "actual": "6.0"
+    },
+    {
+     "path": "$[0].fragment_threshold",
+     "kind": "type_mismatch",
+     "expected": "'off'",
+     "actual": "False"
+    },
+    {
+     "path": "$[0].frequency",
+     "kind": "type_mismatch",
+     "expected": "'5.18'",
+     "actual": "5.18"
+    },
+    {
+     "path": "$[0].invalid_misc",
+     "kind": "type_mismatch",
+     "expected": "'1766'",
+     "actual": "1766"
+    },
+    {
+     "path": "$[0].missed_beacon",
+     "kind": "type_mismatch",
+     "expected": "'0'",
+     "actual": "0"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "m3u-dirty",
+   "parser": "m3u",
+   "status": "mismatch",
+   "diff_count": 12,
+   "kinds": {
+    "value_mismatch": 12
+   },
+   "sample": [
+    {
+     "path": "$[2063].display",
+     "kind": "value_mismatch",
+     "expected": "'Bumblebee TV Classics'",
+     "actual": "'Bumblebee TV Classics #2 (720p)'"
+    },
+    {
+     "path": "$[9195].display",
+     "kind": "value_mismatch",
+     "expected": "'Illinois: Springfield'",
+     "actual": "'Illinois: Springfield #2 (STIRR) (720p)'"
+    },
+    {
+     "path": "$[9524].display",
+     "kind": "value_mismatch",
+     "expected": "'Ohio: Columbus'",
+     "actual": "'Ohio: Columbus #1 (STIRR) (720p)'"
+    },
+    {
+     "path": "$[9533].display",
+     "kind": "value_mismatch",
+     "expected": "'Ohio: Columbus'",
+     "actual": "'Ohio: Columbus #2 (STIRR) (720p)'"
+    },
+    {
+     "path": "$[9595].display",
+     "kind": "value_mismatch",
+     "expected": "'Oregon: Eugene - Springfield'",
+     "actual": "'Oregon: Eugene - Springfield #1 (STIRR) (720p)'"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid0-offline",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid0-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-0-90-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934376",
+     "actual": "1659909176"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934475",
+     "actual": "1659909275"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-checking",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932639",
+     "actual": "1659907439"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-failfast",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933454",
+     "actual": "1659908254"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-faulty1",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932914",
+     "actual": "1659907714"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-faulty2",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932822",
+     "actual": "1659907622"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-moreflags",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934138",
+     "actual": "1659908938"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932408",
+     "actual": "1659907208"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-replacing",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934095",
+     "actual": "1659908895"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-resync",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932752",
+     "actual": "1659907552"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-spare",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933598",
+     "actual": "1659908398"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid1-syncing",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid5-homehost",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694521",
+     "actual": "1660669321"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694525",
+     "actual": "1660669325"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid5-meta09",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694702",
+     "actual": "1660669502"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694706",
+     "actual": "1660669506"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine-raid5-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694374",
+     "actual": "1660669174"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694379",
+     "actual": "1660669179"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-examine",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1271226136",
+     "actual": "1271200936"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1658891791",
+     "actual": "1658866591"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-detail",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1271226136",
+     "actual": "1271200936"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1658891791",
+     "actual": "1658866591"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid0-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659931012",
+     "actual": "1659905812"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-failed-and-flags",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934138",
+     "actual": "1659908938"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-faulty-and-removed",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933147",
+     "actual": "1659907947"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-faulty-with-spare",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933798",
+     "actual": "1659908598"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-faulty",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932914",
+     "actual": "1659907714"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-ok-0-9",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934376",
+     "actual": "1659909176"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934475",
+     "actual": "1659909275"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-ok-failfast",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933454",
+     "actual": "1659908254"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-ok-spare",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933598",
+     "actual": "1659908398"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932408",
+     "actual": "1659907208"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-rebuild-failfast",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659933377",
+     "actual": "1659908177"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-spare-writem-rebuild",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659934062",
+     "actual": "1659908862"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid1-syncing",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1659932149",
+     "actual": "1659906949"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid5-homehost",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694521",
+     "actual": "1660669321"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694525",
+     "actual": "1660669325"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid5-meta09",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694702",
+     "actual": "1660669502"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694706",
+     "actual": "1660669506"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "mdadm-query-raid5-ok",
+   "parser": "mdadm",
+   "status": "mismatch",
+   "diff_count": 2,
+   "kinds": {
+    "value_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.creation_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694374",
+     "actual": "1660669174"
+    },
+    {
+     "path": "$.update_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1660694379",
+     "actual": "1660669179"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "openvpn-status",
+   "parser": "openvpn",
+   "status": "mismatch",
+   "diff_count": 23,
+   "kinds": {
+    "value_mismatch": 23
+   },
+   "sample": [
+    {
+     "path": "$.clients[0].connected_since_epoch",
+     "kind": "value_mismatch",
+     "expected": "1434626583",
+     "actual": "1434601383"
+    },
+    {
+     "path": "$.clients[0].updated_epoch",
+     "kind": "value_mismatch",
+     "expected": "1434640335",
+     "actual": "1434615135"
+    },
+    {
+     "path": "$.clients[1].connected_since_epoch",
+     "kind": "value_mismatch",
+     "expected": "1434626583",
+     "actual": "1434601383"
+    },
+    {
+     "path": "$.clients[1].updated_epoch",
+     "kind": "value_mismatch",
+     "expected": "1434640335",
+     "actual": "1434615135"
+    },
+    {
+     "path": "$.clients[2].connected_since_epoch",
+     "kind": "value_mismatch",
+     "expected": "1434625719",
+     "actual": "1434600519"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "pkg-index-apk-raw",
+   "parser": "pkg_index_apk",
+   "status": "mismatch",
+   "diff_count": 56,
+   "kinds": {
+    "missing_key": 28,
+    "extra_key": 28
+   },
+   "sample": [
+    {
+     "path": "$[0].A",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].C",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].D",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].I",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].L",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "plist-alltypes",
+   "parser": "plist",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.aDate",
+     "kind": "value_mismatch",
+     "expected": "1659310470",
+     "actual": "1659285270"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "plist-nextstep",
+   "parser": "plist",
+   "status": "mismatch",
+   "diff_count": 43,
+   "kinds": {
+    "type_mismatch": 38,
+    "value_mismatch": 5
+   },
+   "sample": [
+    {
+     "path": "$.archiveVersion",
+     "kind": "type_mismatch",
+     "expected": "'1'",
+     "actual": "1"
+    },
+    {
+     "path": "$.objectVersion",
+     "kind": "type_mismatch",
+     "expected": "'46'",
+     "actual": "46"
+    },
+    {
+     "path": "$.objects.15D488951BD3D59200EC46B1.attributes.LastUpgradeCheck",
+     "kind": "type_mismatch",
+     "expected": "'0700'",
+     "actual": "700"
+    },
+    {
+     "path": "$.objects.15D488951BD3D59200EC46B1.hasScannedForEncodings",
+     "kind": "type_mismatch",
+     "expected": "'0'",
+     "actual": "0"
+    },
+    {
+     "path": "$.objects.15D488981BD3D59200EC46B1.defaultConfigurationIsVisible",
+     "kind": "type_mismatch",
+     "expected": "'0'",
+     "actual": "0"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "rsync-i-stats-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 18,
+   "kinds": {
+    "value_mismatch": 4,
+    "missing_key": 14
+   },
+   "sample": [
+    {
+     "path": "$[0].bytes_sec",
+     "kind": "value_mismatch",
+     "expected": "370210.0",
+     "actual": "379095.04"
+    },
+    {
+     "path": "$[0].created_dir_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].created_regular_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].deleted_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].dir_files",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "rsync-i-stats",
+   "parser": "rsync",
+   "status": "mismatch",
+   "diff_count": 18,
+   "kinds": {
+    "value_mismatch": 4,
+    "missing_key": 14
+   },
+   "sample": [
+    {
+     "path": "$[0].summary.bytes_sec",
+     "kind": "value_mismatch",
+     "expected": "370210.0",
+     "actual": "379095.04"
+    },
+    {
+     "path": "$[0].summary.created_dir_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].summary.created_regular_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].summary.deleted_files",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].summary.dir_files",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "timedatectl-rtc-local",
+   "parser": "timedatectl",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.epoch_utc",
+     "kind": "value_mismatch",
+     "expected": "1678709858",
+     "actual": "1678735058"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "traceroute-n-ipv6-streaming",
+   "parser": "traceroute_s",
+   "status": "mismatch",
+   "diff_count": 36,
+   "kinds": {
+    "type_mismatch": 36
+   },
+   "sample": [
+    {
+     "path": "$[1].probes[0].ip",
+     "kind": "type_mismatch",
+     "expected": "'2605:9000:402:6a01::1'",
+     "actual": "None"
+    },
+    {
+     "path": "$[1].probes[1].ip",
+     "kind": "type_mismatch",
+     "expected": "'2605:9000:402:6a01::1'",
+     "actual": "None"
+    },
+    {
+     "path": "$[1].probes[2].ip",
+     "kind": "type_mismatch",
+     "expected": "'2605:9000:402:6a01::1'",
+     "actual": "None"
+    },
+    {
+     "path": "$[2].probes[0].ip",
+     "kind": "type_mismatch",
+     "expected": "'2605:9000:0:400a::f1'",
+     "actual": "None"
+    },
+    {
+     "path": "$[2].probes[1].ip",
+     "kind": "type_mismatch",
+     "expected": "'2605:9000:0:400a::f1'",
+     "actual": "None"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "tsv-dpkg-query-streaming",
+   "parser": "tsv_s",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-s. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tsv-dpkg-query",
+   "parser": "tsv",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tsv_ih-dpkg-query-streaming",
+   "parser": "tsv_ih_s",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tsv_ih-dpkg-query",
+   "parser": "tsv_ih",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tsv_ih-simple-double-quote-streaming",
+   "parser": "tsv_ih_s",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tsv_ih-simple-double-quote",
+   "parser": "tsv_ih",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "tune2fs-l",
+   "parser": "tune2fs",
+   "status": "mismatch",
+   "diff_count": 4,
+   "kinds": {
+    "value_mismatch": 4
+   },
+   "sample": [
+    {
+     "path": "$.filesystem_created_epoch",
+     "kind": "value_mismatch",
+     "expected": "1586211037",
+     "actual": "1586185837"
+    },
+    {
+     "path": "$.last_checked_epoch",
+     "kind": "value_mismatch",
+     "expected": "1649456662",
+     "actual": "1649431462"
+    },
+    {
+     "path": "$.last_mount_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1663625780",
+     "actual": "1663600580"
+    },
+    {
+     "path": "$.last_write_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1663625780",
+     "actual": "1663600580"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "typeset--a",
+   "parser": "typeset",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "typeset--capital-a",
+   "parser": "typeset",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "typeset--p",
+   "parser": "typeset",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "typeset--plain",
+   "parser": "typeset",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "typeset--r",
+   "parser": "typeset",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
+  },
+  {
+   "platform": "generic",
+   "base": "ufw-numbered",
+   "parser": "ufw",
+   "status": "mismatch",
+   "diff_count": 22,
+   "kinds": {
+    "missing_key": 17,
+    "type_mismatch": 5
+   },
+   "sample": [
+    {
+     "path": "$.rules[0].from_port_ranges",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[0].from_service",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'(log)'"
+    },
+    {
+     "path": "$.rules[0].from_transport",
+     "kind": "type_mismatch",
+     "expected": "'any'",
+     "actual": "None"
+    },
+    {
+     "path": "$.rules[0].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[1].from_port_ranges",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "ufw-numbered2",
+   "parser": "ufw",
+   "status": "mismatch",
+   "diff_count": 15,
+   "kinds": {
+    "missing_key": 15
+   },
+   "sample": [
+    {
+     "path": "$.rules[0].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[1].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[2].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[3].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[4].log",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "ufw",
+   "parser": "ufw",
+   "status": "mismatch",
+   "diff_count": 18,
+   "kinds": {
+    "missing_key": 16,
+    "type_mismatch": 2
+   },
+   "sample": [
+    {
+     "path": "$.rules[0].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[1].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[2].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[3].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[4].log",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "generic",
+   "base": "xml-nmap-raw",
+   "parser": "xml",
+   "status": "mismatch",
+   "diff_count": 98,
+   "kinds": {
+    "extra_key": 49,
+    "missing_key": 49
+   },
+   "sample": [
+    {
+     "path": "$.nmaprun.@args",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.nmaprun.@scanner",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.nmaprun.@start",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.nmaprun.@startstr",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$.nmaprun.@version",
+     "kind": "extra_key"
+    }
+   ]
+  },
+  {
+   "platform": "linux-proc",
+   "base": "net_igmp_more",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_fdinfo_dma",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_fdinfo_epoll",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_fdinfo_fanotify",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_fdinfo_inotify",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_fdinfo_timerfd",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_smaps_unknown_flag",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_stat_hack",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "linux-proc",
+   "base": "pid_stat_w_space_and_nl_in_comm",
+   "parser": "proc",
+   "status": "error",
+   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
+  },
+  {
+   "platform": "osx-10.14.6",
+   "base": "ls-alh-streaming",
+   "parser": "ls_s",
+   "status": "mismatch",
+   "diff_count": 34,
+   "kinds": {
+    "missing_key": 34
+   },
+   "sample": [
+    {
+     "path": "$[0].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[4].size",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "osx-10.14.6",
+   "base": "ping-ip-unreachable-streaming",
+   "parser": "ping_s",
+   "status": "mismatch",
+   "diff_count": 54,
+   "kinds": {
+    "missing_key": 6,
+    "extra_key": 36,
+    "value_mismatch": 12
+   },
+   "sample": [
+    {
+     "path": "$[2].bytes",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].icmp_seq",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[2].pattern",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[2].response_bytes",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[2].response_ip",
+     "kind": "value_mismatch",
+     "expected": "'192.168.1.220'",
+     "actual": "'fgt1.attlocal.net'"
+    }
+   ]
+  },
+  {
+   "platform": "osx-10.14.6",
+   "base": "rsync-i-vvv-logfile-nochange-streaming",
+   "parser": "rsync_s",
+   "status": "mismatch",
+   "diff_count": 106,
+   "kinds": {
+    "array_length": 1,
+    "missing_key": 39,
+    "extra_key": 31,
+    "value_mismatch": 35
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 33,
+     "actual": 31
+    },
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "osx-10.14.6",
+   "base": "traceroute-asn-streaming",
+   "parser": "traceroute_s",
+   "status": "mismatch",
+   "diff_count": 6,
+   "kinds": {
+    "type_mismatch": 6
+   },
+   "sample": [
+    {
+     "path": "$[1].probes[1].asn",
+     "kind": "type_mismatch",
+     "expected": "198949",
+     "actual": "None"
+    },
+    {
+     "path": "$[1].probes[2].asn",
+     "kind": "type_mismatch",
+     "expected": "198949",
+     "actual": "None"
+    },
+    {
+     "path": "$[2].probes[1].asn",
+     "kind": "type_mismatch",
+     "expected": "0",
+     "actual": "None"
+    },
+    {
+     "path": "$[2].probes[2].asn",
+     "kind": "type_mismatch",
+     "expected": "0",
+     "actual": "None"
+    },
+    {
+     "path": "$[4].probes[1].asn",
+     "kind": "type_mismatch",
+     "expected": "7018",
+     "actual": "None"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "ls-alh-streaming",
+   "parser": "ls_s",
+   "status": "mismatch",
+   "diff_count": 23,
+   "kinds": {
+    "missing_key": 23
+   },
+   "sample": [
+    {
+     "path": "$[0].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[3].size",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[4].size",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "ls-l-iso-streaming",
+   "parser": "ls_s",
+   "status": "mismatch",
+   "diff_count": 1762,
+   "kinds": {
+    "missing_key": 1762
+   },
+   "sample": [
+    {
+     "path": "$[0].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[0].epoch_utc",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[1].epoch_utc",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$[2].epoch",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "stat-streaming",
+   "parser": "stat_s",
+   "status": "mismatch",
+   "diff_count": 510,
+   "kinds": {
+    "value_mismatch": 510
+   },
+   "sample": [
+    {
+     "path": "$[0].access_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1573748283",
+     "actual": "1573719483"
+    },
+    {
+     "path": "$[0].change_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1565655689",
+     "actual": "1565630489"
+    },
+    {
+     "path": "$[0].modify_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1559885295",
+     "actual": "1559860095"
+    },
+    {
+     "path": "$[1].access_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1573748308",
+     "actual": "1573719508"
+    },
+    {
+     "path": "$[1].change_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1565655689",
+     "actual": "1565630489"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "stat",
+   "parser": "stat",
+   "status": "mismatch",
+   "diff_count": 510,
+   "kinds": {
+    "value_mismatch": 510
+   },
+   "sample": [
+    {
+     "path": "$[0].access_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1573748283",
+     "actual": "1573719483"
+    },
+    {
+     "path": "$[0].change_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1565655689",
+     "actual": "1565630489"
+    },
+    {
+     "path": "$[0].modify_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1559885295",
+     "actual": "1559860095"
+    },
+    {
+     "path": "$[1].access_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1573748308",
+     "actual": "1573719508"
+    },
+    {
+     "path": "$[1].change_time_epoch",
+     "kind": "value_mismatch",
+     "expected": "1565655689",
+     "actual": "1565630489"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "timedatectl",
+   "parser": "timedatectl",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$.epoch_utc",
+     "kind": "value_mismatch",
+     "expected": "1583887871",
+     "actual": "1583913071"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "ufw-numbered",
+   "parser": "ufw",
+   "status": "mismatch",
+   "diff_count": 21,
+   "kinds": {
+    "missing_key": 17,
+    "type_mismatch": 4
+   },
+   "sample": [
+    {
+     "path": "$.rules[0].from_port_ranges",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[0].from_service",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'(log)'"
+    },
+    {
+     "path": "$.rules[0].from_transport",
+     "kind": "type_mismatch",
+     "expected": "'any'",
+     "actual": "None"
+    },
+    {
+     "path": "$.rules[0].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[1].log",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-18.04",
+   "base": "ufw-verbose",
+   "parser": "ufw",
+   "status": "mismatch",
+   "diff_count": 21,
+   "kinds": {
+    "missing_key": 17,
+    "type_mismatch": 4
+   },
+   "sample": [
+    {
+     "path": "$.rules[0].from_port_ranges",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[0].from_service",
+     "kind": "type_mismatch",
+     "expected": "None",
+     "actual": "'(log)'"
+    },
+    {
+     "path": "$.rules[0].from_transport",
+     "kind": "type_mismatch",
+     "expected": "'any'",
+     "actual": "None"
+    },
+    {
+     "path": "$.rules[0].log",
+     "kind": "missing_key"
+    },
+    {
+     "path": "$.rules[1].log",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-20.04",
+   "base": "lsattr-spaces",
+   "parser": "lsattr",
+   "status": "mismatch",
+   "diff_count": 1,
+   "kinds": {
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$[0].file",
+     "kind": "value_mismatch",
+     "expected": "'./ok ok ok ok ok'",
+     "actual": "'./ok'"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "ping-dest-unreachable-streaming",
+   "parser": "ping_s",
+   "status": "mismatch",
+   "diff_count": 17,
+   "kinds": {
+    "array_length": 1,
+    "extra_key": 12,
+    "missing_key": 3,
+    "value_mismatch": 1
+   },
+   "sample": [
+    {
+     "path": "$",
+     "kind": "array_length",
+     "expected": 4,
+     "actual": 1
+    },
+    {
+     "path": "$[0].corrupted",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[0].duplicates",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[0].errors",
+     "kind": "extra_key"
+    },
+    {
+     "path": "$[0].icmp_seq",
+     "kind": "missing_key"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "ping-hostname-source-ip-streaming",
+   "parser": "ping_s",
+   "status": "mismatch",
+   "diff_count": 8,
+   "kinds": {
+    "value_mismatch": 8
+   },
+   "sample": [
+    {
+     "path": "$[0].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    },
+    {
+     "path": "$[0].sent_bytes",
+     "kind": "value_mismatch",
+     "expected": "56",
+     "actual": "84"
+    },
+    {
+     "path": "$[1].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    },
+    {
+     "path": "$[1].sent_bytes",
+     "kind": "value_mismatch",
+     "expected": "56",
+     "actual": "84"
+    },
+    {
+     "path": "$[2].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    }
+   ]
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "ping-ip-source-ip-streaming",
+   "parser": "ping_s",
+   "status": "mismatch",
+   "diff_count": 8,
+   "kinds": {
+    "value_mismatch": 8
+   },
+   "sample": [
+    {
+     "path": "$[0].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    },
+    {
+     "path": "$[0].sent_bytes",
+     "kind": "value_mismatch",
+     "expected": "56",
+     "actual": "84"
+    },
+    {
+     "path": "$[1].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    },
+    {
+     "path": "$[1].sent_bytes",
+     "kind": "value_mismatch",
+     "expected": "56",
+     "actual": "84"
+    },
+    {
+     "path": "$[2].destination_ip",
+     "kind": "value_mismatch",
+     "expected": "'10.0.0.1'",
+     "actual": "'from'"
+    }
+   ]
+  }
+ ],
+ "oracle_rejects": [
+  {
+   "platform": "generic",
+   "base": "plist-alltypes-bin",
+   "parser": "plist",
+   "reason": "AttributeError: 'NoneType' object has no attribute 'nativeType'"
+  },
+  {
+   "platform": "generic",
+   "base": "plist-garageband-info",
+   "parser": "plist",
+   "reason": "AttributeError: 'NoneType' object has no attribute 'nativeType'"
+  },
+  {
+   "platform": "generic",
+   "base": "syslog-3164-streaming",
+   "parser": "syslog_s",
+   "reason": "jc output != its own fixture"
+  },
+  {
+   "platform": "generic",
+   "base": "syslog-3164",
+   "parser": "syslog",
+   "reason": "jc output != its own fixture"
+  },
+  {
+   "platform": "generic",
+   "base": "x509-cert-bad-email2",
+   "parser": "x509_cert",
+   "reason": "ValueError: Insufficient data - 1545628302319780945216462197297646693612019964924826624139847375286965876928877622267495918874737321775526837195207876660526724965874716942451140323115534427173907019736719358411454638229098810461733750119791697342725175540221779582135372191545704385110540494060991795 bytes requested but only 370 available"
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "amixer-control-capture",
+   "parser": "amixer",
+   "reason": "jc output != its own fixture"
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "amixer-control-headphone",
+   "parser": "amixer",
+   "reason": "jc output != its own fixture"
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "amixer-control-master",
+   "parser": "amixer",
+   "reason": "jc output != its own fixture"
+  },
+  {
+   "platform": "ubuntu-22.04",
+   "base": "amixer-control-speakers",
+   "parser": "amixer",
+   "reason": "jc output != its own fixture"
+  }
+ ],
+ "unmapped": [
+  "centos-7.7/iw-scan0.json",
+  "centos-7.7/iw-scan1.json",
+  "centos-7.7/iw-scan2.json",
+  "centos-7.7/lastb.json",
+  "centos-7.7/md5sum-raw.json",
+  "centos-7.7/md5sum.json",
+  "centos-7.7/ping6-hostname-O-D-p-s-streaming.json",
+  "centos-7.7/ping6-hostname-O-D-p-s.json",
+  "centos-7.7/ping6-hostname-O-p-streaming.json",
+  "centos-7.7/ping6-hostname-O-p.json",
+  "centos-7.7/ping6-ip-O-D-p-streaming.json",
+  "centos-7.7/ping6-ip-O-D-p.json",
+  "centos-7.7/ping6-ip-O-p-streaming.json",
+  "centos-7.7/ping6-ip-O-p-unparsable.json",
+  "centos-7.7/ping6-ip-O-p.json",
+  "centos-7.7/ping6-ip-dup-streaming.json",
+  "centos-7.7/ping6-ip-dup.json",
+  "centos-7.7/rpm-qai.json",
+  "centos-7.7/sha256sum-raw.json",
+  "centos-7.7/sha256sum.json",
+  "centos-7.7/sha384sum-raw.json",
+  "centos-7.7/sha384sum.json",
+  "centos-7.7/sum.json",
+  "centos-7.7/tracepath6.json",
+  "fedora32/ping6-hostname-O-D-p-s-streaming.json",
+  "fedora32/ping6-hostname-O-D-p-s.json",
+  "fedora32/ping6-hostname-O-D-p.json",
+  "fedora32/ping6-hostname-O-p-streaming.json",
+  "fedora32/ping6-hostname-O-p.json",
+  "fedora32/ping6-ip-O-D-p-streaming.json",
+  "fedora32/ping6-ip-O-D-p.json",
+  "fedora32/ping6-ip-O-p-streaming.json",
+  "fedora32/ping6-ip-O-p.json",
+  "freebsd12/ping6-hostname-p-streaming.json",
+  "freebsd12/ping6-hostname-p.json",
+  "freebsd12/ping6-hostname-s-streaming.json",
+  "freebsd12/ping6-hostname-s.json",
+  "freebsd12/ping6-hostname-streaming.json",
+  "freebsd12/ping6-hostname.json",
+  "freebsd12/ping6-ip-p-streaming.json",
+  "freebsd12/ping6-ip-p.json",
+  "freebsd12/ping6-ip-s-streaming.json",
+  "freebsd12/ping6-ip-s.json",
+  "freebsd12/ping6-ip-streaming.json",
+  "freebsd12/ping6-ip.json",
+  "freebsd12/traceroute6-streaming.json",
+  "freebsd12/traceroute6.json",
+  "generic/common-log-format-streaming.json",
+  "generic/common-log-format.json",
+  "generic/keyvalue-ifcfg.json",
+  "generic/keyvalue.json",
+  "generic/pci.ids.json",
+  "generic/resolve.conf-1.json",
+  "generic/resolve.conf-2.json",
+  "generic/resolve.conf-3.json",
+  "generic/resolve.conf-4.json",
+  "generic/ssh_config1.json",
+  "generic/ssh_config2.json",
+  "generic/ssh_config3.json",
+  "generic/ssh_config4.json",
+  "generic/ssh_config5.json",
+  "generic/sshd-T-2.json",
+  "generic/sshd-T.json",
+  "generic/sshd_config.json",
+  "generic/traceroute1-streaming.json",
+  "generic/traceroute1.json",
+  "generic/traceroute2-streaming.json",
+  "generic/traceroute2.json",
+  "generic/traceroute3-streaming.json",
+  "generic/traceroute3.json",
+  "generic/traceroute4-streaming.json",
+  "generic/traceroute4.json",
+  "generic/traceroute5-streaming.json",
+  "generic/traceroute5.json",
+  "generic/traceroute6-streaming.json",
+  "generic/traceroute6.json",
+  "generic/traceroute7-streaming.json",
+  "generic/traceroute7.json",
+  "generic/traceroute8-streaming.json",
+  "generic/traceroute8.json",
+  "generic/update-alternatives-get-selections.json",
+  "generic/update-alternatives-query.json",
+  "generic/update-alternatives-query2.json",
+  "generic/x509-ca-cert.json",
+  "generic/x509-letsencrypt.json",
+  "generic/x509-multi-cert.json",
+  "generic/x509-negative-serial.json",
+  "generic/x509-string-serialnumber.json",
+  "generic/xrandr_2.json",
+  "generic/xrandr_3.json",
+  "generic/xrandr_extra_hv_lines.json",
+  "generic/xrandr_properties_1.json",
+  "generic/xrandr_simple.json",
+  "osx-10.11.6/ifconfig2.json",
+  "osx-10.14.6/file2.json",
+  "osx-10.14.6/file3.json",
+  "osx-10.14.6/ifconfig2.json",
+  "osx-10.14.6/md5-raw.json",
+  "osx-10.14.6/md5.json",
+  "osx-10.14.6/mount2.json",
+  "osx-10.14.6/ping6-hostname-p-streaming.json",
+  "osx-10.14.6/ping6-hostname-p.json",
+  "osx-10.14.6/ping6-hostname-s-streaming.json",
+  "osx-10.14.6/ping6-hostname-s.json",
+  "osx-10.14.6/ping6-hostname-streaming.json",
+  "osx-10.14.6/ping6-hostname.json",
+  "osx-10.14.6/ping6-ip-dup-streaming.json",
+  "osx-10.14.6/ping6-ip-dup.json",
+  "osx-10.14.6/ping6-ip-p-streaming.json",
+  "osx-10.14.6/ping6-ip-p.json",
+  "osx-10.14.6/ping6-ip-s-streaming.json",
+  "osx-10.14.6/ping6-ip-s.json",
+  "osx-10.14.6/ping6-ip-streaming.json",
+  "osx-10.14.6/ping6-ip-unparsable.json",
+  "osx-10.14.6/ping6-ip.json",
+  "osx-10.14.6/shasum-raw.json",
+  "osx-10.14.6/shasum.json",
+  "osx-10.14.6/sum.json",
+  "osx-10.14.6/traceroute6-mult-addresses-streaming.json",
+  "osx-10.14.6/traceroute6-mult-addresses.json",
+  "osx-10.14.6/traceroute6-streaming.json",
+  "osx-10.14.6/traceroute6.json",
+  "rhel-8/MANIFEST.MF.MULTI.json",
+  "rhel-8/MANIFEST.MF.json",
+  "ubuntu-18.04/lastb.json",
+  "ubuntu-18.04/ping6-hostname-O-D-p-s-streaming.json",
+  "ubuntu-18.04/ping6-hostname-O-D-p-s.json",
+  "ubuntu-18.04/ping6-hostname-O-D-p.json",
+  "ubuntu-18.04/ping6-hostname-O-p-streaming.json",
+  "ubuntu-18.04/ping6-hostname-O-p.json",
+  "ubuntu-18.04/ping6-ip-O-D-p-streaming.json",
+  "ubuntu-18.04/ping6-ip-O-D-p.json",
+  "ubuntu-18.04/ping6-ip-O-p-streaming.json",
+  "ubuntu-18.04/ping6-ip-O-p.json",
+  "ubuntu-18.04/shasum-portable-raw.json",
+  "ubuntu-18.04/shasum-portable.json",
+  "ubuntu-18.04/time2.json",
+  "ubuntu-20.04/date2.json",
+  "ubuntu-20.10/iftop-b-n1-noport.json",
+  "ubuntu-20.10/iftop-b-n1.json",
+  "ubuntu-20.10/iftop-b-n3.json",
+  "ubuntu-22.04/ping6-hostname-source-ip-streaming.json",
+  "ubuntu-22.04/ping6-hostname-source-ip.json",
+  "ubuntu-22.04/ping6-ip-source-ip-streaming.json",
+  "ubuntu-22.04/ping6-ip-source-ip.json",
+  "ubuntu-24.04/sha256sum-binary-raw.json",
+  "ubuntu-24.04/sha256sum-binary.json",
+  "ubuntu-24.04/shasum-universal-bits-raw.json",
+  "ubuntu-24.04/shasum-universal-bits.json"
+ ],
+ "no_input": [
+  "centos-7.7/iptables-raw.json",
+  "centos-7.7/ping-ip-O-streaming-ignore-exceptions.json",
+  "generic/git-log-streaming-ignore-exceptions.json",
+  "generic/ini-dup-double-quote.json",
+  "generic/ini-dup-iptelserver.json",
+  "generic/ini-dup-mariadb.json",
+  "generic/ini-dup-single-quote.json",
+  "generic/ini-dup-test.json",
+  "generic/srt-attack_of_the_clones_raw.json",
+  "generic/x509-crl-der.json",
+  "generic/x509-csr-der.json",
+  "generic/xml-nmap-nocomment.json",
+  "generic/xml-nmap-raw-nocomment.json",
+  "ubuntu-18.04/iptables-raw.json",
+  "ubuntu-22.04/amixer-control-capture-processed.json",
+  "ubuntu-22.04/amixer-control-headphone-processed.json",
+  "ubuntu-22.04/amixer-control-master-processed.json",
+  "ubuntu-22.04/amixer-control-speakers-processed.json"
+ ]
+}

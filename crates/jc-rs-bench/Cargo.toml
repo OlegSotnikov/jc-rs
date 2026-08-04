@@ -1,0 +1,23 @@
+[package]
+name = "jc-rs-bench"
+version.workspace = true
+edition.workspace = true
+description = "Benchmarks for jc-rs parsers"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+publish = false
+
+[dependencies]
+jc-rs-utils = { path = "../jc-rs-utils" }
+jc-rs-parsers = { path = "../jc-rs-parsers" }
+jc-rs-core = { path = "../jc-rs-core" }
+criterion = { workspace = true }
+serde_json = { workspace = true }
+
+[[bench]]
+name = "parsers"
+harness = false
+
+[lints]
+workspace = true
