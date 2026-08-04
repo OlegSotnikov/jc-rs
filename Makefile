@@ -68,6 +68,13 @@ differential-gate: build submodule ## the release gate: 100% of oracle-valid pai
 bench: ## criterion benchmarks
 	cargo bench -p jc-rs-bench
 
+.PHONY: wasm
+wasm: ## build the npm package into crates/jc-rs-wasm/pkg (needs wasm-pack)
+	@command -v wasm-pack >/dev/null || { \
+	  echo "wasm-pack not installed: cargo install wasm-pack"; exit 1; }
+	wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
+	@echo "package at crates/jc-rs-wasm/pkg"
+
 .PHONY: bench-vs-jc
 bench-vs-jc: build submodule ## time jc-rs against jc on the same inputs
 	./ci/bench-vs-jc.sh

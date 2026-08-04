@@ -14,6 +14,17 @@ categories = ["command-line-utilities", "encoding"]
 name = "jc-rs"
 path = "src/main.rs"
 
+# `cargo binstall jc-rs` fetches the release archive instead of building from
+# source. The paths mirror what release.yml actually produces: the tag carries
+# a `v`, and the binary sits inside a directory named after the archive.
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.{ archive-format }"
+bin-dir = "{ name }-v{ version }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
+
 [dependencies]
 jc-rs-core = { path = "../jc-rs-core", version = "0.0.0" }
 jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.0.0" }

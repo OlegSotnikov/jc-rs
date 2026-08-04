@@ -33,6 +33,7 @@ jobs:
           mkdir -p completions
           ./target/release/jc-rs --bash-comp > completions/jc-rs.bash
           ./target/release/jc-rs --zsh-comp  > completions/_jc-rs
+          ./target/release/jc-rs --fish-comp > completions/jc-rs.fish
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: completions
@@ -188,3 +189,115 @@ jobs:
           tags: |
             appmasterio/jc-rs:${{ github.event.inputs.tag || github.ref_name }}
             appmasterio/jc-rs:latest
+
+  homebrew:
+    name: homebrew tap
+    needs: [release]
+    runs-on: ubuntu-latest
+    # Protected environment: pushing to the tap changes what `brew install`
+    # gives people, so a human approves it and the token is scoped to this job.
+    environment: homebrew
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: is a tap token configured?
+        id: creds
+        env:
+          TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+            echo "HOMEBREW_TAP_TOKEN is not set — skipping the tap update." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        if: steps.creds.outputs.have == 'true'
+        with:
+          pattern: dist-*
+          merge-multiple: true
+      - name: fill in the formula
+        if: steps.creds.outputs.have == 'true'
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          sha() { sha256sum "jc-rs-${TAG}-$1.tar.gz" | cut -d" " -f1; }
+
+          sed \
+            -e "s/__VERSION__/${version}/g" \
+            -e "s/__SHA_DARWIN_ARM64__/$(sha aarch64-apple-darwin)/" \
+            -e "s/__SHA_DARWIN_X86_64__/$(sha x86_64-apple-darwin)/" \
+            -e "s/__SHA_LINUX_ARM64__/$(sha aarch64-unknown-linux-musl)/" \
+            -e "s/__SHA_LINUX_X86_64__/$(sha x86_64-unknown-linux-musl)/" \
+            packaging/homebrew/jc-rs.rb.tmpl > jc-rs.rb
+
+          if grep -q "__" jc-rs.rb; then
+            echo "a placeholder was left unfilled:" >&2
+            grep -n "__" jc-rs.rb >&2
+            exit 1
+          fi
+          cat jc-rs.rb
+      - name: push it to the tap
+        if: steps.creds.outputs.have == 'true'
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 \
+            "https://x-access-token:${TOKEN}@github.com/OlegSotnikov/homebrew-tap.git" tap
+          mkdir -p tap/Formula
+          cp jc-rs.rb tap/Formula/jc-rs.rb
+          cd tap
+          git config user.name "jc-rs release"
+          git config user.email "noreply@jc-rs.com"
+          git add Formula/jc-rs.rb
+          git commit -m "jc-rs ${TAG}"
+          git push
+
+  npm:
+    name: npm package
+    needs: [release]
+    runs-on: ubuntu-latest
+    # Protected environment: publishing to npm is public and irreversible for
+    # a given version, so a human approves and the token is scoped here.
+    environment: npm
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      - name: install wasm-pack
+        run: cargo install wasm-pack --locked
+      - name: build
+        run: wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
+      - name: smoke test the package
+        run: |
+          set -euo pipefail
+          ls -la crates/jc-rs-wasm/pkg
+          test -f crates/jc-rs-wasm/pkg/jc-rs_bg.wasm
+          test -f crates/jc-rs-wasm/pkg/jc-rs.d.ts
+          grep -q "parseLine" crates/jc-rs-wasm/pkg/jc-rs.d.ts
+      - name: is an npm token configured?
+        id: creds
+        env:
+          TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "have=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=false" >> "$GITHUB_OUTPUT"
+            echo "NPM_TOKEN is not set — built the package but did not publish." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: publish
+        if: steps.creds.outputs.have == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+        working-directory: crates/jc-rs-wasm/pkg
