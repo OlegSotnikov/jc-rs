@@ -88,14 +88,15 @@ impl Parser for LsattrParser {
                 continue;
             }
 
-            // Split into attributes and file
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() < 2 {
+            // Split once: everything after the attribute block is the
+            // filename, spaces and all. Splitting on whitespace truncated
+            // `./ok ok ok ok ok` to `./ok`.
+            let Some((attributes, file)) = line.trim_end().split_once(' ') else {
+                continue;
+            };
+            if attributes.is_empty() || file.is_empty() {
                 continue;
             }
-
-            let attributes = parts[0];
-            let file = parts[1];
 
             let mut out = Map::new();
             out.insert("file".to_string(), Value::String(file.to_string()));

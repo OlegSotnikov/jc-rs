@@ -89,11 +89,9 @@ fn parse_date_epoch(s: &str) -> Option<i64> {
     let s = s.trim();
     // ctime format: "Mon Apr  6 15:10:37 2020" — normalize double spaces
     let normalized = s.split_whitespace().collect::<Vec<&str>>().join(" ");
-    // Try: "%a %b %d %H:%M:%S %Y"
-    if let Ok(dt) = NaiveDateTime::parse_from_str(&normalized, "%a %b %d %H:%M:%S %Y") {
-        return Some(dt.and_utc().timestamp());
-    }
-    None
+    // tune2fs prints local time with no zone; reading it as UTC put every
+    // *_epoch out by the machine's offset.
+    jc_rs_utils::parse_timestamp(&normalized, Some("%a %b %d %H:%M:%S %Y")).naive_epoch
 }
 
 fn parse_tune2fs(input: &str) -> Map<String, Value> {

@@ -14,10 +14,7 @@
 #
 # Progress: this file should only ever get shorter. It is the M3 worklist.
 
-disk::tune2fs::tests::test_tune2fs
-network::ethtool::tests::test_ethtool_module_info_golden
 network::iw_scan::tests::test_iw_scan_centos_golden
 network::route::tests::test_route_centos_6n_golden
 network::route_print::tests::test_route_print_win10_golden
 network::route_print::tests::test_route_print_win2016_golden
-network::tracepath::tests::test_tracepath_centos_golden

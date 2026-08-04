@@ -60,18 +60,12 @@ fn jc_convert_to_bool(s: &str) -> bool {
     matches!(stripped.to_lowercase().as_str(), "y" | "yes" | "true" | "*")
 }
 
+/// jc normalises every ethtool key with its shared helper, which maps the whole
+/// punctuation set to underscores and then collapses runs of them. The local
+/// version here dropped some characters instead of converting them, so
+/// `BR, Nominal` became `br,_nominal` rather than `br_nominal`.
 fn normalize_key(s: &str) -> String {
-    s.trim()
-        .to_lowercase()
-        .replace(' ', "_")
-        .replace('-', "_")
-        .replace('/', "_")
-        .replace('(', "")
-        .replace(')', "")
-        .replace(':', "")
-        .replace('.', "")
-        .replace('[', "")
-        .replace(']', "")
+    jc_rs_utils::normalize_key(s)
 }
 
 /// Parse "Settings for ..." format (default ethtool output)

@@ -223,6 +223,10 @@ fn parse_question(line: &str) -> Map<String, Value> {
 }
 
 fn parse_answer_record(line: &str) -> Map<String, Value> {
+    parse_record(line, true)
+}
+
+fn parse_record(line: &str, unquote: bool) -> Map<String, Value> {
     // www.cnn.com.   5   IN  CNAME   turner-tls.map.fastly.net.
     let parts: Vec<&str> = line.split_whitespace().collect();
     let mut obj = Map::new();
@@ -242,6 +246,16 @@ fn parse_answer_record(line: &str) -> Map<String, Value> {
         }
         obj.insert("class".to_string(), Value::String(class));
         obj.insert("type".to_string(), Value::String(rtype));
+        let data = if unquote {
+            // jc unquotes a TXT record in the answer/authority/additional
+            // sections, but leaves the axfr section exactly as printed.
+            match data.strip_prefix('"').and_then(|d| d.strip_suffix('"')) {
+                Some(unquoted) => unquoted.to_string(),
+                None => data,
+            }
+        } else {
+            data
+        };
         obj.insert("data".to_string(), Value::String(data));
     }
     obj
@@ -249,7 +263,7 @@ fn parse_answer_record(line: &str) -> Map<String, Value> {
 
 fn parse_axfr_record(line: &str) -> Map<String, Value> {
     // zonetransfer.me. 7200 IN A 5.196.105.14
-    parse_answer_record(line)
+    parse_record(line, false)
 }
 
 fn parse_footer(line: &str) -> Option<(String, Value)> {

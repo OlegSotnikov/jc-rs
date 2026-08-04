@@ -45,7 +45,9 @@ impl Parser for TracepathParser {
             return Ok(ParseOutput::Object(Map::new()));
         }
 
-        let re_ttl_host = Regex::new(r"^\s?(\d+)(\??): +(\S+|no reply)")
+        // Alternation order matters: `\S+` first would match just "no" in
+        // "no reply" and report it as a hostname.
+        let re_ttl_host = Regex::new(r"^\s?(\d+)(\??): +(no reply|\S+)")
             .map_err(|e| ParseError::Regex(e.to_string()))?;
         let re_pmtu = Regex::new(r" pmtu (\d+)").map_err(|e| ParseError::Regex(e.to_string()))?;
         let re_reply_ms =

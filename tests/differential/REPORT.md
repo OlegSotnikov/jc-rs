@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 904 |
-| Mismatch | 30 |
+| Match | 913 |
+| Mismatch | 21 |
 | Error | 0 |
-| **Match rate** | **96.79%** |
+| **Match rate** | **97.75%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -23,13 +23,10 @@ Everything else is listed below rather than dropped.
 | `cbt` | 4 | 3 | 1 | 0 |
 | `certbot` | 3 | 1 | 2 | 0 |
 | `date` | 4 | 2 | 2 | 0 |
-| `dig` | 24 | 23 | 1 | 0 |
 | `env` | 4 | 3 | 1 | 0 |
-| `ethtool` | 5 | 3 | 2 | 0 |
 | `git_ls_remote` | 2 | 1 | 1 | 0 |
 | `iptables` | 12 | 11 | 1 | 0 |
 | `iwconfig` | 4 | 3 | 1 | 0 |
-| `lsattr` | 4 | 3 | 1 | 0 |
 | `m3u` | 2 | 1 | 1 | 0 |
 | `openvpn` | 1 | 0 | 1 | 0 |
 | `pkg_index_apk` | 2 | 1 | 1 | 0 |
@@ -37,10 +34,7 @@ Everything else is listed below rather than dropped.
 | `route` | 7 | 5 | 2 | 0 |
 | `rsync` | 13 | 12 | 1 | 0 |
 | `stat_s` | 5 | 4 | 1 | 0 |
-| `timedatectl` | 4 | 1 | 3 | 0 |
-| `tracepath` | 1 | 0 | 1 | 0 |
 | `traceroute_s` | 11 | 9 | 2 | 0 |
-| `tune2fs` | 1 | 0 | 1 | 0 |
 | `xml` | 4 | 3 | 1 | 0 |
 
 ## Failing fixtures
@@ -50,17 +44,12 @@ Everything else is listed below rather than dropped.
 | `route` | centos-7.7/route-6-n | mismatch | 1 diffs: 1× array_length |
 | `route` | centos-7.7/route-6 | mismatch | 1 diffs: 1× array_length |
 | `stat_s` | centos-7.7/stat-streaming | mismatch | 142 diffs: 142× value_mismatch |
-| `timedatectl` | centos-7.7/timedatectl | mismatch | 1 diffs: 1× value_mismatch |
-| `tracepath` | centos-7.7/tracepath | mismatch | 24 diffs: 24× type_mismatch |
 | `cbt` | generic/cbt-multiple-rows-raw | mismatch | 2 diffs: 2× type_mismatch |
 | `certbot` | generic/certbot-certs-cert-name | mismatch | 1 diffs: 1× missing_key |
 | `certbot` | generic/certbot-certs | mismatch | 2 diffs: 2× value_mismatch |
 | `date` | generic/date-after-midnight | mismatch | 1 diffs: 1× value_mismatch |
 | `date` | generic/date-before-midnight | mismatch | 1 diffs: 1× value_mismatch |
-| `dig` | generic/dig-answer-spaces | mismatch | 1 diffs: 1× value_mismatch |
 | `env` | generic/env-multiline-raw | mismatch | 1 diffs: 1× type_mismatch |
-| `ethtool` | generic/ethtool--module-info-convert-units | mismatch | 10 diffs: 5× extra_key, 5× missing_key |
-| `ethtool` | generic/ethtool--module-info | mismatch | 10 diffs: 5× extra_key, 5× missing_key |
 | `git_ls_remote` | generic/git-ls-remote-raw | mismatch | 1 diffs: 1× type_mismatch |
 | `iptables` | generic/iptables-no-jump2 | mismatch | 5 diffs: 1× missing_key, 2× type_mismatch, 2× value_mismatch |
 | `iwconfig` | generic/iwconfig-raw | mismatch | 14 diffs: 14× type_mismatch |
@@ -70,10 +59,6 @@ Everything else is listed below rather than dropped.
 | `plist` | generic/plist-alltypes | mismatch | 1 diffs: 1× value_mismatch |
 | `plist` | generic/plist-nextstep | mismatch | 43 diffs: 38× type_mismatch, 5× value_mismatch |
 | `rsync` | generic/rsync-i-stats | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
-| `timedatectl` | generic/timedatectl-rtc-local | mismatch | 1 diffs: 1× value_mismatch |
 | `traceroute_s` | generic/traceroute-n-ipv6-streaming | mismatch | 36 diffs: 36× type_mismatch |
-| `tune2fs` | generic/tune2fs-l | mismatch | 4 diffs: 4× value_mismatch |
 | `xml` | generic/xml-nmap-raw | mismatch | 98 diffs: 49× extra_key, 49× missing_key |
 | `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |
-| `timedatectl` | ubuntu-18.04/timedatectl | mismatch | 1 diffs: 1× value_mismatch |
-| `lsattr` | ubuntu-20.04/lsattr-spaces | mismatch | 1 diffs: 1× value_mismatch |
