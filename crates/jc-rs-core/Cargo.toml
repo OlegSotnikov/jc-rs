@@ -3,6 +3,7 @@ name = "jc-rs-core"
 version.workspace = true
 edition.workspace = true
 description = "Core types, parser registry, and traits for jc-rs"
+readme = "README.md"
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true

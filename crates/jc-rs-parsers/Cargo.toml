@@ -3,6 +3,7 @@ name = "jc-rs-parsers"
 version.workspace = true
 edition.workspace = true
 description = "Parser implementations for jc-rs (200+ parsers for CLI output, file formats, and strings)"
+readme = "README.md"
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
@@ -10,8 +11,8 @@ keywords = ["json", "parser", "cli", "sysadmin"]
 categories = ["encoding", "command-line-utilities", "parser-implementations"]
 
 [dependencies]
-jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
-jc-rs-utils = { path = "../jc-rs-utils", version = "0.1.0" }
+jc-rs-core = { path = "../jc-rs-core", version = "0.0.0" }
+jc-rs-utils = { path = "../jc-rs-utils", version = "0.0.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
