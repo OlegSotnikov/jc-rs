@@ -34,6 +34,7 @@ pub mod shadow;
 pub mod srt;
 pub mod ssh_conf;
 pub mod sshd_conf;
+pub mod typeset;
 pub mod veracrypt;
 pub mod who;
 pub mod xrandr;
