@@ -76,8 +76,18 @@ to make visible.
       normaliser produced keys with commas in them), `tracepath` (`\S+`
       matched "no" in "no reply"), `lsattr` (filenames with spaces), `dig`
       (TXT quotes), `timedatectl` (`epoch_utc` read as local).
-- [x] **Known failures: 15 → 4.** Each line deleted in the commit that fixed
+- [x] **Known failures: 15 → 0.** Each line deleted in the commit that fixed
       the parser. No fixture was edited.
+- [x] **100% of the corpus.** The last 21 mismatches were three more
+      naive-local-read-as-UTC timestamps (certbot, openvpn, plist), a
+      week-of-year calculation that fed the wrong month to a weekday routine,
+      and one defect each in stat_s, traceroute_s, route, iptables, m3u,
+      rsync, iw_scan, route_print, cbt and iwconfig. plist needed a real
+      OpenStep parser: the `plist` crate coerces bare tokens to numbers, and
+      that format has none -- `0700` is a string.
+- [x] **M4 — the bulk lint allow-list is gone.** 585 warnings underneath it,
+      including four regexes compiled in loops, fourteen unreachable
+      functions and a duplicate `who` parser that was never registered.
 
 ## Next, in order
 
@@ -100,9 +110,11 @@ to make visible.
       serializer with a per-parser key sequence, not a feature flag.
 - [ ] **149 fixtures are still `unmapped`** — the filename does not resolve to
       a parser name. That is honest reporting, not coverage. Worth reducing.
-- [ ] **M4 — hygiene.** The workspace manifest bulk-disables ~80 clippy lints
-      plus `dead_code`, `unused_imports`, `unused_variables`, `unused_mut`.
-      Remove them in batches, keep CI at `-D warnings`.
+- [ ] **M4 — hygiene: three allow entries left.** The bulk list is gone;
+      `clippy --workspace --all-targets -- -D warnings` is clean. What remains
+      is `manual_strip` (47 sites), `type_complexity` (7) and
+      `if_same_then_else` (2), each documented in `Cargo.toml` with its count.
+      Removing them is mechanical but wants reading, not a script.
 - [ ] **M5 — distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
       `jc-rs-wasm` (that crate is not written yet), and a fish completion — the
       generator exists in `crates/jc-rs/src/completions.rs` but no CLI flag
