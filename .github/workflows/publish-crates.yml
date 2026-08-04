@@ -104,8 +104,7 @@ jobs:
           # See ci.yml: the dependent crates cannot be verified against the
           # registry until the version they need is on it.
           cargo package -p jc-rs-core
-          cargo package -p jc-rs-utils
-          for crate in jc-rs-parsers jc-rs jc-rs-wasm; do
+          for crate in jc-rs-utils jc-rs-parsers jc-rs jc-rs-wasm; do
             cargo package --list -p "$crate" > /dev/null
             echo "$crate manifest is packageable"
           done

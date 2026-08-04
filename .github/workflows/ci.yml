@@ -118,17 +118,16 @@ jobs:
       # Catches what only surfaces at publish time: a missing manifest field,
       # or a file the build needs that sits outside its crate directory.
       #
-      # Only the crates with no jc-rs dependency can be packaged in full.
-      # `cargo package` verifies by building the tarball against the *registry*
-      # copies of its dependencies, and the 0.0.0 on crates.io is a name
-      # placeholder that predates the current traits -- so verifying jc-rs
-      # against it fails on APIs that exist here and not there. That is a
-      # chicken-and-egg no flag gets you out of; `--list` validates the manifest
-      # and shows exactly what would ship without touching the index.
+      # Only jc-rs-core can be packaged in full: it is the one crate with no
+      # jc-rs dependency. `cargo package` resolves the others against the
+      # *registry*, and the version they now ask for is the one this commit is
+      # about to publish -- a chicken-and-egg no flag gets you out of. `--list`
+      # validates the manifest and shows exactly what would ship without
+      # touching the index.
       #
-      # Once v0.1.0 is published, all five can use the full form again.
+      # Switch the other four back to the full form once 0.1.0 is on crates.io.
       - run: cargo package -p jc-rs-core
-      - run: cargo package -p jc-rs-utils
+      - run: cargo package --list -p jc-rs-utils
       - run: cargo package --list -p jc-rs-parsers
       - run: cargo package --list -p jc-rs
       - run: cargo package --list -p jc-rs-wasm
