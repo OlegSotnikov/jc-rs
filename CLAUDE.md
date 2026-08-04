@@ -152,11 +152,11 @@ Every job that needs a credential checks for it first and reports-and-skips
 rather than failing, so a release completes with whatever is configured. Not
 configured yet: `HOMEBREW_TAP_TOKEN` (and the tap repo itself) and `NPM_TOKEN`.
 
-**`cargo package` cannot verify the dependent crates** until the version they
-need is on crates.io — it builds the tarball against the *registry* copies, and
-the 0.0.0 there is a name placeholder that predates the current traits. ci.yml
-uses `cargo package --list` for `jc-rs-parsers`, `jc-rs` and `jc-rs-wasm`; switch
-them back to the full form once v0.1.0 is published.
+**`cargo package` cannot verify any crate with an internal dependency** until
+the version it asks for is on crates.io — it builds the tarball against the
+*registry* copies, not the workspace. Right after a version bump that is every
+crate except `jc-rs-core`, so ci.yml uses `cargo package --list` for the other
+four. Switch them back to the full form once that version is published.
 
 - crates.io publishing uses **Trusted Publishing (OIDC)**. There is no long-lived
   registry credential anywhere. If the workflow ever falls back to
