@@ -70,13 +70,21 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
+          # From the manifest, not from GITHUB_REF_NAME: on workflow_dispatch
+          # the ref is a branch, and stripping a leading "v" off "master" gives
+          # nonsense that silently breaks the already-published check below.
+          version=$(cargo metadata --no-deps --format-version 1 \
+                    | jq -r '.packages[] | select(.name=="jc-rs") | .version')
+          echo "publishing version $version"
           for crate in jc-rs-core jc-rs-utils jc-rs-parsers jc-rs; do
             if cargo publish -p "$crate"; then
               echo "published $crate"
             elif cargo search "$crate" --limit 1 | grep -q "^$crate = \"$version\""; then
               # Re-running a release must not fail because one crate is already
-              # up at this version.
+              # up at this version. This is also what makes a dispatch run a
+              # safe end-to-end test of the credentials: every crate is already
+              # at 0.0.0, so nothing is uploaded and the OIDC path still gets
+              # exercised for real.
               echo "$crate is already published at $version — continuing"
             else
               echo "publishing $crate failed"; exit 1
