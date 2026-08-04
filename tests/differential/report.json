@@ -2,13 +2,12 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 879,
-  "mismatch": 46,
-  "oracle_reject": 9,
-  "error": 9
+  "match": 904,
+  "mismatch": 30,
+  "oracle_reject": 9
  },
  "tested": 934,
- "match_rate": 94.11,
+ "match_rate": 96.79,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -375,8 +374,7 @@
   },
   "ping_s": {
    "total": 36,
-   "match": 32,
-   "mismatch": 4
+   "match": 36
   },
   "pip_list": {
    "total": 5,
@@ -406,7 +404,7 @@
   },
   "proc": {
    "total": 9,
-   "error": 9
+   "match": 9
   },
   "proc_buddyinfo": {
    "total": 1,
@@ -628,8 +626,7 @@
   },
   "rsync_s": {
    "total": 13,
-   "mismatch": 7,
-   "match": 6
+   "match": 13
   },
   "sfdisk": {
    "total": 14,
@@ -752,8 +749,7 @@
   },
   "ufw": {
    "total": 6,
-   "match": 1,
-   "mismatch": 5
+   "match": 6
   },
   "ufw_appinfo": {
    "total": 6,
@@ -867,192 +863,6 @@
      "kind": "array_length",
      "expected": 22,
      "actual": 21
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "rsync-i-logfile-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 118,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 66,
-    "extra_key": 19,
-    "value_mismatch": 32
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 56,
-     "actual": 55
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "rsync-i-v-logfile-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 123,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 69,
-    "extra_key": 21,
-    "value_mismatch": 32
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 56,
-     "actual": 55
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "rsync-i-vv-logfile-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 124,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 66,
-    "extra_key": 25,
-    "value_mismatch": 32
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 56,
-     "actual": 55
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "rsync-i-vvv-logfile-nochange-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 125,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 68,
-    "extra_key": 25,
-    "value_mismatch": 31
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 58,
-     "actual": 57
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "rsync-i-vvv-logfile-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 226,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 93,
-    "extra_key": 41,
-    "value_mismatch": 75,
-    "type_mismatch": 16
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 85,
-     "actual": 83
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
     }
    ]
   },
@@ -1642,41 +1452,6 @@
   },
   {
    "platform": "generic",
-   "base": "rsync-i-stats-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 18,
-   "kinds": {
-    "value_mismatch": 4,
-    "missing_key": 14
-   },
-   "sample": [
-    {
-     "path": "$[0].bytes_sec",
-     "kind": "value_mismatch",
-     "expected": "370210.0",
-     "actual": "379095.04"
-    },
-    {
-     "path": "$[0].created_dir_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].created_regular_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].deleted_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].dir_files",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "rsync-i-stats",
    "parser": "rsync",
    "status": "mismatch",
@@ -1808,108 +1583,6 @@
   },
   {
    "platform": "generic",
-   "base": "ufw-numbered",
-   "parser": "ufw",
-   "status": "mismatch",
-   "diff_count": 22,
-   "kinds": {
-    "missing_key": 17,
-    "type_mismatch": 5
-   },
-   "sample": [
-    {
-     "path": "$.rules[0].from_port_ranges",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[0].from_service",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'(log)'"
-    },
-    {
-     "path": "$.rules[0].from_transport",
-     "kind": "type_mismatch",
-     "expected": "'any'",
-     "actual": "None"
-    },
-    {
-     "path": "$.rules[0].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[1].from_port_ranges",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "ufw-numbered2",
-   "parser": "ufw",
-   "status": "mismatch",
-   "diff_count": 15,
-   "kinds": {
-    "missing_key": 15
-   },
-   "sample": [
-    {
-     "path": "$.rules[0].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[1].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[2].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[3].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[4].log",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "ufw",
-   "parser": "ufw",
-   "status": "mismatch",
-   "diff_count": 18,
-   "kinds": {
-    "missing_key": 16,
-    "type_mismatch": 2
-   },
-   "sample": [
-    {
-     "path": "$.rules[0].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[1].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[2].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[3].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[4].log",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "xml-nmap-raw",
    "parser": "xml",
    "status": "mismatch",
@@ -1938,142 +1611,6 @@
     {
      "path": "$.nmaprun.@version",
      "kind": "extra_key"
-    }
-   ]
-  },
-  {
-   "platform": "linux-proc",
-   "base": "net_igmp_more",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_fdinfo_dma",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_fdinfo_epoll",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_fdinfo_fanotify",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_fdinfo_inotify",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_fdinfo_timerfd",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_smaps_unknown_flag",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_stat_hack",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "linux-proc",
-   "base": "pid_stat_w_space_and_nl_in_comm",
-   "parser": "proc",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - proc parser could not parse the input data.\nIf this is the correct parser, try setting the locale to C (LC_ALL=C).\nFor details use the -d or -dd option. Use \"jc-rs -h --proc\" for help."
-  },
-  {
-   "platform": "osx-10.14.6",
-   "base": "ping-ip-unreachable-streaming",
-   "parser": "ping_s",
-   "status": "mismatch",
-   "diff_count": 54,
-   "kinds": {
-    "missing_key": 6,
-    "extra_key": 36,
-    "value_mismatch": 12
-   },
-   "sample": [
-    {
-     "path": "$[2].bytes",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].icmp_seq",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[2].pattern",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[2].response_bytes",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[2].response_ip",
-     "kind": "value_mismatch",
-     "expected": "'192.168.1.220'",
-     "actual": "'fgt1.attlocal.net'"
-    }
-   ]
-  },
-  {
-   "platform": "osx-10.14.6",
-   "base": "rsync-i-vvv-logfile-nochange-streaming",
-   "parser": "rsync_s",
-   "status": "mismatch",
-   "diff_count": 106,
-   "kinds": {
-    "array_length": 1,
-    "missing_key": 39,
-    "extra_key": 31,
-    "value_mismatch": 35
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 33,
-     "actual": 31
-    },
-    {
-     "path": "$[0].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[1].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[2].epoch",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[3].epoch",
-     "kind": "missing_key"
     }
    ]
   },
@@ -2138,80 +1675,6 @@
    ]
   },
   {
-   "platform": "ubuntu-18.04",
-   "base": "ufw-numbered",
-   "parser": "ufw",
-   "status": "mismatch",
-   "diff_count": 21,
-   "kinds": {
-    "missing_key": 17,
-    "type_mismatch": 4
-   },
-   "sample": [
-    {
-     "path": "$.rules[0].from_port_ranges",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[0].from_service",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'(log)'"
-    },
-    {
-     "path": "$.rules[0].from_transport",
-     "kind": "type_mismatch",
-     "expected": "'any'",
-     "actual": "None"
-    },
-    {
-     "path": "$.rules[0].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[1].log",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-18.04",
-   "base": "ufw-verbose",
-   "parser": "ufw",
-   "status": "mismatch",
-   "diff_count": 21,
-   "kinds": {
-    "missing_key": 17,
-    "type_mismatch": 4
-   },
-   "sample": [
-    {
-     "path": "$.rules[0].from_port_ranges",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[0].from_service",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'(log)'"
-    },
-    {
-     "path": "$.rules[0].from_transport",
-     "kind": "type_mismatch",
-     "expected": "'any'",
-     "actual": "None"
-    },
-    {
-     "path": "$.rules[0].log",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$.rules[1].log",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
    "platform": "ubuntu-20.04",
    "base": "lsattr-spaces",
    "parser": "lsattr",
@@ -2226,127 +1689,6 @@
      "kind": "value_mismatch",
      "expected": "'./ok ok ok ok ok'",
      "actual": "'./ok'"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-22.04",
-   "base": "ping-dest-unreachable-streaming",
-   "parser": "ping_s",
-   "status": "mismatch",
-   "diff_count": 17,
-   "kinds": {
-    "array_length": 1,
-    "extra_key": 12,
-    "missing_key": 3,
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 4,
-     "actual": 1
-    },
-    {
-     "path": "$[0].corrupted",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[0].duplicates",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[0].errors",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$[0].icmp_seq",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-22.04",
-   "base": "ping-hostname-source-ip-streaming",
-   "parser": "ping_s",
-   "status": "mismatch",
-   "diff_count": 8,
-   "kinds": {
-    "value_mismatch": 8
-   },
-   "sample": [
-    {
-     "path": "$[0].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
-    },
-    {
-     "path": "$[0].sent_bytes",
-     "kind": "value_mismatch",
-     "expected": "56",
-     "actual": "84"
-    },
-    {
-     "path": "$[1].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
-    },
-    {
-     "path": "$[1].sent_bytes",
-     "kind": "value_mismatch",
-     "expected": "56",
-     "actual": "84"
-    },
-    {
-     "path": "$[2].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
-    }
-   ]
-  },
-  {
-   "platform": "ubuntu-22.04",
-   "base": "ping-ip-source-ip-streaming",
-   "parser": "ping_s",
-   "status": "mismatch",
-   "diff_count": 8,
-   "kinds": {
-    "value_mismatch": 8
-   },
-   "sample": [
-    {
-     "path": "$[0].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
-    },
-    {
-     "path": "$[0].sent_bytes",
-     "kind": "value_mismatch",
-     "expected": "56",
-     "actual": "84"
-    },
-    {
-     "path": "$[1].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
-    },
-    {
-     "path": "$[1].sent_bytes",
-     "kind": "value_mismatch",
-     "expected": "56",
-     "actual": "84"
-    },
-    {
-     "path": "$[2].destination_ip",
-     "kind": "value_mismatch",
-     "expected": "'10.0.0.1'",
-     "actual": "'from'"
     }
    ]
   }

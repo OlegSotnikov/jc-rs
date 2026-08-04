@@ -120,13 +120,19 @@ pub fn run_streaming(
         };
 
         match session.parse_line(&line, opts.ignore_exceptions) {
-            Ok(Some(record)) => {
-                if !emit(&mut writer, record) {
-                    writer.finish();
-                    return Ok(count);
+            Ok(record) => {
+                // A line usually yields one record; `take_next` covers the
+                // parsers where it can close one and open another.
+                for record in record
+                    .into_iter()
+                    .chain(std::iter::from_fn(|| session.take_next()))
+                {
+                    if !emit(&mut writer, record) {
+                        writer.finish();
+                        return Ok(count);
+                    }
                 }
             }
-            Ok(None) => {}
             Err(e) => {
                 if !opts.ignore_exceptions {
                     writer.finish();

@@ -86,6 +86,97 @@ struct PingState {
     round_trip_stddev: Option<f64>,
 }
 
+/// jc's ICMP error tables, verbatim. Matching is by substring, first hit wins,
+/// so the order these are declared in is the order jc declares them.
+static ERROR_TYPES_V4: &[(&str, &str)] = &[
+    ("Destination Net Unreachable", "destination_net_unreachable"),
+    (
+        "Destination Host Unreachable",
+        "destination_host_unreachable",
+    ),
+    (
+        "Destination Protocol Unreachable",
+        "destination_protocol_unreachable",
+    ),
+    (
+        "Destination Port Unreachable",
+        "destination_port_unreachable",
+    ),
+    ("Frag needed and DF set", "frag_needed_and_df_set"),
+    ("Source Route Failed", "source_route_failed"),
+    ("Destination Net Unknown", "destination_net_unknown"),
+    ("Destination Host Unknown", "destination_host_unknown"),
+    ("Source Host Isolated", "source_host_isolated"),
+    ("Destination Net Prohibited", "destination_net_prohibited"),
+    ("Destination Host Prohibited", "destination_host_prohibited"),
+    (
+        "Destination Net Unreachable for Type of Service",
+        "destination_net_unreachable_for_type_of_service",
+    ),
+    (
+        "Destination Host Unreachable for Type of Service",
+        "destination_host_unreachable_for_type_of_service",
+    ),
+    ("Packet filtered", "packet_filtered"),
+    ("Precedence Violation", "precedence_violation"),
+    ("Precedence Cutoff", "precedence_cutoff"),
+    ("Dest Unreachable, Bad Code", "dest_unreachable_bad_code"),
+    ("Redirect Network", "redirect_network"),
+    ("Redirect Host", "redirect_host"),
+    (
+        "Redirect Type of Service and Network",
+        "redirect_type_of_service_and_network",
+    ),
+    ("Redirect, Bad Code", "redirect_bad_code"),
+    ("Time to live exceeded", "time_to_live_exceeded"),
+    (
+        "Frag reassembly time exceeded",
+        "frag_reassembly_time_exceeded",
+    ),
+    ("Time exceeded, Bad Code", "time_exceeded_bad_code"),
+];
+
+static ERROR_TYPES_V6: &[(&str, &str)] = &[
+    ("Destination unreachable", "destination_unreachable"),
+    ("Packet too big", "packet_too_big"),
+    ("Time exceeded:", "time_exceeded"),
+    ("Parameter problem:", "parameter_problem"),
+];
+
+/// A v6 error is refined by a second phrase -- `Destination unreachable: Port
+/// unreachable` becomes `destination_unreachable_port_unreachable`.
+static ERROR_CODES_V6: &[(&str, &str)] = &[
+    ("No route", "no_route"),
+    ("Administratively prohibited", "administratively_prohibited"),
+    ("Address unreachable", "address_unreachable"),
+    ("Port unreachable", "port_unreachable"),
+    ("Hop limit", "hop_limit"),
+    (
+        "Fragment reassembly time exceeded",
+        "fragment_reassembly_time_exceeded",
+    ),
+];
+
+fn error_type(line: &str, ipv4: bool) -> Option<String> {
+    if ipv4 {
+        return ERROR_TYPES_V4
+            .iter()
+            .find(|(phrase, _)| line.contains(phrase))
+            .map(|(_, code)| (*code).to_string());
+    }
+
+    let (_, kind) = ERROR_TYPES_V6
+        .iter()
+        .find(|(phrase, _)| line.contains(phrase))?;
+    match ERROR_CODES_V6
+        .iter()
+        .find(|(phrase, _)| line.contains(phrase))
+    {
+        Some((_, code)) => Some(format!("{kind}_{code}")),
+        None => Some((*kind).to_string()),
+    }
+}
+
 fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Value>> {
     if line.starts_with("PING ") {
         state.ipv4 = line.contains("bytes of data");
@@ -107,8 +198,11 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
         let cleaned = l.replace('(', " ").replace(')', " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
 
+        // Field positions after `(` and `)` become spaces. `ping -I <src>` adds
+        // `from <ip>` to the banner, which shifts the byte count but not the
+        // destination -- reading both as shifted put `from` in destination_ip.
         let (dst_ip_idx, bytes_idx) = if state.ipv4 {
-            if state.has_source_ip { (3, 7) } else { (2, 3) }
+            if state.has_source_ip { (2, 6) } else { (2, 3) }
         } else {
             if state.has_source_ip && state.has_hostname {
                 (3, 7)
@@ -277,6 +371,56 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
                 .and_then(|f| serde_json::Number::from_f64(f))
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
+        );
+        return Some(obj);
+    }
+
+    // ICMP error responses ("From 10.0.0.1 icmp_seq=1 Destination Host
+    // Unreachable"). These carry no reply fields at all, so they must be caught
+    // before the reply branch or the whole line is dropped.
+    if let Some(kind) = error_type(line, state.ipv4) {
+        let has_ts = line.starts_with('[');
+        let offset = if has_ts { 1 } else { 0 };
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        let cleaned = line.replace('=', " ");
+        let seq_parts: Vec<&str> = cleaned.split_whitespace().collect();
+
+        let mut obj = Map::with_capacity(6);
+        obj.insert("type".to_string(), Value::String(kind.to_string()));
+        obj.insert(
+            "destination_ip".to_string(),
+            state
+                .destination_ip
+                .as_deref()
+                .map_or(Value::Null, |s| Value::String(s.to_string())),
+        );
+        obj.insert(
+            "sent_bytes".to_string(),
+            state
+                .sent_bytes
+                .map_or(Value::Null, |n| Value::Number(n.into())),
+        );
+        obj.insert(
+            "response_ip".to_string(),
+            parts
+                .get(offset + 1)
+                .map_or(Value::Null, |s| Value::String(s.to_string())),
+        );
+        obj.insert(
+            "icmp_seq".to_string(),
+            seq_parts
+                .get(offset + 3)
+                .map_or(Value::Null, |s| str_to_int(s)),
+        );
+        obj.insert(
+            "timestamp".to_string(),
+            if has_ts {
+                parts.first().map_or(Value::Null, |s| {
+                    Value::String(s.trim_matches(['[', ']']).to_string())
+                })
+            } else {
+                Value::Null
+            },
         );
         return Some(obj);
     }
@@ -575,6 +719,38 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
             }
         }
         return None;
+    }
+
+    // ICMP error response. BSD reports these as `92 bytes from host (ip):
+    // Destination Host Unreachable`, which also matches the reply branch below
+    // -- so it has to be tested first, and it reports far fewer fields.
+    if let Some(kind) = error_type(line, !contains_ipv6(line)) {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        let mut obj = Map::with_capacity(4);
+        obj.insert("type".to_string(), Value::String(kind));
+        if let Some(bytes) = parts.first() {
+            obj.insert("bytes".to_string(), Value::String((*bytes).to_string()));
+        }
+        obj.insert(
+            "destination_ip".to_string(),
+            state
+                .destination_ip
+                .as_deref()
+                .map_or(Value::Null, |s| Value::String(s.to_string())),
+        );
+        if let Some(response) = parts.get(4) {
+            obj.insert(
+                "response_ip".to_string(),
+                Value::String(
+                    response
+                        .trim_end_matches(':')
+                        .trim_start_matches('(')
+                        .trim_end_matches(')')
+                        .to_string(),
+                ),
+            );
+        }
+        return Some(obj);
     }
 
     // Request timeout
