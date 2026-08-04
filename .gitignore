@@ -7,3 +7,6 @@
 # Agent working notes — briefing for whoever picks this up next.
 # Deliberately not committed: it is scaffolding, not product.
 .agent/
+
+# wasm-pack output; built by `make wasm`, published by release.yml
+crates/jc-rs-wasm/pkg/

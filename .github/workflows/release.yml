@@ -278,12 +278,10 @@ jobs:
       - name: build
         run: wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
       - name: smoke test the package
-        run: |
-          set -euo pipefail
-          ls -la crates/jc-rs-wasm/pkg
-          test -f crates/jc-rs-wasm/pkg/jc-rs_bg.wasm
-          test -f crates/jc-rs-wasm/pkg/jc-rs.d.ts
-          grep -q "parseLine" crates/jc-rs-wasm/pkg/jc-rs.d.ts
+        # Runs it, rather than checking that files exist. The difference
+        # matters: an earlier version built and typed correctly while every
+        # record came back as an empty object.
+        run: node crates/jc-rs-wasm/tests/smoke.mjs
       - name: is an npm token configured?
         id: creds
         env:
