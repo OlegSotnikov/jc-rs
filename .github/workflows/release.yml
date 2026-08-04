@@ -9,8 +9,12 @@ on:
         description: 'Tag to build (must already exist)'
         required: true
 
+# Default for every job: read-only. Only the job that creates the GitHub
+# Release gets contents: write, and only the job that pushes an image can see
+# the Docker Hub credentials, because they live in a protected environment
+# rather than at repository level.
 permissions:
-  contents: write
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -20,16 +24,16 @@ jobs:
     name: shell completions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       - run: cargo build --release -p jc-rs
       - name: generate
         run: |
           mkdir -p completions
           ./target/release/jc-rs --bash-comp > completions/jc-rs.bash
           ./target/release/jc-rs --zsh-comp  > completions/_jc-rs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: completions
           path: completions/
@@ -62,11 +66,11 @@ jobs:
             os: windows-latest
             archive: zip
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
         with:
           targets: ${{ matrix.target }}
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
         with:
           key: ${{ matrix.target }}
 
@@ -83,7 +87,7 @@ jobs:
             cargo build --release --target ${{ matrix.target }} -p jc-rs
           fi
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: completions
           path: completions
@@ -111,7 +115,7 @@ jobs:
             tar czf "${stage}.tar.gz" "$stage"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: dist-${{ matrix.target }}
           path: |
@@ -122,14 +126,16 @@ jobs:
     name: publish release
     needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           pattern: dist-*
           merge-multiple: true
       - name: checksums
         run: sha256sum jc-rs-* > SHA256SUMS && cat SHA256SUMS
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           generate_release_notes: true
@@ -141,8 +147,11 @@ jobs:
     name: docker image
     needs: [build]
     runs-on: ubuntu-latest
+    # Protected environment: a human approves before anything is pushed under
+    # the appmasterio namespace, and the credentials are scoped to this job.
+    environment: dockerhub
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: are Docker Hub credentials configured?
         id: creds
         env:
@@ -154,7 +163,7 @@ jobs:
             echo "have=false" >> "$GITHUB_OUTPUT"
             echo "DOCKERHUB_TOKEN is not set — skipping the image." >> "$GITHUB_STEP_SUMMARY"
           fi
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         if: steps.creds.outputs.have == 'true'
         with:
           name: dist-x86_64-unknown-linux-musl
@@ -165,12 +174,12 @@ jobs:
           tar xzf jc-rs-*-x86_64-unknown-linux-musl.tar.gz
           mv jc-rs-*/jc-rs ./jc-rs
           chmod +x jc-rs
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         if: steps.creds.outputs.have == 'true'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         if: steps.creds.outputs.have == 'true'
         with:
           context: .
