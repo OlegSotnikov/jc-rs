@@ -14,18 +14,17 @@ per-fixture breakdown.
 
 ## Done
 
-- [x] **M0 — codebase in place.** Crates renamed `cj-*` → `jc-rs-*`; CLI crate is
-      `jc-rs`, binary is `jc-rs`; workspace metadata points at this repo and
-      jc-rs.com. `cargo build --release` and `cargo test --workspace` green
-      (773 tests).
+- [x] **M0 — codebase in place.** Five-crate workspace, binary `jc-rs`,
+      metadata pointing at this repo and jc-rs.com. `cargo build --release`
+      green.
 - [x] **M1 — honest harness.** `tests/differential/validate.py`. A pair counts
       only when jc reproduces its own fixture; everything else is reported by
       category. Two things that make the number trustworthy and were not
       obvious:
       - `tests/fixtures/` is now a **verbatim mirror** of the `jc` submodule
-        (`make sync-fixtures`, enforced by `make check-fixtures`). cj's copy had
-        17 fixtures in the imported copy carried the implementation's own output
-        rather than jc's; the mirror removes that whole class of problem.
+        (`make sync-fixtures`, enforced by `make check-fixtures`). 17 fixtures
+        in the imported copy carried the implementation's own output rather than
+        jc's; the mirror removes that whole class of problem.
       - the run is pinned to **`TZ=PST8PDT`**, which is what jc's `runtests.sh`
         uses. In any other zone jc cannot reproduce its own `*_epoch` fields and
         146 fixtures silently leave the denominator.
@@ -56,9 +55,10 @@ per-fixture breakdown.
       1. streaming parsers emit a JSON array; jc emits NDJSON, one object per line
       2. nothing is emitted until EOF, so `tail -f … | jc-rs --clf-s` produces
          nothing, ever
-      cj's own comment at `crates/jc-rs/src/main.rs:486` explains why: the design
-      cannot downcast `dyn Parser`. The fix is a separate `StreamingParser` trait
-      (or enum dispatch) plus a line-driven output path honouring `-u/--unbuffer`.
+      The comment at `crates/jc-rs/src/main.rs:486` explains why: the current
+      design cannot downcast `dyn Parser`. The fix is a separate
+      `StreamingParser` trait (or enum dispatch) plus a line-driven output path
+      honouring `-u/--unbuffer`.
       Affects all 17 `*_s` parsers.
 - [ ] **M3 — parity.** 39 parsers still failing. Largest first:
       `mdadm` (33), `git_log` + `git_log_s` (20), `rsync_s` (7), `dir` (7),
@@ -67,14 +67,14 @@ per-fixture breakdown.
       `tsv-ih-s`, `csv-ih`, `csv-ih-s`, `typeset`.
       Also `--proc` autodetect (9 errors) — the entry point for 51 hidden
       `proc_*` parsers and all `/proc/...` magic syntax.
-- [ ] **Key order.** cj serialises alphabetically; jc preserves schema order.
+- [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
       Values agree but no two outputs ever `diff` clean. Needs an order-preserving
       map (`serde_json` `preserve_order`) and per-parser key sequences.
 - [ ] **M4 — hygiene.** The workspace manifest bulk-disables ~80 clippy lints
       plus `dead_code`, `unused_imports`, `unused_variables`, `unused_mut`.
       Remove them in batches, keep CI at `-D warnings`.
 - [ ] **`make test` is red on purpose: 648 pass, 15 fail.** These tests were
-      green only because they compared against the doctored fixture copy.
+      green only because they compared against the edited fixture copy.
       Restoring jc's originals made them fail, which is correct — each one is a
       real defect, and together they are the shortest path into M3:
 
