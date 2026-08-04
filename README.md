@@ -120,7 +120,7 @@ ss -tlnp | jc-rs --ss | jq '[.[].local_port] | unique'
 | [`jc-rs-core`](crates/jc-rs-core) | parser traits, output and error types, registry |
 | [`jc-rs-parsers`](crates/jc-rs-parsers) | every parser — the reuse surface for other tools |
 | [`jc-rs-utils`](crates/jc-rs-utils) | shared helpers: column tables, coercion, key normalisation |
-| `jc-rs-wasm` | `wasm-bindgen` wrapper + npm package (planned) |
+| [`jc-rs-wasm`](crates/jc-rs-wasm) | `wasm-bindgen` wrapper + npm package |
 
 The binary is `jc-rs`, not `jc`. Release archives contain a `jc` alias you can
 enable deliberately; nothing installs it by default, because it would shadow the
@@ -151,6 +151,20 @@ jc-rs -B > /etc/bash_completion.d/jc-rs
 jc-rs -Z > "${fpath[1]}/_jc-rs"
 jc-rs -F > ~/.config/fish/completions/jc-rs.fish
 ```
+
+## Install
+
+```sh
+cargo binstall jc-rs                    # prebuilt binary, no compile
+cargo install jc-rs                     # from source
+brew install OlegSotnikov/tap/jc-rs     # macOS and Linux
+npm install jc-rs-wasm                  # WebAssembly, browser or Node
+docker run --rm -i appmasterio/jc-rs --ps < ps.txt
+```
+
+Or take a static binary straight from the
+[releases](https://github.com/OlegSotnikov/jc-rs/releases): five targets, with
+completions, a `jc` alias and `SHA256SUMS` in every archive.
 
 ## Build from source
 

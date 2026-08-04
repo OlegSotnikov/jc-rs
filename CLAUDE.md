@@ -140,11 +140,21 @@ diffs.
 ## Release and publishing
 
 Cutting a release is a `v*` tag: it fires `release.yml` (five targets, musl
-Linux, completions, a deliberately opt-in `jc` alias, checksums, `scratch` Docker
-image) and `publish-crates.yml` (crates.io in dependency order) in parallel. Both
-stop at a protected environment for human approval, and the environments accept
-deployments only from `v*` tags — a `workflow_dispatch` from `master` is rejected
-before any step runs.
+Linux, bash/zsh/fish completions, a deliberately opt-in `jc` alias, checksums,
+`scratch` Docker image, Homebrew tap, npm) and `publish-crates.yml` (crates.io in
+dependency order) in parallel. Each publishing job sits behind a protected
+environment for human approval, and the environments accept deployments only from
+`v*` tags — a `workflow_dispatch` from `master` is rejected before any step runs.
+
+Every job that needs a credential checks for it first and reports-and-skips
+rather than failing, so a release completes with whatever is configured. Not
+configured yet: `HOMEBREW_TAP_TOKEN` (and the tap repo itself) and `NPM_TOKEN`.
+
+**`cargo package` cannot verify the dependent crates** until the version they
+need is on crates.io — it builds the tarball against the *registry* copies, and
+the 0.0.0 there is a name placeholder that predates the current traits. ci.yml
+uses `cargo package --list` for `jc-rs-parsers`, `jc-rs` and `jc-rs-wasm`; switch
+them back to the full form once v0.1.0 is published.
 
 - crates.io publishing uses **Trusted Publishing (OIDC)**. There is no long-lived
   registry credential anywhere. If the workflow ever falls back to

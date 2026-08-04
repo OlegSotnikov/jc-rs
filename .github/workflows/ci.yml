@@ -116,10 +116,19 @@ jobs:
       - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
       # Catches what only surfaces at publish time: a missing manifest field,
-      # or a file the build needs that sits outside its crate directory. Each
-      # crate is packaged AND the packaged copy is compiled, which is the part
-      # that catches the second case.
+      # or a file the build needs that sits outside its crate directory.
+      #
+      # Only the crates with no jc-rs dependency can be packaged in full.
+      # `cargo package` verifies by building the tarball against the *registry*
+      # copies of its dependencies, and the 0.0.0 on crates.io is a name
+      # placeholder that predates the current traits -- so verifying jc-rs
+      # against it fails on APIs that exist here and not there. That is a
+      # chicken-and-egg no flag gets you out of; `--list` validates the manifest
+      # and shows exactly what would ship without touching the index.
+      #
+      # Once v0.1.0 is published, all five can use the full form again.
       - run: cargo package -p jc-rs-core
       - run: cargo package -p jc-rs-utils
-      - run: cargo package -p jc-rs-parsers
-      - run: cargo package -p jc-rs
+      - run: cargo package --list -p jc-rs-parsers
+      - run: cargo package --list -p jc-rs
+      - run: cargo package --list -p jc-rs-wasm

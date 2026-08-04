@@ -91,11 +91,20 @@ to make visible.
 
 ## Next, in order
 
-- [ ] **M5 — distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
-      `jc-rs-wasm` (that crate is not written yet). Everything else is wired:
-      `release.yml` builds five targets and pushes the scratch image,
-      `publish-crates.yml` publishes via Trusted Publishing, and shell
-      completions for bash, zsh and fish are in the archives.
+- [x] **M5 — distribution is wired end to end.** `cargo-binstall` metadata,
+      a Homebrew formula template plus the release job that fills in its
+      checksums and pushes to the tap, and `jc-rs-wasm` with an npm publish
+      job. Five targets, the scratch image, crates.io via Trusted Publishing,
+      and bash/zsh/fish completions in every archive.
+
+      **Three things need a human before a release can complete them**, each
+      gated so the job reports and skips rather than failing:
+      - the `OlegSotnikov/homebrew-tap` repository does not exist yet, and
+        `HOMEBREW_TAP_TOKEN` is not set in the `homebrew` environment
+      - `NPM_TOKEN` is not set in the `npm` environment
+      - `cargo package` verifies dependent crates against the *registry*, and
+        the 0.0.0 there predates the current traits. ci.yml uses `--list` for
+        those three until v0.1.0 is out; switch them back afterwards.
 - [ ] **`-r/--raw` beyond what the corpus proves.** Seven parsers override
       `parse_raw`; the default forwards to `parse`, which is correct wherever
       jc's `_process` is a no-op. A parser with conversions but no `-raw`

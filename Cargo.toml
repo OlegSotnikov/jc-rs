@@ -5,6 +5,7 @@ members = [
     "crates/jc-rs-parsers",
     "crates/jc-rs",
     "crates/jc-rs-bench",
+    "crates/jc-rs-wasm",
 ]
 resolver = "2"
 
