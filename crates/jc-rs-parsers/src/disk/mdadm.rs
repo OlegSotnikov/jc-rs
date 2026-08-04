@@ -88,13 +88,14 @@ fn normalize_key(key: &str) -> String {
 }
 
 /// Try to parse a ctime-style date string into a Unix epoch.
+///
+/// mdadm prints local time with no zone, and jc's `timestamp().naive` reads it
+/// as local. Reading it as UTC instead put every `*_epoch` in this parser out by
+/// the machine's offset -- seven hours under the `TZ=PST8PDT` the corpus is
+/// pinned to, and a different number of hours everywhere else.
 fn parse_date_epoch(s: &str) -> Option<i64> {
-    use chrono::NaiveDateTime;
     let normalized = s.trim().split_whitespace().collect::<Vec<&str>>().join(" ");
-    if let Ok(dt) = NaiveDateTime::parse_from_str(&normalized, "%a %b %d %H:%M:%S %Y") {
-        return Some(dt.and_utc().timestamp());
-    }
-    None
+    jc_rs_utils::parse_timestamp(&normalized, Some("%a %b %d %H:%M:%S %Y")).naive_epoch
 }
 
 /// Replicate jc's convert_to_int: extract all digit characters, concatenate, parse as i64.

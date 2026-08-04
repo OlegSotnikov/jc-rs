@@ -2,7 +2,7 @@
 //!
 //! Supports 34+ datetime format strings with LRU caching and timezone normalization.
 
-use chrono::{DateTime, Local, NaiveDateTime, TimeZone, Utc};
+use chrono::{DateTime, FixedOffset, Local, NaiveDateTime, TimeZone, Utc};
 use lru::LruCache;
 use std::collections::HashSet;
 use std::num::NonZeroUsize;
@@ -315,10 +315,11 @@ fn naive_local_epoch(dt_naive: &NaiveDateTime) -> i64 {
     }
 }
 
-fn try_parse_aware(s: &str, fmt: &str) -> Option<DateTime<Utc>> {
-    DateTime::parse_from_str(s, fmt)
-        .ok()
-        .map(|dt| dt.with_timezone(&Utc))
+/// Parse a string whose format carries an offset (`%z`), keeping that offset
+/// rather than normalising to UTC -- the caller needs the wall clock as
+/// written. See [`do_parse`] for why.
+fn try_parse_aware(s: &str, fmt: &str) -> Option<DateTime<FixedOffset>> {
+    DateTime::parse_from_str(s, fmt).ok()
 }
 
 /// Parse a datetime string into a `TimestampResult`.
@@ -369,13 +370,20 @@ fn do_parse(input: &str, format_hint: Option<&str>) -> TimestampResult {
     for fmt in &fmt_list {
         // Try aware parse first (handles %z, %Z with UTC)
         if let Some(dt_aware) = try_parse_aware(&normalized, fmt) {
-            let naive_dt = dt_aware.naive_utc();
-            naive_epoch = Some(naive_dt.and_utc().timestamp());
+            // jc computes the naive stamp as `dt.replace(tzinfo=None).timestamp()`:
+            // the parsed offset is *discarded* and the wall clock as written is
+            // read in the local zone. Converting to UTC instead -- which is the
+            // intuitive reading -- puts every `epoch` field out by the
+            // difference between the two zones (three hours for `git log`'s
+            // -0400 stamps under the corpus's PST8PDT).
+            let wall_clock = dt_aware.naive_local();
+            naive_epoch = Some(naive_local_epoch(&wall_clock));
             if utc_tz {
-                utc_epoch = Some(dt_aware.timestamp());
-                iso = Some(dt_aware.to_rfc3339());
+                let dt_utc = Utc.from_utc_datetime(&wall_clock);
+                utc_epoch = Some(dt_utc.timestamp());
+                iso = Some(dt_utc.to_rfc3339());
             } else {
-                iso = Some(naive_dt.format("%Y-%m-%dT%H:%M:%S").to_string());
+                iso = Some(wall_clock.format("%Y-%m-%dT%H:%M:%S").to_string());
             }
             break;
         }
