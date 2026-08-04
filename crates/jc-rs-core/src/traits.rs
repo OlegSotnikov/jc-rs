@@ -100,6 +100,16 @@ pub trait LineParser {
         let _ = quiet;
         Ok(None)
     }
+
+    /// Any further records the last `parse_line` produced, in the order they
+    /// follow the one it returned.
+    ///
+    /// Almost every parser leaves this alone: a line completes at most one
+    /// record. It exists for the case where a single line both closes the
+    /// previous record and opens a new one that is itself already complete.
+    fn take_next(&mut self) -> Option<Record> {
+        None
+    }
 }
 
 /// A session for parsers whose lines are independent of one another -- no
@@ -142,6 +152,9 @@ pub fn parse_via_session(
 
     for line in input.lines() {
         if let Some(record) = session.parse_line(line, quiet)? {
+            records.push(record);
+        }
+        while let Some(record) = session.take_next() {
             records.push(record);
         }
     }

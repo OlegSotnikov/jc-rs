@@ -69,6 +69,17 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
         }
     }
 
+    // Pull `(log)`. It can appear on either side of the rule and has to come
+    // out of the line before the address is read, or it ends up parsed as the
+    // service name.
+    let re_log = Regex::new(r"\(log\)").unwrap();
+    if re_log.is_match(&linedata) {
+        rule_obj.insert("log".to_string(), Value::Bool(true));
+        linedata = re_log.replace_all(&linedata, "").to_string();
+    } else if !rule_obj.contains_key("log") {
+        rule_obj.insert("log".to_string(), Value::Bool(false));
+    }
+
     // Detect IPv6
     let re_v6 = Regex::new(r"\(v6\)").unwrap();
     if re_v6.is_match(&linedata) {

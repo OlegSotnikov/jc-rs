@@ -28,44 +28,23 @@ static INFO: ParserInfo = ParserInfo {
 static RSYNC_STREAM_PARSER: RsyncStreamParser = RsyncStreamParser;
 inventory::submit! { ParserEntry::new(&RSYNC_STREAM_PARSER) }
 
+/// rsync writes sizes as `8.99K` / `6.88T`, and jc reads those with decimal
+/// multipliers -- 8.99K is 8990 bytes, not 9205. Using binary multipliers here
+/// put every suffixed size out by a growing factor.
 fn parse_size_to_int(s: &str) -> Option<i64> {
-    let s = s.replace(',', "");
-    let s = s.trim();
-    if s.is_empty() {
-        return None;
-    }
-    let (num, mult) = if let Some(n) = s.strip_suffix('K') {
-        (n, 1024i64)
-    } else if let Some(n) = s.strip_suffix('M') {
-        (n, 1024 * 1024)
-    } else if let Some(n) = s.strip_suffix('G') {
-        (n, 1024 * 1024 * 1024)
-    } else if let Some(n) = s.strip_suffix('T') {
-        (n, 1024i64 * 1024 * 1024 * 1024)
-    } else {
-        (s, 1)
-    };
-    num.parse::<f64>().ok().map(|f| (f * mult as f64) as i64)
+    jc_rs_utils::convert_size_to_int(s, false)
 }
 
 fn parse_size_to_float(s: &str) -> Option<f64> {
-    let s = s.replace(',', "");
-    let s = s.trim();
-    if s.is_empty() {
+    let cleaned = s.replace(',', "");
+    let cleaned = cleaned.trim();
+    if cleaned.is_empty() {
         return None;
     }
-    let (num, mult) = if let Some(n) = s.strip_suffix('K') {
-        (n, 1024.0f64)
-    } else if let Some(n) = s.strip_suffix('M') {
-        (n, 1024.0 * 1024.0)
-    } else if let Some(n) = s.strip_suffix('G') {
-        (n, 1024.0 * 1024.0 * 1024.0)
-    } else if let Some(n) = s.strip_suffix('T') {
-        (n, 1024.0 * 1024.0 * 1024.0 * 1024.0)
-    } else {
-        (s, 1.0)
-    };
-    num.parse::<f64>().ok().map(|f| f * mult)
+    if cleaned.ends_with(['K', 'M', 'G', 'T']) {
+        return jc_rs_utils::convert_size_to_int(cleaned, false).map(|n| n as f64);
+    }
+    cleaned.parse::<f64>().ok()
 }
 
 fn flag_bool(c: char, true_char: char) -> Value {
@@ -74,6 +53,21 @@ fn flag_bool(c: char, true_char: char) -> Value {
         '.' => Value::Bool(false),
         '+' | ' ' | '?' => Value::Null,
         _ => Value::Null,
+    }
+}
+
+/// jc adds a naive epoch wherever a record carries both a date and a time.
+fn add_epoch(record: &mut Map<String, Value>) {
+    let (Some(date), Some(time)) = (
+        record.get("date").and_then(Value::as_str),
+        record.get("time").and_then(Value::as_str),
+    ) else {
+        return;
+    };
+    let stamp = format!("{} {}", date.replace('/', "-"), time);
+    let ts = jc_rs_utils::parse_timestamp(&stamp, Some("%Y-%m-%d %H:%M:%S"));
+    if let Some(epoch) = ts.naive_epoch {
+        record.insert("epoch".to_string(), Value::Number(epoch.into()));
     }
 }
 
@@ -170,19 +164,19 @@ static FILE_LINE_LOG_MAC_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] ([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][x.+ ?]) (.+)$").expect("valid file_line_log_mac_re pattern")
 });
 static STAT1_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"sent\s+([0-9,]+)\s+bytes\s+received\s+([0-9,]+)\s+bytes\s+([0-9,.]+)\s+bytes/sec")
+    Regex::new(r"^sent\s+([0-9,]+)\s+bytes\s+received\s+([0-9,]+)\s+bytes\s+([0-9,.]+)\s+bytes/sec")
         .expect("valid stat1_re pattern")
 });
 static STAT2_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"total size is\s+([0-9,]+)\s+speedup is\s+([0-9,.]+)")
+    Regex::new(r"^total size is\s+([0-9,]+)\s+speedup is\s+([0-9,.]+)")
         .expect("valid stat2_re pattern")
 });
 static STAT2_SIMPLE_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"total\s+size\s+is\s+([0-9,.TGMK]+)\s+speedup\s+is\s+([0-9,.TGMK]+)")
+    Regex::new(r"^total\s+size\s+is\s+([0-9,.TGMK]+)\s+speedup\s+is\s+([0-9,.TGMK]+)")
         .expect("valid stat2_simple pattern")
 });
 static STAT1_SIMPLE_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"sent\s+([0-9,.TGMK]+)\s+bytes\s+received\s+([0-9,.TGMK]+)\s+bytes\s+([0-9,.TGMK]+)\s+bytes/sec").expect("valid stat1_simple_re pattern")
+    Regex::new(r"^sent\s+([0-9,.TGMK]+)\s+bytes\s+received\s+([0-9,.TGMK]+)\s+bytes\s+([0-9,.TGMK]+)\s+bytes/sec").expect("valid stat1_simple_re pattern")
 });
 static STAT_LOG_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] sent\s+([\d,]+)\s+bytes\s+received\s+([\d,]+)\s+bytes\s+total\s+size\s+([\d,]+)").expect("valid stat_log_re pattern")
@@ -197,19 +191,135 @@ static STAT3_LOG_V_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] total\s+size\s+is\s+([\d,]+)\s+speedup\s+is\s+([\d,.]+)").expect("valid stat3_log_v_re pattern")
 });
 
+/// `rsync --stats` (and `--info=stats2`) adds a block of totals after the file
+/// list. jc names the fields differently from the labels, so the mapping is
+/// spelled out rather than derived.
+static STAT_EX: &[(&str, &[&str])] = &[
+    (
+        r"^Number\sof\sfiles:\s([,0123456789]+)\s\(reg:\s([,0123456789]+),\sdir:\s([,0123456789]+)\)$",
+        &["total_files", "regular_files", "dir_files"],
+    ),
+    (
+        r"^Number\sof\screated\sfiles:\s([,0123456789]+)\s\(reg:\s([,0123456789]+),\sdir:\s([,0123456789]+)\)$",
+        &[
+            "total_created_files",
+            "created_regular_files",
+            "created_dir_files",
+        ],
+    ),
+    (
+        r"^Number\sof\sdeleted\sfiles:\s([,0123456789]+)$",
+        &["deleted_files"],
+    ),
+    (
+        r"^Number\sof\sregular\sfiles\stransferred:\s([,0123456789]+)$",
+        &["transferred_files"],
+    ),
+    // jc reads `Total file size` into `transferred_file_size` and has no
+    // pattern for `Total transferred file size` at all. The names look swapped;
+    // they are jc's, and jc is the schema.
+    (
+        r"^Total\sfile\ssize:\s([,.0123456789]+\S?)\sbytes$",
+        &["transferred_file_size"],
+    ),
+    (
+        r"^Literal\sdata:\s([,.0123456789]+\S?)\sbytes$",
+        &["literal_data"],
+    ),
+    (
+        r"^Matched\sdata:\s([,.0123456789]+\S?)\sbytes$",
+        &["matched_data"],
+    ),
+    (
+        r"^File\slist\ssize:\s([,.0123456789]+\S?)$",
+        &["file_list_size"],
+    ),
+    (
+        r"^File\slist\sgeneration\stime:\s([,.0123456789]+\S?)\sseconds$",
+        &["file_list_generation_time"],
+    ),
+    (
+        r"^File\slist\stransfer\stime:\s([,.0123456789]+\S?)\sseconds$",
+        &["file_list_transfer_time"],
+    ),
+    (r"^Total\sbytes\ssent:\s([,.0123456789]+\S?)$", &["sent"]),
+    (
+        r"^Total\sbytes\sreceived:\s([,.0123456789]+\S?)$",
+        &["received"],
+    ),
+];
+
+/// The two `--stats` fields jc reports as floats; the rest are byte counts.
+static STAT_EX_FLOATS: &[&str] = &["file_list_generation_time", "file_list_transfer_time"];
+
+static STAT_EX_COMPILED: LazyLock<Vec<(Regex, &'static [&'static str])>> = LazyLock::new(|| {
+    STAT_EX
+        .iter()
+        .filter_map(|(pattern, fields)| Regex::new(pattern).ok().map(|re| (re, *fields)))
+        .collect()
+});
+
+/// Returns true if the line was one of the `--stats` totals.
+fn apply_stat_ex(line: &str, summary: &mut Map<String, Value>) -> bool {
+    for (pattern, fields) in STAT_EX_COMPILED.iter() {
+        let Some(caps) = pattern.captures(line) else {
+            continue;
+        };
+        for (i, field) in fields.iter().enumerate() {
+            let raw = caps.get(i + 1).map_or("", |m| m.as_str());
+            let value = if STAT_EX_FLOATS.contains(field) {
+                parse_size_to_float(raw)
+                    .and_then(serde_json::Number::from_f64)
+                    .map_or(Value::Null, Value::Number)
+            } else {
+                parse_size_to_int(raw).map_or(Value::Null, |n| Value::Number(n.into()))
+            };
+            summary.insert((*field).to_string(), value);
+        }
+        return true;
+    }
+    false
+}
+
 /// rsync reports each transferred file on its own line and closes with a
 /// summary block whose fields arrive over several lines, so files stream out
 /// immediately and the summary is emitted once at the end.
 #[derive(Default)]
 struct RsyncSession {
     summary: Map<String, Value>,
+    /// Log-format output can concatenate several rsync runs, each with its own
+    /// pid. jc compares the pid of the *previous* log line against the last one
+    /// it closed, so the rotation lands one line later than you would expect --
+    /// and that is where its fixtures put the record.
+    process: String,
+    last_process: String,
+    /// The record this line produced after the one already returned.
+    next: Option<Record>,
+}
+
+impl RsyncSession {
+    /// A log line's pid closes the previous run.
+    ///
+    /// jc yields an *empty* object here rather than the summary it collected --
+    /// its `output_line` has already been reset by then. That empty record is
+    /// in jc's own fixtures, so it is reproduced rather than corrected: the
+    /// point of this project is to match jc, including where jc is odd.
+    fn rotate_process(&mut self, process: &str) -> Option<Record> {
+        let mut closed = None;
+        if self.process != self.last_process {
+            if !self.summary.is_empty() {
+                closed = Some(Record::new());
+            }
+            self.last_process = self.process.clone();
+            self.summary.clear();
+        }
+        self.process = process.to_string();
+        closed
+    }
 }
 
 impl LineParser for RsyncSession {
     fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
-        if line.trim().is_empty() {
-            return Ok(None);
-        }
         if line.trim().is_empty() {
             return Ok(None);
         }
@@ -235,6 +345,11 @@ impl LineParser for RsyncSession {
                     .map(|n| Value::Number(n.into()))
                     .unwrap_or(Value::Null),
             );
+            add_epoch(&mut file);
+            if let Some(closed) = self.rotate_process(proc_str) {
+                self.next = Some(file);
+                return Ok(Some(closed));
+            }
             return Ok(Some(file));
         }
 
@@ -258,6 +373,11 @@ impl LineParser for RsyncSession {
                     .map(|n| Value::Number(n.into()))
                     .unwrap_or(Value::Null),
             );
+            add_epoch(&mut file);
+            if let Some(closed) = self.rotate_process(proc_str) {
+                self.next = Some(file);
+                return Ok(Some(closed));
+            }
             return Ok(Some(file));
         }
 
@@ -478,6 +598,8 @@ impl LineParser for RsyncSession {
             );
             return Ok(None);
         }
+        apply_stat_ex(line, &mut self.summary);
+
         Ok(None)
     }
 
@@ -485,7 +607,13 @@ impl LineParser for RsyncSession {
         if self.summary.is_empty() {
             return Ok(None);
         }
-        Ok(Some(std::mem::take(&mut self.summary)))
+        let mut summary = std::mem::take(&mut self.summary);
+        add_epoch(&mut summary);
+        Ok(Some(summary))
+    }
+
+    fn take_next(&mut self) -> Option<Record> {
+        self.next.take()
     }
 }
 

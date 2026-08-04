@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 879 |
-| Mismatch | 46 |
-| Error | 9 |
-| **Match rate** | **94.11%** |
+| Match | 904 |
+| Mismatch | 30 |
+| Error | 0 |
+| **Match rate** | **96.79%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -32,19 +32,15 @@ Everything else is listed below rather than dropped.
 | `lsattr` | 4 | 3 | 1 | 0 |
 | `m3u` | 2 | 1 | 1 | 0 |
 | `openvpn` | 1 | 0 | 1 | 0 |
-| `ping_s` | 36 | 32 | 4 | 0 |
 | `pkg_index_apk` | 2 | 1 | 1 | 0 |
 | `plist` | 4 | 2 | 2 | 0 |
-| `proc` | 9 | 0 | 0 | 9 |
 | `route` | 7 | 5 | 2 | 0 |
 | `rsync` | 13 | 12 | 1 | 0 |
-| `rsync_s` | 13 | 6 | 7 | 0 |
 | `stat_s` | 5 | 4 | 1 | 0 |
 | `timedatectl` | 4 | 1 | 3 | 0 |
 | `tracepath` | 1 | 0 | 1 | 0 |
 | `traceroute_s` | 11 | 9 | 2 | 0 |
 | `tune2fs` | 1 | 0 | 1 | 0 |
-| `ufw` | 6 | 1 | 5 | 0 |
 | `xml` | 4 | 3 | 1 | 0 |
 
 ## Failing fixtures
@@ -53,11 +49,6 @@ Everything else is listed below rather than dropped.
 |---|---|---|---|
 | `route` | centos-7.7/route-6-n | mismatch | 1 diffs: 1× array_length |
 | `route` | centos-7.7/route-6 | mismatch | 1 diffs: 1× array_length |
-| `rsync_s` | centos-7.7/rsync-i-logfile-streaming | mismatch | 118 diffs: 1× array_length, 66× missing_key, 19× extra_key, 32× value_mismatch |
-| `rsync_s` | centos-7.7/rsync-i-v-logfile-streaming | mismatch | 123 diffs: 1× array_length, 69× missing_key, 21× extra_key, 32× value_mismatch |
-| `rsync_s` | centos-7.7/rsync-i-vv-logfile-streaming | mismatch | 124 diffs: 1× array_length, 66× missing_key, 25× extra_key, 32× value_mismatch |
-| `rsync_s` | centos-7.7/rsync-i-vvv-logfile-nochange-streaming | mismatch | 125 diffs: 1× array_length, 68× missing_key, 25× extra_key, 31× value_mismatch |
-| `rsync_s` | centos-7.7/rsync-i-vvv-logfile-streaming | mismatch | 226 diffs: 1× array_length, 93× missing_key, 41× extra_key, 75× value_mismatch, 16× type_mismatch |
 | `stat_s` | centos-7.7/stat-streaming | mismatch | 142 diffs: 142× value_mismatch |
 | `timedatectl` | centos-7.7/timedatectl | mismatch | 1 diffs: 1× value_mismatch |
 | `tracepath` | centos-7.7/tracepath | mismatch | 24 diffs: 24× type_mismatch |
@@ -78,49 +69,11 @@ Everything else is listed below rather than dropped.
 | `pkg_index_apk` | generic/pkg-index-apk-raw | mismatch | 56 diffs: 28× missing_key, 28× extra_key |
 | `plist` | generic/plist-alltypes | mismatch | 1 diffs: 1× value_mismatch |
 | `plist` | generic/plist-nextstep | mismatch | 43 diffs: 38× type_mismatch, 5× value_mismatch |
-| `rsync_s` | generic/rsync-i-stats-streaming | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
 | `rsync` | generic/rsync-i-stats | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
 | `timedatectl` | generic/timedatectl-rtc-local | mismatch | 1 diffs: 1× value_mismatch |
 | `traceroute_s` | generic/traceroute-n-ipv6-streaming | mismatch | 36 diffs: 36× type_mismatch |
 | `tune2fs` | generic/tune2fs-l | mismatch | 4 diffs: 4× value_mismatch |
-| `ufw` | generic/ufw-numbered | mismatch | 22 diffs: 17× missing_key, 5× type_mismatch |
-| `ufw` | generic/ufw-numbered2 | mismatch | 15 diffs: 15× missing_key |
-| `ufw` | generic/ufw | mismatch | 18 diffs: 16× missing_key, 2× type_mismatch |
 | `xml` | generic/xml-nmap-raw | mismatch | 98 diffs: 49× extra_key, 49× missing_key |
-| `proc` | linux-proc/net_igmp_more | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_fdinfo_dma | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_fdinfo_epoll | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_fdinfo_fanotify | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_fdinfo_inotify | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_fdinfo_timerfd | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_smaps_unknown_flag | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_stat_hack | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `proc` | linux-proc/pid_stat_w_space_and_nl_in_comm | error | exit 100: jc-rs: error - proc parser could not parse the input data.
-If this is the correct parser, try setting the locale to C (LC_ALL=C).
-For details use the  |
-| `ping_s` | osx-10.14.6/ping-ip-unreachable-streaming | mismatch | 54 diffs: 6× missing_key, 36× extra_key, 12× value_mismatch |
-| `rsync_s` | osx-10.14.6/rsync-i-vvv-logfile-nochange-streaming | mismatch | 106 diffs: 1× array_length, 39× missing_key, 31× extra_key, 35× value_mismatch |
 | `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |
 | `timedatectl` | ubuntu-18.04/timedatectl | mismatch | 1 diffs: 1× value_mismatch |
-| `ufw` | ubuntu-18.04/ufw-numbered | mismatch | 21 diffs: 17× missing_key, 4× type_mismatch |
-| `ufw` | ubuntu-18.04/ufw-verbose | mismatch | 21 diffs: 17× missing_key, 4× type_mismatch |
 | `lsattr` | ubuntu-20.04/lsattr-spaces | mismatch | 1 diffs: 1× value_mismatch |
-| `ping_s` | ubuntu-22.04/ping-dest-unreachable-streaming | mismatch | 17 diffs: 1× array_length, 12× extra_key, 3× missing_key, 1× value_mismatch |
-| `ping_s` | ubuntu-22.04/ping-hostname-source-ip-streaming | mismatch | 8 diffs: 8× value_mismatch |
-| `ping_s` | ubuntu-22.04/ping-ip-source-ip-streaming | mismatch | 8 diffs: 8× value_mismatch |
