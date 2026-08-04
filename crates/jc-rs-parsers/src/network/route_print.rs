@@ -30,6 +30,10 @@ fn str_to_int_opt(s: &str) -> Option<i64> {
     s.trim().parse::<i64>().ok()
 }
 
+/// `route print` pads the interface table with dots to fixed columns, and jc
+/// reads it by column rather than by token: index in [0,5), MAC in [5,30),
+/// description from 30 on. Hunting for "six hex pairs" instead mistook the
+/// eight-byte placeholder that virtual adapters report for part of their name.
 fn parse_interface_list(lines: &[&str]) -> Vec<Map<String, Value>> {
     let mut interfaces = Vec::new();
     let mut in_list = false;
@@ -39,101 +43,50 @@ fn parse_interface_list(lines: &[&str]) -> Vec<Map<String, Value>> {
             in_list = true;
             continue;
         }
-        if in_list {
-            // End of interface list
-            if line.trim_start_matches('=').is_empty() && !line.is_empty() {
-                // not a separator line — parse it
-            } else if line.chars().all(|c| c == '=') {
-                break;
-            }
-
-            let line_str = line.trim_end();
-            if line_str.is_empty() {
-                continue;
-            }
-
-            // Format: "  10...00 0c 29 86 1e 1f ......Intel(R)..."
-            // First 5 chars: index (with dots/spaces)
-            // Next 25 chars: MAC (hex pairs separated by spaces)
-            // Rest: description
-
-            let chars: Vec<char> = line_str.chars().collect();
-            if chars.len() < 5 {
-                continue;
-            }
-
-            // Parse interface index from start
-            let idx_part: String = chars[..5.min(chars.len())]
-                .iter()
-                .filter(|&&c| c.is_ascii_digit() || c == ' ')
-                .collect::<String>()
-                .trim()
-                .to_string();
-            // Actually use the raw first segment before dots
-            let idx_str: String = line_str
-                .chars()
-                .take_while(|c| c.is_ascii_digit() || *c == ' ')
-                .collect::<String>()
-                .trim()
-                .to_string();
-
-            let interface_index = idx_str.parse::<i64>().unwrap_or(0);
-
-            // Find the MAC address area (after dots, 6 hex bytes separated by spaces)
-            // The format uses dots as padding before and after the MAC
-            let stripped = line_str.replace(".", " ");
-            let parts: Vec<&str> = stripped.split_whitespace().collect();
-
-            // First part is the index
-            // MAC might be next 6 hex pairs
-            let mac_address = if parts.len() > 1 {
-                // Try to find 6 consecutive hex pairs
-                let mut mac_parts: Vec<String> = Vec::new();
-                let mut mac_found = false;
-                let mut remaining_start = 1; // skip index
-                for i in 1..parts.len() {
-                    if is_hex_pair(parts[i]) {
-                        mac_parts.push(parts[i].to_lowercase().to_string());
-                        if mac_parts.len() == 6 {
-                            mac_found = true;
-                            remaining_start = i + 1;
-                            break;
-                        }
-                    } else if !mac_parts.is_empty() {
-                        // Interrupted hex sequence
-                        mac_parts.clear();
-                        remaining_start = i;
-                    } else {
-                        remaining_start = i;
-                    }
-                }
-
-                let mac_str = if mac_found {
-                    Some(mac_parts.join(":"))
-                } else {
-                    None
-                };
-                (mac_str, remaining_start)
-            } else {
-                (None, 1)
-            };
-
-            // Description is everything after the MAC area
-            // Use the original line to find description
-            let description = extract_description(line_str);
-
-            let mut iface = Map::new();
-            iface.insert(
-                "interface_index".to_string(),
-                Value::Number(interface_index.into()),
-            );
-            iface.insert(
-                "mac_address".to_string(),
-                mac_address.0.map(Value::String).unwrap_or(Value::Null),
-            );
-            iface.insert("description".to_string(), Value::String(description));
-            interfaces.push(iface);
+        if !in_list {
+            continue;
         }
+        if line.chars().all(|c| c == '=') && !line.is_empty() {
+            break;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+
+        let chars: Vec<char> = line.trim_end().chars().collect();
+        let slice = |from: usize, to: usize| -> String {
+            chars
+                .get(from..to.min(chars.len()))
+                .map(|c| c.iter().collect::<String>())
+                .unwrap_or_default()
+                .replace('.', "")
+                .trim()
+                .to_string()
+        };
+
+        let interface_index = slice(0, 5).parse::<i64>().unwrap_or(0);
+        let mac_field = slice(5, 30);
+        let description = slice(30, chars.len());
+
+        // An empty field, or the placeholder virtual adapters report, is null
+        // rather than an address.
+        let mac_address = if mac_field.is_empty() || mac_field == "00 00 00 00 00 00 00 e0" {
+            None
+        } else {
+            Some(mac_field.replace(' ', ":"))
+        };
+
+        let mut iface = Map::with_capacity(3);
+        iface.insert(
+            "interface_index".to_string(),
+            Value::Number(interface_index.into()),
+        );
+        iface.insert(
+            "mac_address".to_string(),
+            mac_address.map_or(Value::Null, Value::String),
+        );
+        iface.insert("description".to_string(), Value::String(description));
+        interfaces.push(iface);
     }
 
     interfaces
@@ -409,74 +362,6 @@ fn parse_ipv6_route_table(lines: &[&str]) -> (Vec<Map<String, Value>>, Vec<Map<S
 /// The format is:
 ///   INDEX...MAC_BYTES......DESCRIPTION
 /// where INDEX is right-padded to 5 chars, MAC is 6 space-separated hex bytes (25 chars), desc is the rest.
-fn parse_interface_list_v2(lines: &[&str]) -> Vec<Map<String, Value>> {
-    let mut interfaces = Vec::new();
-    let mut in_list = false;
-
-    for line in lines {
-        if line.starts_with("Interface List") {
-            in_list = true;
-            continue;
-        }
-        if !in_list {
-            continue;
-        }
-        if line.trim_matches('=').is_empty() {
-            break; // End of section
-        }
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
-            continue;
-        }
-
-        // Parse: first 5 chars are index (with dots/spaces), next 25 are MAC, rest is description
-        // Example: " 10...00 0c 29 86 1e 1f ......Intel(R) PRO/1000 MT Network Connection"
-        let line_bytes: Vec<char> = line.chars().collect();
-        let len = line_bytes.len();
-
-        // Index: leading digits before first dot
-        let idx_end = line_bytes
-            .iter()
-            .position(|&c| c == '.')
-            .unwrap_or(5.min(len));
-        let idx_str: String = line_bytes[..idx_end]
-            .iter()
-            .collect::<String>()
-            .trim()
-            .to_string();
-        let interface_index = idx_str.parse::<i64>().unwrap_or(0);
-
-        // Find description after "......"
-        let desc = {
-            // Find last run of 3+ dots
-            let line_s = line;
-            if let Some(pos) = find_dot_separator(line_s) {
-                line_s[pos..].trim_start_matches('.').trim().to_string()
-            } else {
-                // fallback: everything after first space-run after index
-                line_s[idx_end..].trim_matches('.').trim().to_string()
-            }
-        };
-
-        // MAC: look for 6 consecutive hex pairs in the line
-        let mac = extract_mac(line);
-
-        let mut iface = Map::new();
-        iface.insert(
-            "interface_index".to_string(),
-            Value::Number(interface_index.into()),
-        );
-        iface.insert(
-            "mac_address".to_string(),
-            mac.map(Value::String).unwrap_or(Value::Null),
-        );
-        iface.insert("description".to_string(), Value::String(desc));
-        interfaces.push(iface);
-    }
-
-    interfaces
-}
-
 fn find_dot_separator(line: &str) -> Option<usize> {
     // Find position of "......" (6+ dots) in line
     let bytes = line.as_bytes();
@@ -535,7 +420,7 @@ impl Parser for RoutePrintParser {
 
         let lines: Vec<&str> = input.lines().collect();
 
-        let interfaces = parse_interface_list_v2(&lines);
+        let interfaces = parse_interface_list(&lines);
         let (ipv4_active, ipv4_persistent) = parse_ipv4_route_table(&lines);
         let (ipv6_active, ipv6_persistent) = parse_ipv6_route_table(&lines);
 

@@ -252,22 +252,23 @@ fn day_of_year_from(year: i32, month: u32, day: u32) -> u32 {
     doy
 }
 
+/// `strftime %W`: complete weeks since the year's first Monday, with the days
+/// before it counting as week 0.
+///
+/// The formula needs the weekday of January 1st. The hand-rolled Sakamoto
+/// version this replaces fed it the *given* month instead of January, so the
+/// answer was wrong for most of the year.
 fn week_of_year_from(year: i32, month: u32, day: u32) -> u32 {
-    // Week of year starting Monday (like strftime %W: week 0 = days before first Monday)
-    let doy = day_of_year_from(year, month, day) as i32;
-    // Find weekday of Jan 1: use Tomohiko Sakamoto's algorithm
-    let jan1_weekday = {
-        let y = if month < 3 { year - 1 } else { year } as i32;
-        let m = month as i32;
-        let d = 1i32;
-        let t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
-        let y2 = y;
-        ((y2 + y2 / 4 - y2 / 100 + y2 / 400 + t[(m as usize) - 1] + d) % 7 + 6) % 7
-        // 0=Mon, 6=Sun
+    use chrono::Datelike;
+
+    let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) else {
+        return 0;
     };
-    // %W: number of complete weeks elapsed since the first Monday
-    let offset = jan1_weekday as i32; // days before first Monday
-    ((doy - 1 + offset) / 7) as u32
+    let Some(jan1) = chrono::NaiveDate::from_ymd_opt(year, 1, 1) else {
+        return 0;
+    };
+    let offset = jan1.weekday().num_days_from_monday();
+    (date.ordinal() - 1 + offset) / 7
 }
 
 trait WeekdayNum {

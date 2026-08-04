@@ -8,49 +8,12 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 917 |
-| Mismatch | 17 |
+| Match | 934 |
+| Mismatch | 0 |
 | Error | 0 |
-| **Match rate** | **98.18%** |
+| **Match rate** | **100.0%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
 
-## Parsers with failures
-
-| Parser | Total | Match | Mismatch | Error |
-|---|---|---|---|---|
-| `cbt` | 4 | 3 | 1 | 0 |
-| `certbot` | 3 | 1 | 2 | 0 |
-| `date` | 4 | 2 | 2 | 0 |
-| `iptables` | 12 | 11 | 1 | 0 |
-| `iwconfig` | 4 | 3 | 1 | 0 |
-| `m3u` | 2 | 1 | 1 | 0 |
-| `openvpn` | 1 | 0 | 1 | 0 |
-| `plist` | 4 | 2 | 2 | 0 |
-| `route` | 7 | 5 | 2 | 0 |
-| `rsync` | 13 | 12 | 1 | 0 |
-| `stat_s` | 5 | 4 | 1 | 0 |
-| `traceroute_s` | 11 | 9 | 2 | 0 |
-
-## Failing fixtures
-
-| Parser | Fixture | Status | Detail |
-|---|---|---|---|
-| `route` | centos-7.7/route-6-n | mismatch | 1 diffs: 1× array_length |
-| `route` | centos-7.7/route-6 | mismatch | 1 diffs: 1× array_length |
-| `stat_s` | centos-7.7/stat-streaming | mismatch | 142 diffs: 142× value_mismatch |
-| `cbt` | generic/cbt-multiple-rows-raw | mismatch | 2 diffs: 2× type_mismatch |
-| `certbot` | generic/certbot-certs-cert-name | mismatch | 1 diffs: 1× missing_key |
-| `certbot` | generic/certbot-certs | mismatch | 2 diffs: 2× value_mismatch |
-| `date` | generic/date-after-midnight | mismatch | 1 diffs: 1× value_mismatch |
-| `date` | generic/date-before-midnight | mismatch | 1 diffs: 1× value_mismatch |
-| `iptables` | generic/iptables-no-jump2 | mismatch | 5 diffs: 1× missing_key, 2× type_mismatch, 2× value_mismatch |
-| `iwconfig` | generic/iwconfig-raw | mismatch | 14 diffs: 14× type_mismatch |
-| `m3u` | generic/m3u-dirty | mismatch | 12 diffs: 12× value_mismatch |
-| `openvpn` | generic/openvpn-status | mismatch | 23 diffs: 23× value_mismatch |
-| `plist` | generic/plist-alltypes | mismatch | 1 diffs: 1× value_mismatch |
-| `plist` | generic/plist-nextstep | mismatch | 43 diffs: 38× type_mismatch, 5× value_mismatch |
-| `rsync` | generic/rsync-i-stats | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
-| `traceroute_s` | generic/traceroute-n-ipv6-streaming | mismatch | 36 diffs: 36× type_mismatch |
-| `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |
+All oracle-valid fixture pairs match.

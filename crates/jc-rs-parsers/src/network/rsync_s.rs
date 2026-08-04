@@ -260,7 +260,7 @@ static STAT_EX_COMPILED: LazyLock<Vec<(Regex, &'static [&'static str])>> = LazyL
 });
 
 /// Returns true if the line was one of the `--stats` totals.
-fn apply_stat_ex(line: &str, summary: &mut Map<String, Value>) -> bool {
+pub(crate) fn apply_stat_ex(line: &str, summary: &mut Map<String, Value>) -> bool {
     for (pattern, fields) in STAT_EX_COMPILED.iter() {
         let Some(caps) = pattern.captures(line) else {
             continue;

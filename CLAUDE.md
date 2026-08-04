@@ -17,7 +17,7 @@ That premise decides most design arguments:
 - Never exclude an awkward fixture from the count; report it in a category.
 - Publish the number even when it is bad.
 
-Current state: 917/934 = 98.2% (`tests/differential/REPORT.md`), workspace
+Current state: 934/934 = 100% (`tests/differential/REPORT.md`), workspace
 version `0.0.0` (the crates.io releases exist only to hold the names).
 
 ## Commands
@@ -38,7 +38,7 @@ Narrower runs:
 TZ=PST8PDT cargo test -p jc-rs-parsers disk::mdadm          # one module's tests
 TZ=PST8PDT cargo test -p jc-rs --test integration           # CLI integration tests
 python3 tests/differential/validate.py --parser mdadm -v    # differential for one parser
-python3 tests/differential/validate.py --fail-under 98.1    # the CI floor
+python3 tests/differential/validate.py --fail-under 100     # the CI floor
 ```
 
 `TZ=PST8PDT` is mandatory and non-obvious: jc's fixtures carry `*_epoch` fields
@@ -52,13 +52,12 @@ The Makefile and both harnesses set it; hand-run cargo does not.
 Both fail the build in CI, and both exist because a plain green/red signal would
 be useless while the port is incomplete.
 
-**`ci/known-failures.txt`** lists the unit tests that currently fail (real parser
-defects, exposed when `tests/fixtures/` became a verbatim mirror of jc's corpus).
-`ci/run-tests.sh` fails on a *new* failure **and** on a listed test that starts
-passing — when you fix a parser, delete its line in the same commit. The file
-should only ever get shorter. `make test` on its own is red by design.
+**`ci/known-failures.txt`** is **empty** — every unit test passes. It stays as
+the mechanism: `ci/run-tests.sh` fails on a new failure *and* on a listed test
+that starts passing, so adding a line to it is a deliberate act of deferring a
+regression, not a way to make the build green.
 
-**`--fail-under 98.1`** in `.github/workflows/ci.yml`. Raise the floor in the
+**`--fail-under 100`** in `.github/workflows/ci.yml`. Raise the floor in the
 same commit that raises the number; never lower it silently.
 
 ## Architecture
@@ -118,9 +117,10 @@ the number to move, and update the CI floor.
 
 ## Known structural gaps
 
-- **`-r/--raw` is partial.** `Parser::parse_raw` defaults to forwarding to
-  `parse`, which is correct only where jc's `_process` is a no-op. Four parsers
-  override it; `cbt` and `iwconfig` still return processed output under `-r`.
+- **`-r/--raw` is implemented where the corpus proves it.** `Parser::parse_raw`
+  defaults to forwarding to `parse`, which is correct wherever jc's `_process`
+  is a no-op; seven parsers override it. A parser with conversions but no raw
+  fixture is still unproven — if you add one, check `-r` too.
 - **Key order.** Keys serialise alphabetically; jc preserves schema order. Values
   agree so the differential passes, but no two outputs ever `diff` clean. Fixing
   it needs `serde_json`'s `preserve_order` plus per-parser key sequences.

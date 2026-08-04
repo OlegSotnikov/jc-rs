@@ -29,63 +29,14 @@ inventory::submit! {
     ParserEntry::new(&CERTBOT_PARSER)
 }
 
-/// Parse an ISO-8601-like datetime string "2023-05-11 01:33:10+00:00" into a UTC epoch timestamp.
-/// Returns None if parsing fails.
-fn parse_datetime_to_epoch(s: &str) -> Option<i64> {
-    // Try to parse "YYYY-MM-DD HH:MM:SS+HH:MM" or "YYYY-MM-DD HH:MM:SS+00:00"
-    // Use a manual parser to avoid dependencies.
-    let s = s.trim();
-
-    // Split date and time
-    let parts: Vec<&str> = s.splitn(2, ' ').collect();
-    if parts.len() != 2 {
-        return None;
-    }
-    let date_part = parts[0];
-    let time_tz = parts[1];
-
-    // Parse date
-    let date_parts: Vec<&str> = date_part.split('-').collect();
-    if date_parts.len() != 3 {
-        return None;
-    }
-    let year: i64 = date_parts[0].parse().ok()?;
-    let month: i64 = date_parts[1].parse().ok()?;
-    let day: i64 = date_parts[2].parse().ok()?;
-
-    // Parse timezone offset: find +/- at end
-    let (time_part, tz_offset_secs) = if let Some(pos) = time_tz.rfind('+') {
-        let tz = &time_tz[pos + 1..];
-        let tz_parts: Vec<&str> = tz.split(':').collect();
-        let h: i64 = tz_parts.first().and_then(|s| s.parse().ok()).unwrap_or(0);
-        let m: i64 = tz_parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
-        (&time_tz[..pos], h * 3600 + m * 60)
-    } else if let Some(pos) = time_tz.rfind('-') {
-        // negative offset
-        let tz = &time_tz[pos + 1..];
-        let tz_parts: Vec<&str> = tz.split(':').collect();
-        let h: i64 = tz_parts.first().and_then(|s| s.parse().ok()).unwrap_or(0);
-        let m: i64 = tz_parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
-        (&time_tz[..pos], -(h * 3600 + m * 60))
-    } else {
-        (time_tz, 0i64)
-    };
-
-    // Parse time
-    let time_parts: Vec<&str> = time_part.split(':').collect();
-    if time_parts.len() != 3 {
-        return None;
-    }
-    let hour: i64 = time_parts[0].parse().ok()?;
-    let minute: i64 = time_parts[1].parse().ok()?;
-    let second: i64 = time_parts[2].parse().ok()?;
-
-    // Days since epoch calculation
-    // Using algorithm from https://howardhinnant.github.io/date_algorithms.html
-    let epoch = days_since_epoch(year, month, day)?;
-    let utc_epoch = epoch * 86400 + hour * 3600 + minute * 60 + second - tz_offset_secs;
-
-    Some(utc_epoch)
+/// Certbot prints `2023-05-11 01:33:10+00:00`.
+///
+/// jc reports both readings of that: `_epoch` is the wall clock read in the
+/// local zone (its `timestamp().naive`) and `_epoch_utc` is the real instant.
+/// They differ by the machine's offset, so returning one for both put every
+/// certificate's expiry out by that much.
+fn parse_expiry(s: &str) -> jc_rs_utils::TimestampResult {
+    jc_rs_utils::parse_timestamp(s.trim(), &[jc_rs_utils::timestamp::formats::F1760])
 }
 
 fn days_since_epoch(y: i64, m: i64, d: i64) -> Option<i64> {
@@ -122,9 +73,12 @@ impl Parser for CertbotParser {
         let mut cert_dict: Option<Map<String, Value>> = None;
         let mut acct_dict: Map<String, Value> = Map::new();
 
-        let is_certificates = input
-            .lines()
-            .any(|l| l.trim() == "Found the following certs:");
+        // certbot prints "matching" when the command was narrowed with
+        // --cert-name, and jc's pattern allows for it.
+        let is_certificates = input.lines().any(|l| {
+            let l = l.trim();
+            l == "Found the following certs:" || l == "Found the following matching certs:"
+        });
 
         let cmd_option = if is_certificates {
             "certificates"
@@ -192,15 +146,14 @@ impl Parser for CertbotParser {
                                     Value::String(validity.trim().to_string()),
                                 );
                             }
-                            // Add epoch fields
-                            if let Some(epoch) = parse_datetime_to_epoch(date_str) {
+                            let ts = parse_expiry(date_str);
+                            if let Some(epoch) = ts.utc_epoch {
                                 cert.insert(
                                     "expiration_date_epoch_utc".to_string(),
                                     Value::Number(epoch.into()),
                                 );
-                                // naive epoch (local time) - we just use UTC here as approximation
-                                // The Python jc parser uses local time for naive epoch
-                                // For a portable implementation we use UTC
+                            }
+                            if let Some(epoch) = ts.naive_epoch {
                                 cert.insert(
                                     "expiration_date_epoch".to_string(),
                                     Value::Number(epoch.into()),

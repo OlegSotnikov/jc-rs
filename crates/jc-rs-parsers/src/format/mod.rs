@@ -9,6 +9,7 @@ pub mod ini;
 pub mod ini_dup;
 pub mod kv;
 pub mod kv_dup;
+pub mod openstep;
 pub mod plist;
 pub mod toml;
 pub mod tsv;

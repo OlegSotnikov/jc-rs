@@ -65,7 +65,13 @@ fn parse_extinf(extinf_value: &str) -> Option<(String, String, Vec<(String, Stri
     Some((runtime, display, extra_kv))
 }
 
-/// Simple shlex-like split using comma and space as delimiters, respecting double-quotes.
+/// Simple shlex-like split using comma and space as delimiters, respecting
+/// double-quotes.
+///
+/// `#` starts a comment and ends the line, because that is what `shlex` does in
+/// POSIX mode and jc passes it a default `shlex`. It reads as a bug against
+/// channel names like `Bumblebee TV Classics #2 (720p)` -- jc records that name
+/// as `Bumblebee TV Classics` -- but jc is the schema, quirk included.
 fn shlex_split(s: &str) -> Option<Vec<String>> {
     let mut tokens = Vec::new();
     let mut current = String::new();
@@ -78,6 +84,8 @@ fn shlex_split(s: &str) -> Option<Vec<String>> {
             } else {
                 current.push(ch);
             }
+        } else if ch == '#' {
+            break;
         } else if ch == '"' {
             in_quote = true;
         } else if ch == ',' || ch == ' ' {

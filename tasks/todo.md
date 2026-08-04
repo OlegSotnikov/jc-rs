@@ -4,12 +4,17 @@ Last updated: 2026-08-04
 
 ## Where this stands
 
-**Compatibility right now: 917/934 = 98.2%.** The imported codebase measured
-80.0%. Run `make differential` to regenerate; `tests/differential/REPORT.md` has
-the per-fixture breakdown, `report.json` the per-case diffs.
+**Compatibility: 934/934 = 100%.** The imported codebase measured 80.0%. Run
+`make differential` to regenerate; `tests/differential/REPORT.md` has the
+breakdown. CI fails below 100% (`--fail-under 100`), and
+`ci/known-failures.txt` is empty — every unit test passes.
 
-No fixture errors out any more: every pair produces output, and the 17 that
-remain are mismatches in the detail.
+What 100% does *and does not* mean: it is 100% of the pairs jc itself can
+reproduce. 149 fixtures remain `unmapped` (the filename resolves to no parser),
+18 have no input file, and 9 are ones jc cannot reproduce. Those are reported
+every run rather than hidden, and reducing the unmapped set will *lower* the
+headline number before it raises it. That is the trade the harness was built
+to make visible.
 
 ## Done
 
@@ -76,18 +81,15 @@ remain are mismatches in the detail.
 
 ## Next, in order
 
-- [ ] **The last 17 mismatches.** `route` (2, an IPv6 row dropped), `certbot`
-      (2), `date` (2, `week_of_year` off by one), `plist` (2),
-      `traceroute_s` (2), and one each in `stat_s`, `cbt`, `iptables`,
-      `iwconfig`, `m3u`, `openvpn`, `rsync`.
-- [ ] **`-r/--raw` is implemented for four parsers, defaulted for the rest.**
-      `Parser::parse_raw` defaults to forwarding to `parse`, which is *correct*
-      for every parser whose jc `_process` returns its input unchanged, and
-      wrong for the rest. Done: `env`, `git_ls_remote`, `pkg_index_apk`, `xml`.
-      Still processed-when-raw-was-asked: `cbt` (cells list vs map) and
-      `iwconfig` (string values vs coerced) are the two the corpus catches;
-      others exist but no fixture proves them. Overriding `parse_raw` is the
-      fix, one parser at a time.
+- [ ] **M5 — distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
+      `jc-rs-wasm` (that crate is not written yet). Everything else is wired:
+      `release.yml` builds five targets and pushes the scratch image,
+      `publish-crates.yml` publishes via Trusted Publishing, and shell
+      completions for bash, zsh and fish are in the archives.
+- [ ] **`-r/--raw` beyond what the corpus proves.** Seven parsers override
+      `parse_raw`; the default forwards to `parse`, which is correct wherever
+      jc's `_process` is a no-op. A parser with conversions but no `-raw`
+      fixture is unproven either way.
 - [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
       Values agree but no two outputs ever `diff` clean.
       **`serde_json`'s `preserve_order` feature is not the answer — measured.**
