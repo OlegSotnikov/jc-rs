@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::{convert_to_int, normalize_key, parse_timestamp};
+use jc_rs_utils::{convert_to_int, normalize_key, parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct RpmQiParser;
@@ -188,7 +188,7 @@ pub(crate) fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
                 ),
             ] {
                 if let Some(Value::String(ds)) = entry.get(*date_field) {
-                    let parsed = parse_timestamp(ds, None);
+                    let parsed = parse_timestamp(ds, &[formats::F3000]);
                     entry.insert(
                         epoch_field.to_string(),
                         parsed

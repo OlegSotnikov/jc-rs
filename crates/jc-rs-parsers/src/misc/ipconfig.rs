@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 struct IpconfigParser;
@@ -96,7 +96,7 @@ fn parse_link_local_ipv6(s: &str) -> (String, Option<i64>, Option<String>) {
 /// Parse a lease date string and return (raw, epoch, iso).
 fn parse_lease_date(s: &str) -> (String, Option<i64>, Option<String>) {
     let raw = s.trim().to_string();
-    let parsed = parse_timestamp(&raw, Some("%A, %B %d, %Y %I:%M:%S %p"));
+    let parsed = parse_timestamp(&raw, &[formats::F1720]);
     (raw, parsed.naive_epoch, parsed.iso)
 }
 

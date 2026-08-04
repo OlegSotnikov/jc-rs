@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
@@ -237,7 +237,7 @@ pub fn parse_syslog_line(line: &str) -> Map<String, Value> {
 
         // Timestamp epoch fields
         if let Some(Value::String(ts)) = map.get("timestamp") {
-            let parsed = parse_timestamp(ts, None);
+            let parsed = parse_timestamp(ts, &[formats::F1300, formats::F1310]);
             map.insert(
                 "timestamp_epoch".to_string(),
                 match parsed.naive_epoch {

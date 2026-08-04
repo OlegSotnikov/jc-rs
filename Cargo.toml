@@ -22,6 +22,21 @@ thiserror = "2"
 inventory = "0.3"
 criterion = { version = "0.5", features = ["html_reports"] }
 
+# A CLI whose whole pitch is startup time should be built like one. `panic =
+# "abort"` also drops the unwind tables, which is most of the binary-size win.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# Benchmarks need symbols.
+[profile.bench]
+inherits = "release"
+debug = true
+strip = false
+
 [workspace.lints.clippy]
 # Bulk-allow legacy patterns from jc port — clean up incrementally
 collapsible_if = "allow"

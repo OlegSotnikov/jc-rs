@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct WhoParser;
@@ -289,7 +289,7 @@ fn parse_who(input: &str) -> Vec<Map<String, Value>> {
 
 fn add_time_and_epoch(record: &mut Map<String, Value>, time_str: &str) {
     record.insert("time".to_string(), Value::String(time_str.to_string()));
-    let ts = parse_timestamp(time_str, None);
+    let ts = parse_timestamp(time_str, &[formats::F1500]);
     record.insert(
         "epoch".to_string(),
         ts.naive_epoch

@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::{convert_to_int, parse_timestamp};
+use jc_rs_utils::{convert_to_int, parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::Value;
 use std::sync::LazyLock;
@@ -166,7 +166,7 @@ impl LineParser for LsSession {
             .map(|fields| fields.join(" "))
             .unwrap_or_default();
         if !SHORT_DATE_RE.is_match(&date) {
-            let ts = parse_timestamp(&date, None);
+            let ts = parse_timestamp(&date, &[formats::F7200]);
             entry.insert(
                 "epoch".to_string(),
                 ts.naive_epoch

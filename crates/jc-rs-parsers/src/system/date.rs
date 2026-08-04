@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct DateParser;
@@ -80,7 +80,7 @@ impl Parser for DateParser {
         let data = input.trim();
         let tz = find_timezone(data);
 
-        let ts = parse_timestamp(data, None);
+        let ts = parse_timestamp(data, &[formats::F1000, formats::F6000, formats::F7000]);
 
         // Use UTC-aware datetime if available, else naive
         let epoch = ts.naive_epoch;

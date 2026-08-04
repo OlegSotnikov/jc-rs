@@ -4,7 +4,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
@@ -89,7 +89,7 @@ pub fn parse_dir(input: &str) -> Vec<Map<String, Value>> {
 
             // Parse epoch
             let ts_str = format!("{date} {time}");
-            let parsed = parse_timestamp(&ts_str, Some("%m/%d/%Y %I:%M %p"));
+            let parsed = parse_timestamp(&ts_str, &[formats::F1600]);
             let epoch_val = match parsed.naive_epoch {
                 Some(e) => Value::Number(e.into()),
                 None => Value::Null,

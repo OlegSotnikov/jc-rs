@@ -7,7 +7,7 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use jc_rs_utils::parse_timestamp;
+use jc_rs_utils::{parse_timestamp, timestamp::formats};
 use serde_json::{Map, Value};
 
 pub struct DigParser;
@@ -504,7 +504,7 @@ impl Parser for DigParser {
         // Post-process: compute when_epoch and when_epoch_utc from "when" field
         for entry in &mut raw_output {
             if let Some(Value::String(when_str)) = entry.get("when") {
-                let parsed = parse_timestamp(when_str, None);
+                let parsed = parse_timestamp(when_str, &[formats::F1000, formats::F7000]);
                 entry.insert(
                     "when_epoch".to_string(),
                     parsed

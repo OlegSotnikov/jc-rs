@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Time jc-rs against jc on the same inputs, on this machine, with one harness
+# for both. Prints a markdown table.
+#
+# The speed claims in the README come from here. Anyone can re-run it: a number
+# you cannot reproduce is a number you should not print.
+#
+# Both sides are invoked the way a user would -- `python3 -m jc` includes the
+# interpreter start-up that is most of what this comparison is about, and is
+# what `jc` on your PATH does too.
+set -uo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+BIN="${BIN:-./target/release/jc-rs}"
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+
+if [ ! -x "$BIN" ]; then
+  echo "no release binary at $BIN -- run: make build" >&2
+  exit 1
+fi
+if [ ! -d jc/jc ]; then
+  echo "jc submodule not checked out -- run: make submodule" >&2
+  exit 1
+fi
+
+# Two synthetic inputs, because the corpus has nothing large enough to say
+# anything about throughput on repetitive data.
+python3 - "$WORK" <<'PY'
+import sys
+work = sys.argv[1]
+line = ('127.0.0.1 user-identifier frank [10/Oct/2000:13:55:36 -0700] '
+        '"GET /apache_pb.gif HTTP/1.0" 200 2326\n')
+with open(f"{work}/big.clf", "w") as f:
+    f.write(line * 10000)
+with open(f"{work}/rows.csv", "w") as f:
+    f.write("a,b,c,d\n")
+    for i in range(10000):
+        f.write(f"{i},{i * 2},value{i},other{i}\n")
+PY
+
+median() {
+  local runs="$1"; shift
+  local times=()
+  for _ in $(seq "$runs"); do
+    local start end
+    start=$(date +%s%N)
+    "$@" > /dev/null 2>&1
+    end=$(date +%s%N)
+    times+=($(( (end - start) / 1000000 )))
+  done
+  printf '%s\n' "${times[@]}" | sort -n | sed -n "$(( runs / 2 + 1 ))p"
+}
+
+row() {
+  local label="$1" runs="$2" args="$3" input="${4:-}"
+  local jc_ms rs_ms
+  if [ -n "$input" ]; then
+    jc_ms=$(median "$runs" bash -c "PYTHONPATH=jc python3 -m jc $args < $input")
+    rs_ms=$(median "$runs" bash -c "$BIN $args < $input")
+  else
+    jc_ms=$(median "$runs" env PYTHONPATH=jc python3 -m jc "$args")
+    rs_ms=$(median "$runs" "$BIN" "$args")
+  fi
+  printf '| %-36s | %5s ms | %5s ms | **%sx** |\n' \
+    "$label" "$jc_ms" "$rs_ms" \
+    "$(python3 -c "print(f'{$jc_ms / max($rs_ms, 1):.1f}')")"
+}
+
+echo "| Scenario | jc | jc-rs | Speedup |"
+echo "|---|---|---|---|"
+row 'Cold start (`-v`)'                 11 -v
+row '`ps aux`, 110 lines'               11 --ps            tests/fixtures/centos-7.7/ps-axu.out
+row '`clf`, 10,000 log lines'            7 --clf           "$WORK/big.clf"
+row '`csv`, 10,000 rows'                 7 --csv           "$WORK/rows.csv"
+row '`pkg-index-deb`, 1.5 MB'            5 --pkg-index-deb tests/fixtures/generic/pkg-index-deb.out
