@@ -2,12 +2,11 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 917,
-  "mismatch": 17,
+  "match": 934,
   "oracle_reject": 9
  },
  "tested": 934,
- "match_rate": 98.18,
+ "match_rate": 100.0,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -39,8 +38,7 @@
   },
   "cbt": {
    "total": 4,
-   "match": 3,
-   "mismatch": 1
+   "match": 4
   },
   "cef": {
    "total": 1,
@@ -52,8 +50,7 @@
   },
   "certbot": {
    "total": 3,
-   "match": 1,
-   "mismatch": 2
+   "match": 3
   },
   "chage": {
    "total": 1,
@@ -93,8 +90,7 @@
   },
   "date": {
    "total": 4,
-   "mismatch": 2,
-   "match": 2
+   "match": 4
   },
   "debconf_show": {
    "total": 1,
@@ -234,13 +230,11 @@
   },
   "iptables": {
    "total": 12,
-   "match": 11,
-   "mismatch": 1
+   "match": 12
   },
   "iwconfig": {
    "total": 4,
-   "match": 3,
-   "mismatch": 1
+   "match": 4
   },
   "jobs": {
    "total": 2,
@@ -288,8 +282,7 @@
   },
   "m3u": {
    "total": 2,
-   "mismatch": 1,
-   "match": 1
+   "match": 2
   },
   "mdadm": {
    "total": 40,
@@ -329,7 +322,7 @@
   },
   "openvpn": {
    "total": 1,
-   "mismatch": 1
+   "match": 1
   },
   "os_release": {
    "total": 2,
@@ -389,8 +382,7 @@
   },
   "plist": {
    "total": 4,
-   "mismatch": 2,
-   "match": 2
+   "match": 4
   },
   "postconf": {
    "total": 1,
@@ -606,8 +598,7 @@
   },
   "route": {
    "total": 7,
-   "mismatch": 2,
-   "match": 5
+   "match": 7
   },
   "rpm_qi": {
    "total": 1,
@@ -615,8 +606,7 @@
   },
   "rsync": {
    "total": 13,
-   "match": 12,
-   "mismatch": 1
+   "match": 13
   },
   "rsync_s": {
    "total": 13,
@@ -644,8 +634,7 @@
   },
   "stat_s": {
    "total": 5,
-   "mismatch": 1,
-   "match": 4
+   "match": 5
   },
   "swapon": {
    "total": 2,
@@ -709,8 +698,7 @@
   },
   "traceroute_s": {
    "total": 11,
-   "match": 9,
-   "mismatch": 2
+   "match": 11
   },
   "tsv": {
    "total": 1,
@@ -821,534 +809,7 @@
    "match": 5
   }
  },
- "failures": [
-  {
-   "platform": "centos-7.7",
-   "base": "route-6-n",
-   "parser": "route",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "array_length": 1
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 22,
-     "actual": 21
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "route-6",
-   "parser": "route",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "array_length": 1
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "array_length",
-     "expected": 22,
-     "actual": 21
-    }
-   ]
-  },
-  {
-   "platform": "centos-7.7",
-   "base": "stat-streaming",
-   "parser": "stat_s",
-   "status": "mismatch",
-   "diff_count": 142,
-   "kinds": {
-    "value_mismatch": 142
-   },
-   "sample": [
-    {
-     "path": "$[4].file",
-     "kind": "value_mismatch",
-     "expected": "'/bin/apropos'",
-     "actual": "'/bin/apropos\u2019'"
-    },
-    {
-     "path": "$[4].link_to",
-     "kind": "value_mismatch",
-     "expected": "'whatis'",
-     "actual": "'\u2018whatis'"
-    },
-    {
-     "path": "$[10].file",
-     "kind": "value_mismatch",
-     "expected": "'/bin/audit2why'",
-     "actual": "'/bin/audit2why\u2019'"
-    },
-    {
-     "path": "$[10].link_to",
-     "kind": "value_mismatch",
-     "expected": "'audit2allow'",
-     "actual": "'\u2018audit2allow'"
-    },
-    {
-     "path": "$[15].file",
-     "kind": "value_mismatch",
-     "expected": "'/bin/awk'",
-     "actual": "'/bin/awk\u2019'"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "cbt-multiple-rows-raw",
-   "parser": "cbt",
-   "status": "mismatch",
-   "diff_count": 2,
-   "kinds": {
-    "type_mismatch": 2
-   },
-   "sample": [
-    {
-     "path": "$[0].cells",
-     "kind": "type_mismatch",
-     "expected": "[{'column_family': 'foo', 'column': 'bar', 'value': 'baz1', 'timestamp_iso': '2000-01-01T01:00:00', 'timestamp_epoch': 9",
-     "actual": "{'foo': {'bar': 'baz1'}}"
-    },
-    {
-     "path": "$[1].cells",
-     "kind": "type_mismatch",
-     "expected": "[{'column_family': 'foo', 'column': 'bar', 'value': 'baz2', 'timestamp_iso': '2000-01-01T01:00:00', 'timestamp_epoch': 9",
-     "actual": "{'foo': {'bar': 'baz2'}}"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "certbot-certs-cert-name",
-   "parser": "certbot",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "missing_key": 1
-   },
-   "sample": [
-    {
-     "path": "$.certificates",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "certbot-certs",
-   "parser": "certbot",
-   "status": "mismatch",
-   "diff_count": 2,
-   "kinds": {
-    "value_mismatch": 2
-   },
-   "sample": [
-    {
-     "path": "$.certificates[0].expiration_date_epoch",
-     "kind": "value_mismatch",
-     "expected": "1683793990",
-     "actual": "1683768790"
-    },
-    {
-     "path": "$.certificates[1].expiration_date_epoch",
-     "kind": "value_mismatch",
-     "expected": "1686558930",
-     "actual": "1686533730"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "date-after-midnight",
-   "parser": "date",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.week_of_year",
-     "kind": "value_mismatch",
-     "expected": "12",
-     "actual": "11"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "date-before-midnight",
-   "parser": "date",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.week_of_year",
-     "kind": "value_mismatch",
-     "expected": "12",
-     "actual": "11"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "iptables-no-jump2",
-   "parser": "iptables",
-   "status": "mismatch",
-   "diff_count": 5,
-   "kinds": {
-    "missing_key": 1,
-    "type_mismatch": 2,
-    "value_mismatch": 2
-   },
-   "sample": [
-    {
-     "path": "$[0].rules[0].destination",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].rules[0].opt",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'*'"
-    },
-    {
-     "path": "$[0].rules[0].out",
-     "kind": "value_mismatch",
-     "expected": "'*'",
-     "actual": "'0.0.0.0/0'"
-    },
-    {
-     "path": "$[0].rules[0].prot",
-     "kind": "value_mismatch",
-     "expected": "'all'",
-     "actual": "'--'"
-    },
-    {
-     "path": "$[0].rules[0].target",
-     "kind": "type_mismatch",
-     "expected": "None",
-     "actual": "'all'"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "iwconfig-raw",
-   "parser": "iwconfig",
-   "status": "mismatch",
-   "diff_count": 14,
-   "kinds": {
-    "type_mismatch": 14
-   },
-   "sample": [
-    {
-     "path": "$[0].bit_rate",
-     "kind": "type_mismatch",
-     "expected": "'6'",
-     "actual": "6.0"
-    },
-    {
-     "path": "$[0].fragment_threshold",
-     "kind": "type_mismatch",
-     "expected": "'off'",
-     "actual": "False"
-    },
-    {
-     "path": "$[0].frequency",
-     "kind": "type_mismatch",
-     "expected": "'5.18'",
-     "actual": "5.18"
-    },
-    {
-     "path": "$[0].invalid_misc",
-     "kind": "type_mismatch",
-     "expected": "'1766'",
-     "actual": "1766"
-    },
-    {
-     "path": "$[0].missed_beacon",
-     "kind": "type_mismatch",
-     "expected": "'0'",
-     "actual": "0"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "m3u-dirty",
-   "parser": "m3u",
-   "status": "mismatch",
-   "diff_count": 12,
-   "kinds": {
-    "value_mismatch": 12
-   },
-   "sample": [
-    {
-     "path": "$[2063].display",
-     "kind": "value_mismatch",
-     "expected": "'Bumblebee TV Classics'",
-     "actual": "'Bumblebee TV Classics #2 (720p)'"
-    },
-    {
-     "path": "$[9195].display",
-     "kind": "value_mismatch",
-     "expected": "'Illinois: Springfield'",
-     "actual": "'Illinois: Springfield #2 (STIRR) (720p)'"
-    },
-    {
-     "path": "$[9524].display",
-     "kind": "value_mismatch",
-     "expected": "'Ohio: Columbus'",
-     "actual": "'Ohio: Columbus #1 (STIRR) (720p)'"
-    },
-    {
-     "path": "$[9533].display",
-     "kind": "value_mismatch",
-     "expected": "'Ohio: Columbus'",
-     "actual": "'Ohio: Columbus #2 (STIRR) (720p)'"
-    },
-    {
-     "path": "$[9595].display",
-     "kind": "value_mismatch",
-     "expected": "'Oregon: Eugene - Springfield'",
-     "actual": "'Oregon: Eugene - Springfield #1 (STIRR) (720p)'"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "openvpn-status",
-   "parser": "openvpn",
-   "status": "mismatch",
-   "diff_count": 23,
-   "kinds": {
-    "value_mismatch": 23
-   },
-   "sample": [
-    {
-     "path": "$.clients[0].connected_since_epoch",
-     "kind": "value_mismatch",
-     "expected": "1434626583",
-     "actual": "1434601383"
-    },
-    {
-     "path": "$.clients[0].updated_epoch",
-     "kind": "value_mismatch",
-     "expected": "1434640335",
-     "actual": "1434615135"
-    },
-    {
-     "path": "$.clients[1].connected_since_epoch",
-     "kind": "value_mismatch",
-     "expected": "1434626583",
-     "actual": "1434601383"
-    },
-    {
-     "path": "$.clients[1].updated_epoch",
-     "kind": "value_mismatch",
-     "expected": "1434640335",
-     "actual": "1434615135"
-    },
-    {
-     "path": "$.clients[2].connected_since_epoch",
-     "kind": "value_mismatch",
-     "expected": "1434625719",
-     "actual": "1434600519"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "plist-alltypes",
-   "parser": "plist",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$.aDate",
-     "kind": "value_mismatch",
-     "expected": "1659310470",
-     "actual": "1659285270"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "plist-nextstep",
-   "parser": "plist",
-   "status": "mismatch",
-   "diff_count": 43,
-   "kinds": {
-    "type_mismatch": 38,
-    "value_mismatch": 5
-   },
-   "sample": [
-    {
-     "path": "$.archiveVersion",
-     "kind": "type_mismatch",
-     "expected": "'1'",
-     "actual": "1"
-    },
-    {
-     "path": "$.objectVersion",
-     "kind": "type_mismatch",
-     "expected": "'46'",
-     "actual": "46"
-    },
-    {
-     "path": "$.objects.15D488951BD3D59200EC46B1.attributes.LastUpgradeCheck",
-     "kind": "type_mismatch",
-     "expected": "'0700'",
-     "actual": "700"
-    },
-    {
-     "path": "$.objects.15D488951BD3D59200EC46B1.hasScannedForEncodings",
-     "kind": "type_mismatch",
-     "expected": "'0'",
-     "actual": "0"
-    },
-    {
-     "path": "$.objects.15D488981BD3D59200EC46B1.defaultConfigurationIsVisible",
-     "kind": "type_mismatch",
-     "expected": "'0'",
-     "actual": "0"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "rsync-i-stats",
-   "parser": "rsync",
-   "status": "mismatch",
-   "diff_count": 18,
-   "kinds": {
-    "value_mismatch": 4,
-    "missing_key": 14
-   },
-   "sample": [
-    {
-     "path": "$[0].summary.bytes_sec",
-     "kind": "value_mismatch",
-     "expected": "370210.0",
-     "actual": "379095.04"
-    },
-    {
-     "path": "$[0].summary.created_dir_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].summary.created_regular_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].summary.deleted_files",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].summary.dir_files",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "traceroute-n-ipv6-streaming",
-   "parser": "traceroute_s",
-   "status": "mismatch",
-   "diff_count": 36,
-   "kinds": {
-    "type_mismatch": 36
-   },
-   "sample": [
-    {
-     "path": "$[1].probes[0].ip",
-     "kind": "type_mismatch",
-     "expected": "'2605:9000:402:6a01::1'",
-     "actual": "None"
-    },
-    {
-     "path": "$[1].probes[1].ip",
-     "kind": "type_mismatch",
-     "expected": "'2605:9000:402:6a01::1'",
-     "actual": "None"
-    },
-    {
-     "path": "$[1].probes[2].ip",
-     "kind": "type_mismatch",
-     "expected": "'2605:9000:402:6a01::1'",
-     "actual": "None"
-    },
-    {
-     "path": "$[2].probes[0].ip",
-     "kind": "type_mismatch",
-     "expected": "'2605:9000:0:400a::f1'",
-     "actual": "None"
-    },
-    {
-     "path": "$[2].probes[1].ip",
-     "kind": "type_mismatch",
-     "expected": "'2605:9000:0:400a::f1'",
-     "actual": "None"
-    }
-   ]
-  },
-  {
-   "platform": "osx-10.14.6",
-   "base": "traceroute-asn-streaming",
-   "parser": "traceroute_s",
-   "status": "mismatch",
-   "diff_count": 6,
-   "kinds": {
-    "type_mismatch": 6
-   },
-   "sample": [
-    {
-     "path": "$[1].probes[1].asn",
-     "kind": "type_mismatch",
-     "expected": "198949",
-     "actual": "None"
-    },
-    {
-     "path": "$[1].probes[2].asn",
-     "kind": "type_mismatch",
-     "expected": "198949",
-     "actual": "None"
-    },
-    {
-     "path": "$[2].probes[1].asn",
-     "kind": "type_mismatch",
-     "expected": "0",
-     "actual": "None"
-    },
-    {
-     "path": "$[2].probes[2].asn",
-     "kind": "type_mismatch",
-     "expected": "0",
-     "actual": "None"
-    },
-    {
-     "path": "$[4].probes[1].asn",
-     "kind": "type_mismatch",
-     "expected": "7018",
-     "actual": "None"
-    }
-   ]
-  }
- ],
+ "failures": [],
  "oracle_rejects": [
   {
    "platform": "generic",

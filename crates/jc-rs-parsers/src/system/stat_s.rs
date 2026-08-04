@@ -100,6 +100,15 @@ impl StreamingParser for StatSParser {
     }
 }
 
+/// Strip the quotes GNU `stat` wraps a filename in.
+fn unquote_filename(name: &str) -> String {
+    name.trim()
+        .trim_matches('\'')
+        .trim_start_matches('\u{2018}')
+        .trim_end_matches('\u{2019}')
+        .to_string()
+}
+
 fn apply_linux_field(line: &str, obj: &mut Map<String, Value>) {
     if line.starts_with("  Size:") {
         let parts: Vec<&str> = line.split_whitespace().collect();
@@ -282,24 +291,23 @@ impl LineParser for StatSession {
             let previous = (!self.obj.is_empty()).then(|| std::mem::take(&mut self.obj));
 
             let after = line.splitn(2, "File:").nth(1).unwrap_or("").trim();
-            let after = after
-                .trim_matches('\'')
-                .trim_matches('\u{2018}')
-                .trim_matches('\u{2019}');
+            // Split before unquoting. GNU stat writes a symlink with each side
+            // quoted separately, so stripping the quotes off the whole field
+            // first leaves one dangling on each side of the arrow.
             match after.split_once(" -> ") {
                 Some((filename, link_to)) => {
                     self.obj.insert(
                         "file".to_string(),
-                        Value::String(filename.trim_matches('\'').to_string()),
+                        Value::String(unquote_filename(filename)),
                     );
                     self.obj.insert(
                         "link_to".to_string(),
-                        Value::String(link_to.trim_matches('\'').to_string()),
+                        Value::String(unquote_filename(link_to)),
                     );
                 }
                 None => {
                     self.obj
-                        .insert("file".to_string(), Value::String(after.to_string()));
+                        .insert("file".to_string(), Value::String(unquote_filename(after)));
                 }
             }
             return Ok(previous);

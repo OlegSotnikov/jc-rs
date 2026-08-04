@@ -9,12 +9,12 @@ $ df -h   | jc-rs --df
 $ dig example.com | jc-rs -p --dig
 ```
 
-> **Status: pre-release. Do not use this yet.**
-> Current compatibility with jc: **98.2%** (917 of 934 fixture pairs).
-> Baseline of the code this started from was 80.0%.
-> v0.1.0 ships when that number is 100%. The number comes from
+> **Status: pre-release.**
+> Compatibility with jc: **100%** (934 of 934 oracle-valid fixture pairs).
+> The code this started from measured 80.0%. The number comes from
 > `make differential` and is published whatever it says — see
 > [tests/differential/REPORT.md](tests/differential/REPORT.md).
+> CI fails below 100%.
 
 ---
 
@@ -62,8 +62,8 @@ Two details decide whether the number means anything:
 ```console
 $ make differential
 jc 1.25.7 · 943 pairs · 236 parsers known
-match 917 · mismatch 17 · error 0
-match rate over oracle-valid pairs: 98.2%  (934 pairs)
+match 934 · mismatch 0 · error 0
+match rate over oracle-valid pairs: 100.0%  (934 pairs)
 reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 ```
 

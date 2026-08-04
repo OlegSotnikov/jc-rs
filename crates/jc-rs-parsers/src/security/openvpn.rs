@@ -69,46 +69,9 @@ fn split_addr(addr_str: &str) -> (String, Option<String>, Option<String>) {
     (address, prefix, port)
 }
 
-/// Parse date like "Thu Jun 18 04:23:03 2015" to epoch.
-/// This is a simplified parser for common OpenVPN date format.
+/// `Thu Jun 18 04:23:03 2015`, read in the local zone the way jc reads it.
 fn parse_openvpn_date(s: &str) -> Option<i64> {
-    let parts: Vec<&str> = s.split_whitespace().collect();
-    // Format: "Thu Jun 18 04:23:03 2015" or "Thu Oct 19 20:14:19 2017"
-    if parts.len() < 5 {
-        return None;
-    }
-
-    let month_str = parts[1];
-    let day: i64 = parts[2].parse().ok()?;
-    let time_str = parts[3];
-    let year: i64 = parts[4].parse().ok()?;
-
-    let month = match month_str {
-        "Jan" => 1i64,
-        "Feb" => 2,
-        "Mar" => 3,
-        "Apr" => 4,
-        "May" => 5,
-        "Jun" => 6,
-        "Jul" => 7,
-        "Aug" => 8,
-        "Sep" => 9,
-        "Oct" => 10,
-        "Nov" => 11,
-        "Dec" => 12,
-        _ => return None,
-    };
-
-    let time_parts: Vec<&str> = time_str.split(':').collect();
-    if time_parts.len() != 3 {
-        return None;
-    }
-    let hour: i64 = time_parts[0].parse().ok()?;
-    let minute: i64 = time_parts[1].parse().ok()?;
-    let second: i64 = time_parts[2].parse().ok()?;
-
-    let days = days_since_epoch(year, month, day)?;
-    Some(days * 86400 + hour * 3600 + minute * 60 + second)
+    jc_rs_utils::parse_timestamp(s.trim(), &[jc_rs_utils::timestamp::formats::F1000]).naive_epoch
 }
 
 fn days_since_epoch(y: i64, m: i64, d: i64) -> Option<i64> {

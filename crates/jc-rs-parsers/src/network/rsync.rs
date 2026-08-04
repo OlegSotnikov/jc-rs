@@ -28,45 +28,22 @@ static INFO: ParserInfo = ParserInfo {
 static RSYNC_PARSER: RsyncParser = RsyncParser;
 inventory::submit! { ParserEntry::new(&RSYNC_PARSER) }
 
+/// rsync writes sizes as `8.99K` / `6.88T`, and jc reads those with decimal
+/// multipliers -- 8.99K is 8990 bytes, not 9205.
 fn parse_size_to_int(s: &str) -> Option<i64> {
-    let s = s.replace(',', "");
-    let s = s.trim();
-    if s.is_empty() {
-        return None;
-    }
-    // Handle K/M/G/T suffixes
-    let (num, mult) = if let Some(n) = s.strip_suffix('K') {
-        (n, 1024i64)
-    } else if let Some(n) = s.strip_suffix('M') {
-        (n, 1024 * 1024)
-    } else if let Some(n) = s.strip_suffix('G') {
-        (n, 1024 * 1024 * 1024)
-    } else if let Some(n) = s.strip_suffix('T') {
-        (n, 1024i64 * 1024 * 1024 * 1024)
-    } else {
-        (s, 1)
-    };
-    num.parse::<f64>().ok().map(|f| (f * mult as f64) as i64)
+    jc_rs_utils::convert_size_to_int(s, false)
 }
 
 fn parse_size_to_float(s: &str) -> Option<f64> {
-    let s = s.replace(',', "");
-    let s = s.trim();
-    if s.is_empty() {
+    let cleaned = s.replace(',', "");
+    let cleaned = cleaned.trim();
+    if cleaned.is_empty() {
         return None;
     }
-    let (num, mult) = if let Some(n) = s.strip_suffix('K') {
-        (n, 1024.0f64)
-    } else if let Some(n) = s.strip_suffix('M') {
-        (n, 1024.0 * 1024.0)
-    } else if let Some(n) = s.strip_suffix('G') {
-        (n, 1024.0 * 1024.0 * 1024.0)
-    } else if let Some(n) = s.strip_suffix('T') {
-        (n, 1024.0 * 1024.0 * 1024.0 * 1024.0)
-    } else {
-        (s, 1.0)
-    };
-    num.parse::<f64>().ok().map(|f| f * mult)
+    if cleaned.ends_with(['K', 'M', 'G', 'T']) {
+        return jc_rs_utils::convert_size_to_int(cleaned, false).map(|n| n as f64);
+    }
+    cleaned.parse::<f64>().ok()
 }
 
 fn compute_epoch(date: &str, time: &str) -> Option<i64> {
@@ -506,6 +483,10 @@ impl Parser for RsyncParser {
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
+                continue;
+            }
+            if crate::network::rsync_s::apply_stat_ex(line, &mut summary_partial) {
+                current_summary = summary_partial.clone();
                 continue;
             }
             if let Some(caps) = stat3_log_v_re.captures(line) {

@@ -170,9 +170,25 @@ impl Parser for IptablesParser {
             if chain.is_some() && !headers.is_empty() {
                 let mut rule_line = line.to_string();
 
-                // Handle blank target: if first header is "target" and line starts with space
+                // A blank "target" column collapses under whitespace splitting
+                // and shifts every later field left. jc stuffs an invisible
+                // separator into the gap; the verbose (`-v`) layout needs the
+                // same treatment, detected by the `opt` column landing where
+                // `prot` should be.
                 if !headers.is_empty() && headers[0] == "target" && line.starts_with(' ') {
                     rule_line = format!("\u{2063}{}", line);
+                } else if headers.first().is_some_and(|h| *h == "pkts") {
+                    let fields: Vec<&str> = line.split_whitespace().collect();
+                    if fields
+                        .get(3)
+                        .is_some_and(|f| matches!(*f, "--" | "-f" | "!f"))
+                    {
+                        rule_line = format!(
+                            "{} \u{2063} {}",
+                            fields[..2].join(" "),
+                            fields[2..].join(" ")
+                        );
+                    }
                 }
 
                 // Python-style split with maxsplit: split on whitespace, collapsing consecutive

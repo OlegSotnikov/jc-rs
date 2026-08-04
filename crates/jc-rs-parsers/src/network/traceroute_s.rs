@@ -29,207 +29,178 @@ static TRACEROUTE_STREAM_PARSER: TracerouteStreamParser = TracerouteStreamParser
 inventory::submit! { ParserEntry::new(&TRACEROUTE_STREAM_PARSER) }
 
 // Re-use the get_probes logic from traceroute
+static RE_PROBE_ASN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\[AS(\d+)\]").expect("valid asn pattern"));
+
+static RE_PROBE_NAME_IP: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\S+)\s+\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[0-9a-fA-F:]+)\)+")
+        .expect("valid name/ip pattern")
+});
+
+static RE_PROBE_IP_ONLY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+([^(])").expect("valid ip pattern")
+});
+
+static RE_PROBE_BSD_IPV6: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b").expect("valid bsd ipv6 pattern")
+});
+
+/// Compressed IPv6, which the BSD pattern above cannot match because it insists
+/// on all eight groups. Without it every `2605:9000:402:6a01::1` probe came out
+/// with a null ip.
+static RE_PROBE_IPV6_ONLY: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(([a-f0-9]*:)+[a-f0-9]+)").expect("valid ipv6 pattern"));
+
+static RE_PROBE_RTT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?:(\d+(?:\.?\d+)?)\s+ms|(\s+\*\s+))\s*(!\S*)?").expect("valid rtt pattern")
+});
+
+/// One probe under construction. Cloned wholesale when a hop reports several
+/// round-trip times for the same host -- jc deep-copies the previous probe and
+/// swaps in the new time, which is what carries the ASN and name across.
+#[derive(Clone, Default)]
+struct Probe {
+    annotation: Option<String>,
+    asn: Option<i64>,
+    ip: Option<String>,
+    name: Option<String>,
+    rtt: Option<f64>,
+}
+
+impl Probe {
+    fn is_empty(&self) -> bool {
+        self.annotation.is_none()
+            && self.asn.is_none()
+            && self.ip.is_none()
+            && self.name.is_none()
+            && self.rtt.is_none()
+    }
+
+    fn into_record(self) -> Map<String, Value> {
+        let mut obj = Map::with_capacity(5);
+        obj.insert(
+            "annotation".to_string(),
+            self.annotation.map_or(Value::Null, Value::String),
+        );
+        obj.insert(
+            "asn".to_string(),
+            self.asn.map_or(Value::Null, |n| Value::Number(n.into())),
+        );
+        obj.insert("ip".to_string(), self.ip.map_or(Value::Null, Value::String));
+        obj.insert(
+            "name".to_string(),
+            self.name.map_or(Value::Null, Value::String),
+        );
+        obj.insert(
+            "rtt".to_string(),
+            self.rtt
+                .and_then(serde_json::Number::from_f64)
+                .map_or(Value::Null, Value::Number),
+        );
+        obj
+    }
+}
+
+/// Every token in a hop line, in the order it appears.
+struct Token {
+    start: usize,
+    kind: TokenKind,
+    first: String,
+    second: Option<String>,
+    annotation: Option<String>,
+}
+
+#[derive(PartialEq)]
+enum TokenKind {
+    Asn,
+    NameIp,
+    IpOnly,
+    Ipv6,
+    Rtt,
+}
+
 fn get_probes(hop_string: &str) -> Vec<Map<String, Value>> {
-    let re_asn = Regex::new(r"\[AS(\d+)\]").unwrap();
-    let re_name_ip =
-        Regex::new(r"(\S+)\s+\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[0-9a-fA-F:]+)\)").unwrap();
-    let re_ip_only = Regex::new(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+[^(]").unwrap();
-    let re_ipv6 = Regex::new(r"\b(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}\b").unwrap();
-    let re_rtt = Regex::new(r"(?:(\d+(?:[.]\d+)?)\s+ms|(\s+[*]\s+))\s*(![\S]*)?\s*").unwrap();
+    let mut tokens: Vec<Token> = Vec::new();
 
-    struct MatchItem {
-        start: usize,
-        match_type: &'static str,
-        value: String,
-        value2: Option<String>,
-        value3: Option<String>,
+    let mut push = |kind: TokenKind, start: usize, first: String, second: Option<String>| {
+        tokens.push(Token {
+            start,
+            kind,
+            first,
+            second,
+            annotation: None,
+        });
+    };
+
+    for cap in RE_PROBE_ASN.captures_iter(hop_string) {
+        let m = cap.get(0).expect("group 0 always matches");
+        push(TokenKind::Asn, m.start(), cap[1].to_string(), None);
     }
-
-    let mut matches: Vec<MatchItem> = Vec::new();
-
-    for cap in re_asn.captures_iter(hop_string) {
-        let m = cap.get(0).unwrap();
-        matches.push(MatchItem {
+    for cap in RE_PROBE_NAME_IP.captures_iter(hop_string) {
+        let m = cap.get(0).expect("group 0 always matches");
+        push(
+            TokenKind::NameIp,
+            m.start(),
+            cap[1].to_string(),
+            Some(cap[2].to_string()),
+        );
+    }
+    for cap in RE_PROBE_IP_ONLY.captures_iter(hop_string) {
+        let m = cap.get(0).expect("group 0 always matches");
+        push(TokenKind::IpOnly, m.start(), cap[1].to_string(), None);
+    }
+    for m in RE_PROBE_BSD_IPV6.find_iter(hop_string) {
+        push(TokenKind::Ipv6, m.start(), m.as_str().to_string(), None);
+    }
+    for cap in RE_PROBE_IPV6_ONLY.captures_iter(hop_string) {
+        let m = cap.get(0).expect("group 0 always matches");
+        push(TokenKind::Ipv6, m.start(), cap[1].to_string(), None);
+    }
+    for cap in RE_PROBE_RTT.captures_iter(hop_string) {
+        let m = cap.get(0).expect("group 0 always matches");
+        tokens.push(Token {
             start: m.start(),
-            match_type: "ASN",
-            value: cap.get(1).map_or("", |m| m.as_str()).to_string(),
-            value2: None,
-            value3: None,
-        });
-    }
-    for cap in re_name_ip.captures_iter(hop_string) {
-        let m = cap.get(0).unwrap();
-        matches.push(MatchItem {
-            start: m.start(),
-            match_type: "NAME_IP",
-            value: cap.get(1).map_or("", |m| m.as_str()).to_string(),
-            value2: Some(cap.get(2).map_or("", |m| m.as_str()).to_string()),
-            value3: None,
-        });
-    }
-    for cap in re_ip_only.captures_iter(hop_string) {
-        let m = cap.get(0).unwrap();
-        let ip_pos = m.start();
-        let already_covered = matches.iter().any(|x| {
-            x.match_type == "NAME_IP" && {
-                let d = x.start as isize - ip_pos as isize;
-                d.abs() < 50
-            }
-        });
-        if !already_covered {
-            matches.push(MatchItem {
-                start: ip_pos,
-                match_type: "IP_ONLY",
-                value: cap.get(1).map_or("", |m| m.as_str()).to_string(),
-                value2: None,
-                value3: None,
-            });
-        }
-    }
-    for cap in re_ipv6.captures_iter(hop_string) {
-        let m = cap.get(0).unwrap();
-        matches.push(MatchItem {
-            start: m.start(),
-            match_type: "IP_IPV6",
-            value: m.as_str().to_string(),
-            value2: None,
-            value3: None,
-        });
-    }
-    for cap in re_rtt.captures_iter(hop_string) {
-        let m = cap.get(0).unwrap();
-        matches.push(MatchItem {
-            start: m.start(),
-            match_type: "RTT",
-            value: cap.get(1).map_or("", |m| m.as_str()).to_string(),
-            value2: cap.get(2).map(|m| m.as_str().to_string()),
-            value3: cap.get(3).map(|m| m.as_str().to_string()),
+            kind: TokenKind::Rtt,
+            first: cap.get(1).map_or(String::new(), |g| g.as_str().to_string()),
+            second: cap.get(2).map(|g| g.as_str().to_string()),
+            annotation: cap.get(3).map(|g| g.as_str().to_string()),
         });
     }
 
-    matches.sort_by_key(|m| m.start);
-
-    struct ProbeState {
-        annotation: Option<String>,
-        asn: Option<i64>,
-        ip: Option<String>,
-        name: Option<String>,
-        rtt: Option<f64>,
-    }
+    tokens.sort_by_key(|t| t.start);
 
     let mut probes: Vec<Map<String, Value>> = Vec::new();
-    let mut probe = ProbeState {
-        annotation: None,
-        asn: None,
-        ip: None,
-        name: None,
-        rtt: None,
-    };
+    let mut probe = Probe::default();
+    let mut last_probe = Probe::default();
     let mut last_was_rtt = false;
-    let mut last_ip: Option<String> = None;
-    let mut last_name: Option<String> = None;
 
-    for item in &matches {
-        match item.match_type {
-            "ASN" => {
-                probe.asn = item.value.parse::<i64>().ok();
-                last_was_rtt = false;
+    for token in tokens {
+        match token.kind {
+            TokenKind::Asn => probe.asn = token.first.parse().ok(),
+            TokenKind::NameIp => {
+                probe.name = Some(token.first);
+                probe.ip = token.second;
             }
-            "NAME_IP" => {
-                probe.name = Some(item.value.clone());
-                probe.ip = item.value2.clone();
-                last_was_rtt = false;
-            }
-            "IP_ONLY" => {
-                probe.ip = Some(item.value.clone());
-                last_was_rtt = false;
-            }
-            "IP_IPV6" => {
-                probe.ip = Some(item.value.clone());
-                last_was_rtt = false;
-            }
-            "RTT" => {
-                let rtt = if !item.value.is_empty() {
-                    item.value.parse::<f64>().ok()
-                } else {
-                    None
-                };
+            TokenKind::IpOnly | TokenKind::Ipv6 => probe.ip = Some(token.first),
+            TokenKind::Rtt => {
+                let rtt = (!token.first.is_empty())
+                    .then(|| token.first.parse::<f64>().ok())
+                    .flatten();
 
+                // A second time for the same host repeats the whole probe.
                 if last_was_rtt {
-                    if probe.ip.is_none() {
-                        probe.ip = last_ip.clone();
-                        probe.name = last_name.clone();
-                    }
+                    probe = last_probe.clone();
                 }
-
                 probe.rtt = rtt;
-                probe.annotation = item.value3.as_ref().filter(|s| !s.is_empty()).cloned();
+                probe.annotation = token.annotation.filter(|a| !a.is_empty());
 
-                last_ip = probe.ip.clone();
-                last_name = probe.name.clone();
-
-                let has_data = probe.ip.is_some()
-                    || probe.asn.is_some()
-                    || probe.annotation.is_some()
-                    || probe.rtt.is_some()
-                    || probe.name.is_some();
-
-                if has_data {
-                    let mut obj = Map::new();
-                    obj.insert(
-                        "annotation".to_string(),
-                        probe
-                            .annotation
-                            .as_ref()
-                            .map(|s| Value::String(s.clone()))
-                            .unwrap_or(Value::Null),
-                    );
-                    obj.insert(
-                        "asn".to_string(),
-                        probe
-                            .asn
-                            .map(|n| Value::Number(n.into()))
-                            .unwrap_or(Value::Null),
-                    );
-                    obj.insert(
-                        "ip".to_string(),
-                        probe
-                            .ip
-                            .as_ref()
-                            .map(|s| Value::String(s.clone()))
-                            .unwrap_or(Value::Null),
-                    );
-                    obj.insert(
-                        "name".to_string(),
-                        probe
-                            .name
-                            .as_ref()
-                            .map(|s| Value::String(s.clone()))
-                            .unwrap_or(Value::Null),
-                    );
-                    obj.insert(
-                        "rtt".to_string(),
-                        probe
-                            .rtt
-                            .and_then(|f| serde_json::Number::from_f64(f))
-                            .map(Value::Number)
-                            .unwrap_or(Value::Null),
-                    );
-                    probes.push(obj);
+                if !probe.is_empty() {
+                    probes.push(probe.clone().into_record());
                 }
-
-                probe = ProbeState {
-                    annotation: None,
-                    asn: None,
-                    ip: None,
-                    name: None,
-                    rtt: None,
-                };
-                last_was_rtt = true;
-                continue;
+                last_probe = std::mem::take(&mut probe);
             }
-            _ => {}
         }
+        last_was_rtt = matches!(token.kind, TokenKind::Rtt);
     }
 
     probes

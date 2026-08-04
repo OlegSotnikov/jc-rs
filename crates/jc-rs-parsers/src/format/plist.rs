@@ -64,14 +64,13 @@ fn plist_val_to_json_inner(val: plist::Value) -> JsonValOrDatetime {
             JsonValOrDatetime::Json(serde_json::Value::String(bytes_to_hex(&bytes)))
         }
         plist::Value::Date(dt) => {
-            // plist::Date represents seconds since 2001-01-01 (Apple epoch)
-            // Convert to Unix timestamp
-            use std::time::UNIX_EPOCH;
-            let system_time: std::time::SystemTime = dt.into();
-            let ts = system_time
-                .duration_since(UNIX_EPOCH)
-                .map(|d| d.as_secs() as i64)
-                .unwrap_or(0);
+            // A plist date is written as UTC, but Python's plistlib hands jc a
+            // *naive* datetime and `.timestamp()` then reads it in the local
+            // zone. So jc's number is the wall clock as written, read as local
+            // -- not the instant the file names. Reproducing that is the whole
+            // point; computing the true epoch here left every date out by the
+            // machine's offset.
+            let ts = plist_date_epoch(dt);
 
             // Format ISO string without timezone for naive times, with tz for aware
             let iso = format_plist_date_iso(dt);
@@ -110,6 +109,26 @@ fn plist_val_to_json_inner(val: plist::Value) -> JsonValOrDatetime {
 }
 
 /// Format a plist::Date as an ISO string.
+/// The wall clock a plist date is written with, read in the local zone.
+fn plist_date_epoch(dt: plist::Date) -> i64 {
+    use chrono::{TimeZone, Utc};
+    use std::time::UNIX_EPOCH;
+
+    let system_time: std::time::SystemTime = dt.into();
+    let Ok(since_epoch) = system_time.duration_since(UNIX_EPOCH) else {
+        return 0;
+    };
+    let Some(utc) = Utc.timestamp_opt(since_epoch.as_secs() as i64, 0).single() else {
+        return 0;
+    };
+    jc_rs_utils::parse_timestamp(
+        &utc.format("%Y-%m-%d %H:%M:%S").to_string(),
+        &[jc_rs_utils::timestamp::formats::F7250],
+    )
+    .naive_epoch
+    .unwrap_or(0)
+}
+
 fn format_plist_date_iso(dt: plist::Date) -> String {
     use std::time::UNIX_EPOCH;
     let system_time: std::time::SystemTime = dt.into();
@@ -167,6 +186,14 @@ impl Parser for PlistParser {
     fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
         if input.trim().is_empty() {
             return Err(ParseError::InvalidInput("empty input".to_string()));
+        }
+
+        // The `plist` crate parses old-style plists but coerces bare tokens to
+        // numbers, and that format has no numbers -- `0700` is a string, and jc
+        // (via pbPlist) reports it as one. Check for the format before handing
+        // the input over.
+        if super::openstep::looks_like_openstep(input) {
+            return super::openstep::parse(input).map(ParseOutput::Object);
         }
 
         let bytes = input.as_bytes();

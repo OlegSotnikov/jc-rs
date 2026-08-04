@@ -12,9 +12,6 @@
 #   * never edit a fixture to make one of these pass; `make check-fixtures`
 #     will catch it and it is the exact mistake that produces a fake 100%
 #
-# Progress: this file should only ever get shorter. It is the M3 worklist.
-
-network::iw_scan::tests::test_iw_scan_centos_golden
-network::route::tests::test_route_centos_6n_golden
-network::route_print::tests::test_route_print_win10_golden
-network::route_print::tests::test_route_print_win2016_golden
+# Progress: this file should only ever get shorter. It is empty as of
+# 2026-08-04 -- the whole corpus matches jc. Keep it that way: a new entry
+# here is a regression that someone chose not to fix.
