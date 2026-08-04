@@ -14,15 +14,7 @@
 #
 # Progress: this file should only ever get shorter. It is the M3 worklist.
 
-disk::mdadm::tests::test_mdadm_examine_raid1_ok
-disk::mdadm::tests::test_mdadm_query_raid1_ok
 disk::tune2fs::tests::test_tune2fs
-log::git_log::tests::test_git_log_blank_author_fix
-log::git_log::tests::test_git_log_default
-log::git_log::tests::test_git_log_hash_in_message
-log::git_log::tests::test_git_log_is_hash_regex
-log::git_log::tests::test_git_log_medium
-log::git_log_s::tests::test_git_log_s_golden
 network::ethtool::tests::test_ethtool_module_info_golden
 network::iw_scan::tests::test_iw_scan_centos_golden
 network::route::tests::test_route_centos_6n_golden

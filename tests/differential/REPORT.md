@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 808 |
-| Mismatch | 102 |
+| Match | 863 |
+| Mismatch | 47 |
 | Error | 24 |
-| **Match rate** | **86.51%** |
+| **Match rate** | **92.4%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -29,14 +29,11 @@ Everything else is listed below rather than dropped.
 | `dig` | 24 | 23 | 1 | 0 |
 | `env` | 4 | 3 | 1 | 0 |
 | `ethtool` | 5 | 3 | 2 | 0 |
-| `git_log` | 19 | 9 | 10 | 0 |
-| `git_log_s` | 19 | 9 | 10 | 0 |
 | `git_ls_remote` | 2 | 1 | 1 | 0 |
 | `iptables` | 12 | 11 | 1 | 0 |
 | `iwconfig` | 4 | 3 | 1 | 0 |
 | `lsattr` | 4 | 3 | 1 | 0 |
 | `m3u` | 2 | 1 | 1 | 0 |
-| `mdadm` | 40 | 7 | 33 | 0 |
 | `openvpn` | 1 | 0 | 1 | 0 |
 | `ping_s` | 36 | 32 | 4 | 0 |
 | `pkg_index_apk` | 2 | 1 | 1 | 0 |
@@ -45,8 +42,7 @@ Everything else is listed below rather than dropped.
 | `route` | 7 | 5 | 2 | 0 |
 | `rsync` | 13 | 12 | 1 | 0 |
 | `rsync_s` | 13 | 6 | 7 | 0 |
-| `stat` | 6 | 5 | 1 | 0 |
-| `stat_s` | 5 | 3 | 2 | 0 |
+| `stat_s` | 5 | 4 | 1 | 0 |
 | `timedatectl` | 4 | 1 | 3 | 0 |
 | `tracepath` | 1 | 0 | 1 | 0 |
 | `traceroute_s` | 11 | 9 | 2 | 0 |
@@ -87,63 +83,10 @@ Everything else is listed below rather than dropped.
 | `env` | generic/env-multiline-raw | mismatch | 1 diffs: 1× type_mismatch |
 | `ethtool` | generic/ethtool--module-info-convert-units | mismatch | 10 diffs: 5× extra_key, 5× missing_key |
 | `ethtool` | generic/ethtool--module-info | mismatch | 10 diffs: 5× extra_key, 5× missing_key |
-| `git_log_s` | generic/git-log-blank-author-fix-streaming | mismatch | 3 diffs: 3× value_mismatch |
-| `git_log` | generic/git-log-blank-author-fix | mismatch | 3 diffs: 3× value_mismatch |
-| `git_log_s` | generic/git-log-fuller-shortstat-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-fuller-shortstat | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-fuller-stat-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-fuller-stat | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-fuller-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-fuller | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-hash-in-message-fix-streaming | mismatch | 1 diffs: 1× value_mismatch |
-| `git_log` | generic/git-log-hash-in-message-fix | mismatch | 1 diffs: 1× value_mismatch |
-| `git_log_s` | generic/git-log-is-hash-regex-fix-streaming | mismatch | 3 diffs: 3× value_mismatch |
-| `git_log` | generic/git-log-is-hash-regex-fix | mismatch | 3 diffs: 3× value_mismatch |
-| `git_log_s` | generic/git-log-medium-shortstat-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-medium-shortstat | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-medium-stat-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-medium-stat | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-medium-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log-medium | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log_s` | generic/git-log-streaming | mismatch | 81 diffs: 81× value_mismatch |
-| `git_log` | generic/git-log | mismatch | 81 diffs: 81× value_mismatch |
 | `git_ls_remote` | generic/git-ls-remote-raw | mismatch | 1 diffs: 1× type_mismatch |
 | `iptables` | generic/iptables-no-jump2 | mismatch | 5 diffs: 1× missing_key, 2× type_mismatch, 2× value_mismatch |
 | `iwconfig` | generic/iwconfig-raw | mismatch | 14 diffs: 14× type_mismatch |
 | `m3u` | generic/m3u-dirty | mismatch | 12 diffs: 12× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid0-offline | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid0-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-0-90-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-checking | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-failfast | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-faulty1 | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-faulty2 | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-moreflags | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-replacing | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-resync | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-spare | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid1-syncing | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid5-homehost | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid5-meta09 | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine-raid5-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-examine | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-detail | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid0-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-failed-and-flags | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-faulty-and-removed | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-faulty-with-spare | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-faulty | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-ok-0-9 | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-ok-failfast | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-ok-spare | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-ok | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-rebuild-failfast | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-spare-writem-rebuild | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid1-syncing | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid5-homehost | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid5-meta09 | mismatch | 2 diffs: 2× value_mismatch |
-| `mdadm` | generic/mdadm-query-raid5-ok | mismatch | 2 diffs: 2× value_mismatch |
 | `openvpn` | generic/openvpn-status | mismatch | 23 diffs: 23× value_mismatch |
 | `pkg_index_apk` | generic/pkg-index-apk-raw | mismatch | 56 diffs: 28× missing_key, 28× extra_key |
 | `plist` | generic/plist-alltypes | mismatch | 1 diffs: 1× value_mismatch |
@@ -198,8 +141,6 @@ For details use the  |
 | `ping_s` | osx-10.14.6/ping-ip-unreachable-streaming | mismatch | 54 diffs: 6× missing_key, 36× extra_key, 12× value_mismatch |
 | `rsync_s` | osx-10.14.6/rsync-i-vvv-logfile-nochange-streaming | mismatch | 106 diffs: 1× array_length, 39× missing_key, 31× extra_key, 35× value_mismatch |
 | `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |
-| `stat_s` | ubuntu-18.04/stat-streaming | mismatch | 510 diffs: 510× value_mismatch |
-| `stat` | ubuntu-18.04/stat | mismatch | 510 diffs: 510× value_mismatch |
 | `timedatectl` | ubuntu-18.04/timedatectl | mismatch | 1 diffs: 1× value_mismatch |
 | `ufw` | ubuntu-18.04/ufw-numbered | mismatch | 21 diffs: 17× missing_key, 4× type_mismatch |
 | `ufw` | ubuntu-18.04/ufw-verbose | mismatch | 21 diffs: 17× missing_key, 4× type_mismatch |
