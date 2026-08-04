@@ -77,17 +77,23 @@ jobs:
                     | jq -r '.packages[] | select(.name=="jc-rs") | .version')
           echo "publishing version $version"
           for crate in jc-rs-core jc-rs-utils jc-rs-parsers jc-rs; do
-            if cargo publish -p "$crate"; then
-              echo "published $crate"
-            elif cargo search "$crate" --limit 1 | grep -q "^$crate = \"$version\""; then
-              # Re-running a release must not fail because one crate is already
-              # up at this version. This is also what makes a dispatch run a
-              # safe end-to-end test of the credentials: every crate is already
-              # at 0.0.0, so nothing is uploaded and the OIDC path still gets
-              # exercised for real.
-              echo "$crate is already published at $version — continuing"
+            # Ask the registry directly instead of publishing and interpreting
+            # the failure. Re-running a release must not break because one
+            # crate is already up, and this is also what makes a manual
+            # dispatch a safe end-to-end test of the credentials: nothing is
+            # uploaded, the OIDC exchange still happens for real.
+            #
+            # An earlier version parsed `cargo search` output. It could never
+            # match: CARGO_TERM_COLOR=always above wraps the crate name in ANSI
+            # escapes, so the anchored pattern silently failed and every re-run
+            # died on the first crate.
+            if curl -sf -A "jc-rs release (github actions)" \
+                 "https://crates.io/api/v1/crates/$crate/$version" \
+                 | jq -e '.version.num' > /dev/null 2>&1; then
+              echo "$crate $version is already on crates.io — skipping"
             else
-              echo "publishing $crate failed"; exit 1
+              cargo publish -p "$crate"
+              echo "published $crate $version"
             fi
           done
 
