@@ -95,7 +95,7 @@ jobs:
       - name: run the full corpus
         # Ratchet: the floor is the current rate. Raise it in the same commit
         # that improves it. Never lower it.
-        run: python3 tests/differential/validate.py --fail-under 86.0
+        run: python3 tests/differential/validate.py --fail-under 97.7
       - name: publish the report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
