@@ -2,13 +2,13 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 863,
-  "mismatch": 47,
-  "error": 24,
-  "oracle_reject": 9
+  "match": 879,
+  "mismatch": 46,
+  "oracle_reject": 9,
+  "error": 9
  },
  "tested": 934,
- "match_rate": 92.4,
+ "match_rate": 94.11,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -78,16 +78,15 @@
   },
   "csv_ih": {
    "total": 2,
-   "error": 2
+   "match": 2
   },
   "csv_ih_s": {
    "total": 2,
-   "error": 2
+   "match": 2
   },
   "csv_s": {
    "total": 11,
-   "match": 10,
-   "mismatch": 1
+   "match": 11
   },
   "curl_head": {
    "total": 6,
@@ -725,19 +724,19 @@
   },
   "tsv": {
    "total": 1,
-   "error": 1
+   "match": 1
   },
   "tsv_ih": {
    "total": 2,
-   "error": 2
+   "match": 2
   },
   "tsv_ih_s": {
    "total": 2,
-   "error": 2
+   "match": 2
   },
   "tsv_s": {
    "total": 1,
-   "error": 1
+   "match": 1
   },
   "tune2fs": {
    "total": 1,
@@ -745,7 +744,7 @@
   },
   "typeset": {
    "total": 5,
-   "error": 5
+   "match": 5
   },
   "udevadm": {
    "total": 1,
@@ -1222,52 +1221,6 @@
      "actual": "1686533730"
     }
    ]
-  },
-  {
-   "platform": "generic",
-   "base": "csv-doublequoted-streaming",
-   "parser": "csv_s",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "value_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$[1].B",
-     "kind": "value_mismatch",
-     "expected": "'this is a field with \" in it\"'",
-     "actual": "'this is a field with \" in it'"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "csv_ih-homes-streaming",
-   "parser": "csv_ih_s",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "csv_ih-homes",
-   "parser": "csv_ih",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "csv_ih-jagged-streaming",
-   "parser": "csv_ih_s",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "csv_ih-jagged",
-   "parser": "csv_ih",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --csv-ih. Use \"jc-rs -h\" for help."
   },
   {
    "platform": "generic",
@@ -1819,48 +1772,6 @@
   },
   {
    "platform": "generic",
-   "base": "tsv-dpkg-query-streaming",
-   "parser": "tsv_s",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-s. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "tsv-dpkg-query",
-   "parser": "tsv",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "tsv_ih-dpkg-query-streaming",
-   "parser": "tsv_ih_s",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "tsv_ih-dpkg-query",
-   "parser": "tsv_ih",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "tsv_ih-simple-double-quote-streaming",
-   "parser": "tsv_ih_s",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "tsv_ih-simple-double-quote",
-   "parser": "tsv_ih",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
    "base": "tune2fs-l",
    "parser": "tune2fs",
    "status": "mismatch",
@@ -1894,41 +1805,6 @@
      "actual": "1663600580"
     }
    ]
-  },
-  {
-   "platform": "generic",
-   "base": "typeset--a",
-   "parser": "typeset",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "typeset--capital-a",
-   "parser": "typeset",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "typeset--p",
-   "parser": "typeset",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "typeset--plain",
-   "parser": "typeset",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
-  },
-  {
-   "platform": "generic",
-   "base": "typeset--r",
-   "parser": "typeset",
-   "status": "error",
-   "detail": "exit 100: jc-rs: error - Unknown parser: --typeset. Use \"jc-rs -h\" for help."
   },
   {
    "platform": "generic",

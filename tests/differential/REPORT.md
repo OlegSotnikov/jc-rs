@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 863 |
-| Mismatch | 47 |
-| Error | 24 |
-| **Match rate** | **92.4%** |
+| Match | 879 |
+| Mismatch | 46 |
+| Error | 9 |
+| **Match rate** | **94.11%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -22,9 +22,6 @@ Everything else is listed below rather than dropped.
 |---|---|---|---|---|
 | `cbt` | 4 | 3 | 1 | 0 |
 | `certbot` | 3 | 1 | 2 | 0 |
-| `csv_ih` | 2 | 0 | 0 | 2 |
-| `csv_ih_s` | 2 | 0 | 0 | 2 |
-| `csv_s` | 11 | 10 | 1 | 0 |
 | `date` | 4 | 2 | 2 | 0 |
 | `dig` | 24 | 23 | 1 | 0 |
 | `env` | 4 | 3 | 1 | 0 |
@@ -46,12 +43,7 @@ Everything else is listed below rather than dropped.
 | `timedatectl` | 4 | 1 | 3 | 0 |
 | `tracepath` | 1 | 0 | 1 | 0 |
 | `traceroute_s` | 11 | 9 | 2 | 0 |
-| `tsv` | 1 | 0 | 0 | 1 |
-| `tsv_ih` | 2 | 0 | 0 | 2 |
-| `tsv_ih_s` | 2 | 0 | 0 | 2 |
-| `tsv_s` | 1 | 0 | 0 | 1 |
 | `tune2fs` | 1 | 0 | 1 | 0 |
-| `typeset` | 5 | 0 | 0 | 5 |
 | `ufw` | 6 | 1 | 5 | 0 |
 | `xml` | 4 | 3 | 1 | 0 |
 
@@ -72,11 +64,6 @@ Everything else is listed below rather than dropped.
 | `cbt` | generic/cbt-multiple-rows-raw | mismatch | 2 diffs: 2× type_mismatch |
 | `certbot` | generic/certbot-certs-cert-name | mismatch | 1 diffs: 1× missing_key |
 | `certbot` | generic/certbot-certs | mismatch | 2 diffs: 2× value_mismatch |
-| `csv_s` | generic/csv-doublequoted-streaming | mismatch | 1 diffs: 1× value_mismatch |
-| `csv_ih_s` | generic/csv_ih-homes-streaming | error | exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use "jc-rs -h" for help. |
-| `csv_ih` | generic/csv_ih-homes | error | exit 100: jc-rs: error - Unknown parser: --csv-ih. Use "jc-rs -h" for help. |
-| `csv_ih_s` | generic/csv_ih-jagged-streaming | error | exit 100: jc-rs: error - Unknown parser: --csv-ih-s. Use "jc-rs -h" for help. |
-| `csv_ih` | generic/csv_ih-jagged | error | exit 100: jc-rs: error - Unknown parser: --csv-ih. Use "jc-rs -h" for help. |
 | `date` | generic/date-after-midnight | mismatch | 1 diffs: 1× value_mismatch |
 | `date` | generic/date-before-midnight | mismatch | 1 diffs: 1× value_mismatch |
 | `dig` | generic/dig-answer-spaces | mismatch | 1 diffs: 1× value_mismatch |
@@ -95,18 +82,7 @@ Everything else is listed below rather than dropped.
 | `rsync` | generic/rsync-i-stats | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
 | `timedatectl` | generic/timedatectl-rtc-local | mismatch | 1 diffs: 1× value_mismatch |
 | `traceroute_s` | generic/traceroute-n-ipv6-streaming | mismatch | 36 diffs: 36× type_mismatch |
-| `tsv_s` | generic/tsv-dpkg-query-streaming | error | exit 100: jc-rs: error - Unknown parser: --tsv-s. Use "jc-rs -h" for help. |
-| `tsv` | generic/tsv-dpkg-query | error | exit 100: jc-rs: error - Unknown parser: --tsv. Use "jc-rs -h" for help. |
-| `tsv_ih_s` | generic/tsv_ih-dpkg-query-streaming | error | exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use "jc-rs -h" for help. |
-| `tsv_ih` | generic/tsv_ih-dpkg-query | error | exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use "jc-rs -h" for help. |
-| `tsv_ih_s` | generic/tsv_ih-simple-double-quote-streaming | error | exit 100: jc-rs: error - Unknown parser: --tsv-ih-s. Use "jc-rs -h" for help. |
-| `tsv_ih` | generic/tsv_ih-simple-double-quote | error | exit 100: jc-rs: error - Unknown parser: --tsv-ih. Use "jc-rs -h" for help. |
 | `tune2fs` | generic/tune2fs-l | mismatch | 4 diffs: 4× value_mismatch |
-| `typeset` | generic/typeset--a | error | exit 100: jc-rs: error - Unknown parser: --typeset. Use "jc-rs -h" for help. |
-| `typeset` | generic/typeset--capital-a | error | exit 100: jc-rs: error - Unknown parser: --typeset. Use "jc-rs -h" for help. |
-| `typeset` | generic/typeset--p | error | exit 100: jc-rs: error - Unknown parser: --typeset. Use "jc-rs -h" for help. |
-| `typeset` | generic/typeset--plain | error | exit 100: jc-rs: error - Unknown parser: --typeset. Use "jc-rs -h" for help. |
-| `typeset` | generic/typeset--r | error | exit 100: jc-rs: error - Unknown parser: --typeset. Use "jc-rs -h" for help. |
 | `ufw` | generic/ufw-numbered | mismatch | 22 diffs: 17× missing_key, 5× type_mismatch |
 | `ufw` | generic/ufw-numbered2 | mismatch | 15 diffs: 15× missing_key |
 | `ufw` | generic/ufw | mismatch | 18 diffs: 16× missing_key, 2× type_mismatch |
