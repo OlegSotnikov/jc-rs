@@ -65,7 +65,6 @@ fn parse_kv_line(line: &str) -> Option<(String, String)> {
 struct ParsedIniDup {
     top_level: BTreeMap<String, Vec<String>>,
     sections: Vec<(String, BTreeMap<String, Vec<String>>)>,
-    section_index: BTreeMap<String, usize>,
 }
 
 fn parse_ini_dup_str(input: &str) -> Result<ParsedIniDup, ParseError> {
@@ -85,11 +84,13 @@ fn parse_ini_dup_str(input: &str) -> Result<ParsedIniDup, ParseError> {
             let section_name = trimmed[1..trimmed.len() - 1].trim().to_string();
             current_section = Some(section_name.clone());
 
-            if !section_index.contains_key(&section_name) {
-                let idx = sections.len();
-                sections.push((section_name.clone(), BTreeMap::new()));
-                section_index.insert(section_name, idx);
-            }
+            section_index
+                .entry(section_name.clone())
+                .or_insert_with(|| {
+                    let idx = sections.len();
+                    sections.push((section_name.clone(), BTreeMap::new()));
+                    idx
+                });
             continue;
         }
 
@@ -109,7 +110,6 @@ fn parse_ini_dup_str(input: &str) -> Result<ParsedIniDup, ParseError> {
     Ok(ParsedIniDup {
         top_level,
         sections,
-        section_index,
     })
 }
 

@@ -136,33 +136,33 @@ impl Parser for UfwAppinfoParser {
                 if item.is_none() {
                     item = Some(Map::new());
                 }
-                if let Some(ref mut obj) = item {
-                    if let Some(val) = line.splitn(2, ": ").nth(1) {
-                        obj.insert("profile".to_string(), Value::String(val.trim().to_string()));
-                    }
+                if let Some(ref mut obj) = item
+                    && let Some(val) = line.split_once(": ").map(|x| x.1)
+                {
+                    obj.insert("profile".to_string(), Value::String(val.trim().to_string()));
                 }
                 in_ports = false;
                 continue;
             }
 
             if line.starts_with("Title:") {
-                if let Some(ref mut obj) = item {
-                    if let Some(val) = line.splitn(2, ": ").nth(1) {
-                        obj.insert("title".to_string(), Value::String(val.trim().to_string()));
-                    }
+                if let Some(ref mut obj) = item
+                    && let Some(val) = line.split_once(": ").map(|x| x.1)
+                {
+                    obj.insert("title".to_string(), Value::String(val.trim().to_string()));
                 }
                 in_ports = false;
                 continue;
             }
 
             if line.starts_with("Description:") {
-                if let Some(ref mut obj) = item {
-                    if let Some(val) = line.splitn(2, ": ").nth(1) {
-                        obj.insert(
-                            "description".to_string(),
-                            Value::String(val.trim().to_string()),
-                        );
-                    }
+                if let Some(ref mut obj) = item
+                    && let Some(val) = line.split_once(": ").map(|x| x.1)
+                {
+                    obj.insert(
+                        "description".to_string(),
+                        Value::String(val.trim().to_string()),
+                    );
                 }
                 in_ports = false;
                 continue;
@@ -193,7 +193,7 @@ impl Parser for UfwAppinfoParser {
                                     obj.insert(
                                         "tcp_list".to_string(),
                                         Value::Array(
-                                            plist.into_iter().map(|s| Value::String(s)).collect(),
+                                            plist.into_iter().map(Value::String).collect(),
                                         ),
                                     );
                                 }
@@ -218,7 +218,7 @@ impl Parser for UfwAppinfoParser {
                                     obj.insert(
                                         "udp_list".to_string(),
                                         Value::Array(
-                                            plist.into_iter().map(|s| Value::String(s)).collect(),
+                                            plist.into_iter().map(Value::String).collect(),
                                         ),
                                     );
                                 }
@@ -359,19 +359,16 @@ impl Parser for UfwAppinfoParser {
                             .map(|r| {
                                 if let Value::Object(mut range_obj) = r {
                                     if let Some(Value::String(s)) = range_obj.get("start").cloned()
+                                        && let Ok(n) = s.parse::<i64>()
                                     {
-                                        if let Ok(n) = s.parse::<i64>() {
-                                            range_obj.insert(
-                                                "start".to_string(),
-                                                Value::Number(n.into()),
-                                            );
-                                        }
+                                        range_obj
+                                            .insert("start".to_string(), Value::Number(n.into()));
                                     }
-                                    if let Some(Value::String(s)) = range_obj.get("end").cloned() {
-                                        if let Ok(n) = s.parse::<i64>() {
-                                            range_obj
-                                                .insert("end".to_string(), Value::Number(n.into()));
-                                        }
+                                    if let Some(Value::String(s)) = range_obj.get("end").cloned()
+                                        && let Ok(n) = s.parse::<i64>()
+                                    {
+                                        range_obj
+                                            .insert("end".to_string(), Value::Number(n.into()));
                                     }
                                     Value::Object(range_obj)
                                 } else {

@@ -68,12 +68,12 @@ fn unwrap_url(s: &str) -> &str {
         s
     };
     // strip URL: prefix (case insensitive)
-    let s = if s.len() >= 4 && s[..4].eq_ignore_ascii_case("url:") {
+
+    (if s.len() >= 4 && s[..4].eq_ignore_ascii_case("url:") {
         &s[4..]
     } else {
         s
-    };
-    s
+    }) as _
 }
 
 fn build_url_map(parsed: &url::Url, original: &str) -> Map<String, Value> {

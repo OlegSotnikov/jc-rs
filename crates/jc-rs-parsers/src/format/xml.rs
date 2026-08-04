@@ -158,16 +158,18 @@ fn node_to_json(node: &XmlNode) -> serde_json::Value {
             children,
         } => {
             // Separate text children from element/comment children
-            let text_only = children.iter().all(|c| matches!(c, XmlNode::Text(_)));
+            let _text_only = children.iter().all(|c| matches!(c, XmlNode::Text(_)));
             let has_attrs = !attrs.is_empty();
             let has_element_children = children
                 .iter()
                 .any(|c| matches!(c, XmlNode::Element { .. } | XmlNode::Comment(_)));
 
-            if !has_attrs && !has_element_children && children.len() == 1 {
-                if let XmlNode::Text(t) = &children[0] {
-                    return serde_json::Value::String(t.clone());
-                }
+            if !has_attrs
+                && !has_element_children
+                && children.len() == 1
+                && let XmlNode::Text(t) = &children[0]
+            {
+                return serde_json::Value::String(t.clone());
             }
 
             if !has_attrs && children.is_empty() {
@@ -335,7 +337,7 @@ mod tests {
     #[test]
     fn test_xml_nmap_nocomment() {
         let input = load_fixture("xml-nmap.xml");
-        let expected = parse_json_obj(&load_fixture("xml-nmap-nocomment.json"));
+        let _expected = parse_json_obj(&load_fixture("xml-nmap-nocomment.json"));
         // We test the nmap without comment check since our parser preserves comments
         let parser = XmlParser;
         let result = parser.parse(&input, false).unwrap();

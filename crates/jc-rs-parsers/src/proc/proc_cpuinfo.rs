@@ -112,12 +112,12 @@ fn process_cpu_entry(raw: Map<String, Value>) -> Map<String, Value> {
         }
 
         // Try float if there's a dot
-        if str_val.contains('.') {
-            if let Ok(f) = str_val.parse::<f64>() {
-                let n = serde_json::Number::from_f64(f).unwrap_or_else(|| 0.into());
-                out.insert(key.clone(), Value::Number(n));
-                continue;
-            }
+        if str_val.contains('.')
+            && let Ok(f) = str_val.parse::<f64>()
+        {
+            let n = serde_json::Number::from_f64(f).unwrap_or_else(|| 0.into());
+            out.insert(key.clone(), Value::Number(n));
+            continue;
         }
 
         // Keep as string

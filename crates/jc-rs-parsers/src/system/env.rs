@@ -82,11 +82,11 @@ fn parse_env(input: &str) -> Vec<Map<String, Value>> {
             output.push(record);
         } else {
             // Continuation line: append to last value
-            if let Some(last) = output.last_mut() {
-                if let Some(Value::String(v)) = last.get_mut("value") {
-                    v.push('\n');
-                    v.push_str(line);
-                }
+            if let Some(last) = output.last_mut()
+                && let Some(Value::String(v)) = last.get_mut("value")
+            {
+                v.push('\n');
+                v.push_str(line);
             }
         }
     }

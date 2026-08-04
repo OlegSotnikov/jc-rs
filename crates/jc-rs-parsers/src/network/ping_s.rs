@@ -38,18 +38,14 @@ fn str_to_float(s: &str) -> Value {
     s.trim()
         .parse::<f64>()
         .ok()
-        .and_then(|f| serde_json::Number::from_f64(f))
+        .and_then(serde_json::Number::from_f64)
         .map(Value::Number)
         .unwrap_or(Value::Null)
 }
 
 fn contains_ipv6(line: &str) -> bool {
     // Check if line contains an IPv6 address
-    let normalized = line
-        .replace('(', " ")
-        .replace(')', " ")
-        .replace(',', " ")
-        .replace('%', " ");
+    let normalized = line.replace(['(', ')', ',', '%'], " ");
     let parts: Vec<String> = normalized
         .split_whitespace()
         .map(|s| s.to_string())
@@ -189,13 +185,11 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             l = format!("{}nohost{}", &line[..5], &line[5..]);
         } else if state.ipv4 {
             state.has_hostname = false;
-        } else if line.contains(" (") {
-            state.has_hostname = true;
         } else {
-            state.has_hostname = false;
+            state.has_hostname = line.contains(" (");
         }
 
-        let cleaned = l.replace('(', " ").replace(')', " ");
+        let cleaned = l.replace(['(', ')'], " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
 
         // Field positions after `(` and `)` become spaces. `ping -I <src>` adds
@@ -252,13 +246,12 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
         }
         if let Ok(re) =
             Regex::new(r"rtt min/avg/max/mdev\s*=\s*([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+)\s*ms")
+            && let Some(caps) = re.captures(line)
         {
-            if let Some(caps) = re.captures(line) {
-                state.round_trip_min = caps.get(1).and_then(|m| m.as_str().parse().ok());
-                state.round_trip_avg = caps.get(2).and_then(|m| m.as_str().parse().ok());
-                state.round_trip_max = caps.get(3).and_then(|m| m.as_str().parse().ok());
-                state.round_trip_stddev = caps.get(4).and_then(|m| m.as_str().parse().ok());
-            }
+            state.round_trip_min = caps.get(1).and_then(|m| m.as_str().parse().ok());
+            state.round_trip_avg = caps.get(2).and_then(|m| m.as_str().parse().ok());
+            state.round_trip_max = caps.get(3).and_then(|m| m.as_str().parse().ok());
+            state.round_trip_stddev = caps.get(4).and_then(|m| m.as_str().parse().ok());
         }
 
         // Return summary on each footer line (caller will use the last one)
@@ -305,7 +298,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             "packet_loss_percent".to_string(),
             state
                 .packet_loss_percent
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -344,7 +337,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             "round_trip_ms_min".to_string(),
             state
                 .round_trip_min
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -352,7 +345,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             "round_trip_ms_avg".to_string(),
             state
                 .round_trip_avg
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -360,7 +353,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             "round_trip_ms_max".to_string(),
             state
                 .round_trip_max
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -368,7 +361,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
             "round_trip_ms_stddev".to_string(),
             state
                 .round_trip_stddev
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null),
         );
@@ -477,7 +470,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
     if line.contains(" bytes from ") {
         let has_ts = line.starts_with('[');
         let offset = if has_ts { 1 } else { 0 };
-        let cleaned = line.replace('(', " ").replace(')', " ").replace('=', " ");
+        let cleaned = line.replace(['(', ')', '='], " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
 
         let (bts, rip, iseq, t2l, tms) = if state.ipv4 && !state.has_hostname {
@@ -581,7 +574,7 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
     }
 
     if line.starts_with("PING6(") {
-        let cleaned = line.replace('(', " ").replace(')', " ");
+        let cleaned = line.replace(['(', ')'], " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
         state.destination_ip = parts.get(6).map(|s| s.to_string());
         state.sent_bytes = parts.get(1).and_then(|s| s.parse::<i64>().ok());
@@ -597,7 +590,7 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
         if line.contains("packets transmitted") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             if line.contains(" duplicates,") {
-                state.packets_transmitted = parts.get(0).and_then(|s| s.parse().ok());
+                state.packets_transmitted = parts.first().and_then(|s| s.parse().ok());
                 state.packets_received = parts.get(3).and_then(|s| s.parse().ok());
                 state.packet_loss_percent = parts
                     .get(8)
@@ -608,7 +601,7 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
                     .map(|s| s.trim_start_matches('+'))
                     .and_then(|s| s.parse().ok());
             } else {
-                state.packets_transmitted = parts.get(0).and_then(|s| s.parse().ok());
+                state.packets_transmitted = parts.first().and_then(|s| s.parse().ok());
                 state.packets_received = parts.get(3).and_then(|s| s.parse().ok());
                 state.packet_loss_percent = parts
                     .get(6)
@@ -620,103 +613,103 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
         }
 
         // round-trip line
-        if line.contains('/') {
-            if let Some(eq_pos) = line.find('=') {
-                let after = line[eq_pos + 1..].trim().trim_end_matches(" ms");
-                let rtt_parts: Vec<&str> = after.split('/').collect();
-                state.round_trip_min = rtt_parts.get(0).and_then(|s| s.trim().parse().ok());
-                state.round_trip_avg = rtt_parts.get(1).and_then(|s| s.trim().parse().ok());
-                state.round_trip_max = rtt_parts.get(2).and_then(|s| s.trim().parse().ok());
-                state.round_trip_stddev = rtt_parts.get(3).and_then(|s| s.trim().parse().ok());
+        if line.contains('/')
+            && let Some(eq_pos) = line.find('=')
+        {
+            let after = line[eq_pos + 1..].trim().trim_end_matches(" ms");
+            let rtt_parts: Vec<&str> = after.split('/').collect();
+            state.round_trip_min = rtt_parts.first().and_then(|s| s.trim().parse().ok());
+            state.round_trip_avg = rtt_parts.get(1).and_then(|s| s.trim().parse().ok());
+            state.round_trip_max = rtt_parts.get(2).and_then(|s| s.trim().parse().ok());
+            state.round_trip_stddev = rtt_parts.get(3).and_then(|s| s.trim().parse().ok());
 
-                let mut obj = Map::new();
-                obj.insert("type".to_string(), Value::String("summary".to_string()));
-                obj.insert(
-                    "destination_ip".to_string(),
-                    state
-                        .destination_ip
-                        .as_ref()
-                        .map(|s| Value::String(s.clone()))
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "sent_bytes".to_string(),
-                    state
-                        .sent_bytes
-                        .map(|n| Value::Number(n.into()))
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "pattern".to_string(),
-                    state
-                        .pattern
-                        .as_ref()
-                        .map(|s| Value::String(s.clone()))
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "packets_transmitted".to_string(),
-                    state
-                        .packets_transmitted
-                        .map(|n| Value::Number(n.into()))
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "packets_received".to_string(),
-                    state
-                        .packets_received
-                        .map(|n| Value::Number(n.into()))
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "packet_loss_percent".to_string(),
-                    state
-                        .packet_loss_percent
-                        .and_then(|f| serde_json::Number::from_f64(f))
-                        .map(Value::Number)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "duplicates".to_string(),
-                    state
-                        .duplicates
-                        .map(|n| Value::Number(n.into()))
-                        .unwrap_or(Value::Number(0i64.into())),
-                );
-                obj.insert(
-                    "round_trip_ms_min".to_string(),
-                    state
-                        .round_trip_min
-                        .and_then(|f| serde_json::Number::from_f64(f))
-                        .map(Value::Number)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "round_trip_ms_avg".to_string(),
-                    state
-                        .round_trip_avg
-                        .and_then(|f| serde_json::Number::from_f64(f))
-                        .map(Value::Number)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "round_trip_ms_max".to_string(),
-                    state
-                        .round_trip_max
-                        .and_then(|f| serde_json::Number::from_f64(f))
-                        .map(Value::Number)
-                        .unwrap_or(Value::Null),
-                );
-                obj.insert(
-                    "round_trip_ms_stddev".to_string(),
-                    state
-                        .round_trip_stddev
-                        .and_then(|f| serde_json::Number::from_f64(f))
-                        .map(Value::Number)
-                        .unwrap_or(Value::Null),
-                );
-                return Some(obj);
-            }
+            let mut obj = Map::new();
+            obj.insert("type".to_string(), Value::String("summary".to_string()));
+            obj.insert(
+                "destination_ip".to_string(),
+                state
+                    .destination_ip
+                    .as_ref()
+                    .map(|s| Value::String(s.clone()))
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "sent_bytes".to_string(),
+                state
+                    .sent_bytes
+                    .map(|n| Value::Number(n.into()))
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "pattern".to_string(),
+                state
+                    .pattern
+                    .as_ref()
+                    .map(|s| Value::String(s.clone()))
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "packets_transmitted".to_string(),
+                state
+                    .packets_transmitted
+                    .map(|n| Value::Number(n.into()))
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "packets_received".to_string(),
+                state
+                    .packets_received
+                    .map(|n| Value::Number(n.into()))
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "packet_loss_percent".to_string(),
+                state
+                    .packet_loss_percent
+                    .and_then(serde_json::Number::from_f64)
+                    .map(Value::Number)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "duplicates".to_string(),
+                state
+                    .duplicates
+                    .map(|n| Value::Number(n.into()))
+                    .unwrap_or(Value::Number(0i64.into())),
+            );
+            obj.insert(
+                "round_trip_ms_min".to_string(),
+                state
+                    .round_trip_min
+                    .and_then(serde_json::Number::from_f64)
+                    .map(Value::Number)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "round_trip_ms_avg".to_string(),
+                state
+                    .round_trip_avg
+                    .and_then(serde_json::Number::from_f64)
+                    .map(Value::Number)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "round_trip_ms_max".to_string(),
+                state
+                    .round_trip_max
+                    .and_then(serde_json::Number::from_f64)
+                    .map(Value::Number)
+                    .unwrap_or(Value::Null),
+            );
+            obj.insert(
+                "round_trip_ms_stddev".to_string(),
+                state
+                    .round_trip_stddev
+                    .and_then(serde_json::Number::from_f64)
+                    .map(Value::Number)
+                    .unwrap_or(Value::Null),
+            );
+            return Some(obj);
         }
         return None;
     }
@@ -788,7 +781,7 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
 
     // Normal response
     if line.contains(" bytes from ") {
-        let cleaned = line.replace(':', " ").replace('=', " ");
+        let cleaned = line.replace([':', '='], " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
         let mut obj = Map::new();
         obj.insert("type".to_string(), Value::String("reply".to_string()));
@@ -817,7 +810,7 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
         );
         obj.insert(
             "response_bytes".to_string(),
-            str_to_int(parts.get(0).copied().unwrap_or("")),
+            str_to_int(parts.first().copied().unwrap_or("")),
         );
         obj.insert(
             "response_ip".to_string(),
@@ -935,7 +928,7 @@ impl LineParser for PingSession {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
+    use jc_rs_core::traits::Parser;
 
     #[test]
     fn test_ping_s_centos_golden() {

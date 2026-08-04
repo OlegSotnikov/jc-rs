@@ -60,10 +60,10 @@ fn parse_sfdisk_json(input: &str) -> Result<Vec<Map<String, Value>>, ParseError>
     let parsed: Value = serde_json::from_str(input)
         .map_err(|e| ParseError::InvalidInput(format!("Failed to parse sfdisk JSON: {}", e)))?;
 
-    if let Some(pt) = parsed.get("partitiontable") {
-        if let Some(obj) = pt.as_object() {
-            return Ok(vec![obj.clone()]);
-        }
+    if let Some(pt) = parsed.get("partitiontable")
+        && let Some(obj) = pt.as_object()
+    {
+        return Ok(vec![obj.clone()]);
     }
 
     if let Some(obj) = parsed.as_object() {
@@ -119,7 +119,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
                     part.insert("device".to_string(), Value::String(fields[0].to_string()));
                 }
                 // Parse: /dev/sda1 : start=  2048, size=  2097152, Id=83, bootable
-                let normalized = line.replace(',', " ").replace('=', " ");
+                let normalized = line.replace([',', '='], " ");
                 let norm_fields: Vec<&str> = normalized.split_whitespace().collect();
                 // Find start, size, Id values by keyword
                 for i in 0..norm_fields.len() {
@@ -175,7 +175,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
                 partitions.clear();
                 section.clear();
 
-                let cleaned = line.replace(':', "").replace(',', "");
+                let cleaned = line.replace([':', ','], "");
                 let fields: Vec<&str> = cleaned.split_whitespace().collect();
                 if fields.len() >= 7 {
                     item.insert("disk".to_string(), Value::String(fields[1].to_string()));
@@ -212,7 +212,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
                 partitions.clear();
                 section.clear();
 
-                let cleaned = line.replace(':', "").replace(',', "");
+                let cleaned = line.replace([':', ','], "");
                 let fields: Vec<&str> = cleaned.split_whitespace().collect();
                 if fields.len() >= 7 {
                     item.insert("disk".to_string(), Value::String(fields[1].to_string()));
@@ -227,7 +227,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
             }
 
             if line.starts_with("Disk model: ") {
-                if let Some(val) = line.splitn(2, ':').nth(1) {
+                if let Some(val) = line.split_once(':').map(|x| x.1) {
                     item.insert(
                         "disk_model".to_string(),
                         Value::String(val.trim().to_string()),
@@ -267,7 +267,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
             }
 
             if line.starts_with("Disklabel type") {
-                if let Some(val) = line.splitn(2, ':').nth(1) {
+                if let Some(val) = line.split_once(':').map(|x| x.1) {
                     item.insert(
                         "disk_label_type".to_string(),
                         Value::String(val.trim().to_string()),
@@ -277,7 +277,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
             }
 
             if line.starts_with("Disk identifier") {
-                if let Some(val) = line.splitn(2, ':').nth(1) {
+                if let Some(val) = line.split_once(':').map(|x| x.1) {
                     item.insert(
                         "disk_identifier".to_string(),
                         Value::String(val.trim().to_string()),
@@ -287,7 +287,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
             }
 
             if line.starts_with("Units: ") {
-                if let Some(val) = line.splitn(2, ':').nth(1) {
+                if let Some(val) = line.split_once(':').map(|x| x.1) {
                     item.insert("units".to_string(), Value::String(val.trim().to_string()));
                 }
                 continue;
@@ -295,7 +295,7 @@ fn parse_sfdisk_text(input: &str) -> Vec<Map<String, Value>> {
 
             // sfdisk -F: Unpartitioned space /dev/sda: 0 B, 0 bytes, 0 sectors
             if line.starts_with("Unpartitioned space") {
-                let cleaned = line.replace(':', "").replace(',', "");
+                let cleaned = line.replace([':', ','], "");
                 let fields: Vec<&str> = cleaned.split_whitespace().collect();
                 // "Unpartitioned space /dev/sda 0 B 0 bytes 0 sectors"
                 if fields.len() >= 8 {
@@ -406,7 +406,7 @@ fn sparse_table_parse(lines: &[String]) -> Vec<Map<String, Value>> {
         for (_col_name, h_end) in header_spec.iter().rev() {
             let mut pos = *h_end;
             // Adjust left if position lands on non-whitespace
-            while pos > 0 && !entry.get(pos).map_or(true, |c| c.is_whitespace()) {
+            while pos > 0 && !entry.get(pos).is_none_or(|c| c.is_whitespace()) {
                 pos -= 1;
             }
             if pos < entry.len() {
@@ -458,11 +458,11 @@ fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
     for entry in &mut output {
         // Convert disk-level int fields
         for &key in int_keys {
-            if let Some(val) = entry.get(key).cloned() {
-                if let Some(s) = val.as_str() {
-                    let cleaned = s.replace('-', "");
-                    entry.insert(key.to_string(), convert_to_int(&cleaned));
-                }
+            if let Some(val) = entry.get(key).cloned()
+                && let Some(s) = val.as_str()
+            {
+                let cleaned = s.replace('-', "");
+                entry.insert(key.to_string(), convert_to_int(&cleaned));
             }
         }
 
@@ -471,22 +471,22 @@ fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
             for part_val in parts.iter_mut() {
                 if let Value::Object(part) = part_val {
                     // Special handling for "size" field in -d option
-                    if let Some(size_val) = part.get("size").cloned() {
-                        if let Some(s) = size_val.as_str() {
-                            // Only convert to int if it's purely numeric
-                            if s.chars().all(|c| c.is_ascii_digit()) && !s.is_empty() {
-                                part.insert("size".to_string(), convert_to_int(s));
-                            }
+                    if let Some(size_val) = part.get("size").cloned()
+                        && let Some(s) = size_val.as_str()
+                    {
+                        // Only convert to int if it's purely numeric
+                        if s.chars().all(|c| c.is_ascii_digit()) && !s.is_empty() {
+                            part.insert("size".to_string(), convert_to_int(s));
                         }
                     }
 
                     // Convert int fields
                     for &key in int_keys {
-                        if let Some(val) = part.get(key).cloned() {
-                            if let Some(s) = val.as_str() {
-                                let cleaned = s.replace('-', "");
-                                part.insert(key.to_string(), convert_to_int(&cleaned));
-                            }
+                        if let Some(val) = part.get(key).cloned()
+                            && let Some(s) = val.as_str()
+                        {
+                            let cleaned = s.replace('-', "");
+                            part.insert(key.to_string(), convert_to_int(&cleaned));
                         }
                     }
 

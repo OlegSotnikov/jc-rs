@@ -43,10 +43,10 @@ fn parse_int(s: &str) -> Value {
 }
 
 fn parse_float(s: &str) -> Value {
-    if let Ok(f) = s.trim().parse::<f64>() {
-        if let Some(n) = serde_json::Number::from_f64(f) {
-            return Value::Number(n);
-        }
+    if let Ok(f) = s.trim().parse::<f64>()
+        && let Some(n) = serde_json::Number::from_f64(f)
+    {
+        return Value::Number(n);
     }
     Value::String(s.trim().to_string())
 }

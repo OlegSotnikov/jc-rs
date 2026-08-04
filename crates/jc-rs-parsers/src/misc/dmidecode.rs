@@ -68,25 +68,23 @@ impl Parser for DmidecodeParser {
             raw_output: &mut Vec<Map<String, Value>>,
         ) {
             if let Some(it) = item {
-                if !values.is_empty() {
-                    if let Some(attr) = attribute {
-                        item_map_values.insert(
-                            attr.clone(),
-                            Value::Array(values.iter().map(|s| Value::String(s.clone())).collect()),
-                        );
-                        values.clear();
-                    }
+                if !values.is_empty()
+                    && let Some(attr) = attribute
+                {
+                    item_map_values.insert(
+                        attr.clone(),
+                        Value::Array(values.iter().map(|s| Value::String(s.clone())).collect()),
+                    );
+                    values.clear();
                 }
-                if !key_data.is_empty() {
-                    if let Some(k) = key {
-                        item_map_values.insert(
-                            format!("{}_data", k),
-                            Value::Array(
-                                key_data.iter().map(|s| Value::String(s.clone())).collect(),
-                            ),
-                        );
-                        key_data.clear();
-                    }
+                if !key_data.is_empty()
+                    && let Some(k) = key
+                {
+                    item_map_values.insert(
+                        format!("{}_data", k),
+                        Value::Array(key_data.iter().map(|s| Value::String(s.clone())).collect()),
+                    );
+                    key_data.clear();
                 }
 
                 // Finalize values into item
@@ -100,15 +98,15 @@ impl Parser for DmidecodeParser {
                 }
 
                 // Convert type and bytes to integers
-                if let Some(Value::String(s)) = it.get("type") {
-                    if let Ok(n) = s.parse::<i64>() {
-                        it.insert("type".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(Value::String(s)) = it.get("type")
+                    && let Ok(n) = s.parse::<i64>()
+                {
+                    it.insert("type".to_string(), Value::Number(n.into()));
                 }
-                if let Some(Value::String(s)) = it.get("bytes") {
-                    if let Ok(n) = s.parse::<i64>() {
-                        it.insert("bytes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(Value::String(s)) = it.get("bytes")
+                    && let Ok(n) = s.parse::<i64>()
+                {
+                    it.insert("bytes".to_string(), Value::Number(n.into()));
                 }
 
                 raw_output.push(std::mem::take(it));
@@ -234,27 +232,25 @@ impl Parser for DmidecodeParser {
                     value_list = false;
 
                     // Flush previous list/data
-                    if !values.is_empty() {
-                        if let Some(ref attr) = attribute {
-                            item_map_values.insert(
-                                attr.clone(),
-                                Value::Array(
-                                    values.iter().map(|s| Value::String(s.clone())).collect(),
-                                ),
-                            );
-                            values = Vec::new();
-                        }
+                    if !values.is_empty()
+                        && let Some(ref attr) = attribute
+                    {
+                        item_map_values.insert(
+                            attr.clone(),
+                            Value::Array(values.iter().map(|s| Value::String(s.clone())).collect()),
+                        );
+                        values = Vec::new();
                     }
-                    if !key_data.is_empty() {
-                        if let Some(ref k) = key {
-                            item_map_values.insert(
-                                format!("{}_data", k),
-                                Value::Array(
-                                    key_data.iter().map(|s| Value::String(s.clone())).collect(),
-                                ),
-                            );
-                            key_data = Vec::new();
-                        }
+                    if !key_data.is_empty()
+                        && let Some(ref k) = key
+                    {
+                        item_map_values.insert(
+                            format!("{}_data", k),
+                            Value::Array(
+                                key_data.iter().map(|s| Value::String(s.clone())).collect(),
+                            ),
+                        );
+                        key_data = Vec::new();
                     }
 
                     let k = normalize_key(parts[0]);
@@ -277,25 +273,23 @@ impl Parser for DmidecodeParser {
                 value_list = true;
 
                 // Flush previous list/data
-                if !values.is_empty() {
-                    if let Some(ref attr) = attribute {
-                        item_map_values.insert(
-                            attr.clone(),
-                            Value::Array(values.iter().map(|s| Value::String(s.clone())).collect()),
-                        );
-                        values = Vec::new();
-                    }
+                if !values.is_empty()
+                    && let Some(ref attr) = attribute
+                {
+                    item_map_values.insert(
+                        attr.clone(),
+                        Value::Array(values.iter().map(|s| Value::String(s.clone())).collect()),
+                    );
+                    values.clear();
                 }
-                if !key_data.is_empty() {
-                    if let Some(ref k) = key {
-                        item_map_values.insert(
-                            format!("{}_data", k),
-                            Value::Array(
-                                key_data.iter().map(|s| Value::String(s.clone())).collect(),
-                            ),
-                        );
-                        key_data = Vec::new();
-                    }
+                if !key_data.is_empty()
+                    && let Some(ref k) = key
+                {
+                    item_map_values.insert(
+                        format!("{}_data", k),
+                        Value::Array(key_data.iter().map(|s| Value::String(s.clone())).collect()),
+                    );
+                    key_data = Vec::new();
                 }
 
                 // Strip trailing colon from attribute name

@@ -100,14 +100,14 @@ impl Parser for AmixerParser {
             let line = line.trim();
 
             if line.starts_with("Capabilities:") {
-                let caps_str = line.splitn(2, ':').nth(1).unwrap_or("").trim();
+                let caps_str = line.split_once(':').map(|x| x.1).unwrap_or("").trim();
                 let caps: Vec<Value> = caps_str
                     .split_whitespace()
                     .map(|s| Value::String(s.to_string()))
                     .collect();
                 obj.insert("capabilities".to_string(), Value::Array(caps));
             } else if line.starts_with("Playback channels:") {
-                let chans_str = line.splitn(2, ':').nth(1).unwrap_or("").trim();
+                let chans_str = line.split_once(':').map(|x| x.1).unwrap_or("").trim();
                 let chans: Vec<Value> = chans_str
                     .split(" - ")
                     .map(|s| Value::String(s.trim().to_string()))
@@ -115,7 +115,7 @@ impl Parser for AmixerParser {
                 playback_channels = Some(chans);
             } else if line.starts_with("Limits:") {
                 // Limits: Playback 0 - 87  OR  Limits: Capture 0 - 63
-                let limits_str = line.splitn(2, ':').nth(1).unwrap_or("").trim();
+                let limits_str = line.split_once(':').map(|x| x.1).unwrap_or("").trim();
                 let parts: Vec<&str> = limits_str.splitn(3, " - ").collect();
                 if parts.len() >= 2 {
                     // parts[0] = "Playback 0" or "Capture 0"

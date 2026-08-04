@@ -50,10 +50,10 @@ fn parse_mount(input: &str) -> Vec<Map<String, Value>> {
 
     // Detect AIX format: first non-empty line contains "mounted over"
     let first_nonempty = lines.iter().find(|l| !l.trim().is_empty()).copied();
-    if let Some(hdr) = first_nonempty {
-        if hdr.to_lowercase().contains("mounted over") {
-            return parse_mount_aix(&lines);
-        }
+    if let Some(hdr) = first_nonempty
+        && hdr.to_lowercase().contains("mounted over")
+    {
+        return parse_mount_aix(&lines);
     }
 
     let mut output = Vec::new();

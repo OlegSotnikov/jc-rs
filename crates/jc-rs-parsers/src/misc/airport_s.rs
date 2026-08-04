@@ -90,7 +90,7 @@ impl Parser for AirportSParser {
                 _ => None,
             });
             let rssi_val = rssi_str
-                .and_then(|s| convert_to_int(s))
+                .and_then(convert_to_int)
                 .map(Value::from)
                 .unwrap_or(Value::Null);
             obj.insert("rssi".to_string(), rssi_val);
@@ -111,7 +111,7 @@ impl Parser for AirportSParser {
                 _ => None,
             });
             let ht_val = ht_str
-                .and_then(|s| convert_to_bool(s))
+                .and_then(convert_to_bool)
                 .map(Value::Bool)
                 .unwrap_or(Value::Null);
             obj.insert("ht".to_string(), ht_val);

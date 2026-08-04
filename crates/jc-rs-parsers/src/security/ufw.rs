@@ -278,31 +278,31 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
     let has_ports = rule_obj.contains_key(&format!("{}_ports", direction));
     let has_ranges = rule_obj.contains_key(&format!("{}_port_ranges", direction));
 
-    if !has_ports && !has_ranges {
-        if let Some(Value::String(t)) = rule_obj.get(&format!("{}_transport", direction)) {
-            if t == "tcp" || t == "udp" || t == "any" {
-                rule_obj.insert(
-                    format!("{}_port_ranges", direction),
-                    Value::Array(vec![{
-                        let mut r = Map::new();
-                        r.insert("start".to_string(), Value::String("0".to_string()));
-                        r.insert("end".to_string(), Value::String("65535".to_string()));
-                        Value::Object(r)
-                    }]),
-                );
-                rule_obj.insert(format!("{}_service", direction), Value::Null);
-            }
-        }
+    if !has_ports
+        && !has_ranges
+        && let Some(Value::String(t)) = rule_obj.get(&format!("{}_transport", direction))
+        && (t == "tcp" || t == "udp" || t == "any")
+    {
+        rule_obj.insert(
+            format!("{}_port_ranges", direction),
+            Value::Array(vec![{
+                let mut r = Map::new();
+                r.insert("start".to_string(), Value::String("0".to_string()));
+                r.insert("end".to_string(), Value::String("65535".to_string()));
+                Value::Object(r)
+            }]),
+        );
+        rule_obj.insert(format!("{}_service", direction), Value::Null);
     }
 }
 
 fn process_rule(rule: &mut Map<String, Value>) {
     let int_fields = ["index", "to_ip_prefix", "from_ip_prefix"];
     for field in &int_fields {
-        if let Some(Value::String(s)) = rule.get(*field).cloned() {
-            if let Ok(n) = s.trim().parse::<i64>() {
-                rule.insert(field.to_string(), Value::Number(n.into()));
-            }
+        if let Some(Value::String(s)) = rule.get(*field).cloned()
+            && let Ok(n) = s.trim().parse::<i64>()
+        {
+            rule.insert(field.to_string(), Value::Number(n.into()));
         }
     }
 
@@ -312,10 +312,10 @@ fn process_rule(rule: &mut Map<String, Value>) {
             let converted: Vec<Value> = ports
                 .into_iter()
                 .map(|v| {
-                    if let Value::String(s) = &v {
-                        if let Ok(n) = s.parse::<i64>() {
-                            return Value::Number(n.into());
-                        }
+                    if let Value::String(s) = &v
+                        && let Ok(n) = s.parse::<i64>()
+                    {
+                        return Value::Number(n.into());
                     }
                     v
                 })
@@ -329,15 +329,15 @@ fn process_rule(rule: &mut Map<String, Value>) {
                 .into_iter()
                 .map(|r| {
                     if let Value::Object(mut range_obj) = r {
-                        if let Some(Value::String(s)) = range_obj.get("start").cloned() {
-                            if let Ok(n) = s.parse::<i64>() {
-                                range_obj.insert("start".to_string(), Value::Number(n.into()));
-                            }
+                        if let Some(Value::String(s)) = range_obj.get("start").cloned()
+                            && let Ok(n) = s.parse::<i64>()
+                        {
+                            range_obj.insert("start".to_string(), Value::Number(n.into()));
                         }
-                        if let Some(Value::String(s)) = range_obj.get("end").cloned() {
-                            if let Ok(n) = s.parse::<i64>() {
-                                range_obj.insert("end".to_string(), Value::Number(n.into()));
-                            }
+                        if let Some(Value::String(s)) = range_obj.get("end").cloned()
+                            && let Ok(n) = s.parse::<i64>()
+                        {
+                            range_obj.insert("end".to_string(), Value::Number(n.into()));
                         }
                         Value::Object(range_obj)
                     } else {

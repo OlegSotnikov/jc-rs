@@ -43,10 +43,10 @@ impl Parser for ZipinfoParser {
         let mut datalines: Vec<&str> = input.lines().collect();
 
         // Remove trailing "N archives were successfully processed." line
-        if let Some(last) = datalines.last() {
-            if last.ends_with("archives were successfully processed.") {
-                datalines.pop();
-            }
+        if let Some(last) = datalines.last()
+            && last.ends_with("archives were successfully processed.")
+        {
+            datalines.pop();
         }
 
         // Split into archive blocks by empty lines
@@ -137,7 +137,7 @@ impl Parser for ZipinfoParser {
                     let filesize = row
                         .get("filesize")
                         .and_then(|v| v.as_str())
-                        .and_then(|s| convert_to_int(s))
+                        .and_then(convert_to_int)
                         .map(Value::from)
                         .unwrap_or(Value::Number(0.into()));
                     obj.insert("filesize".to_string(), filesize);
@@ -184,7 +184,7 @@ impl Parser for ZipinfoParser {
             archive_obj.insert(
                 "percent_compressed".to_string(),
                 convert_to_float(percent_compressed)
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::String(percent_compressed.to_string())),
             );

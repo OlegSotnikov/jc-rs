@@ -10,7 +10,6 @@
 //! array. Mirrors `JcCli::streaming_parse_and_print()`.
 
 use jc_rs_core::traits::{Parser, StreamingParser};
-use jc_rs_core::types::Tag;
 use serde_json::{Map, Value};
 use std::io::{self, BufWriter, StdoutLock, Write};
 
@@ -188,11 +187,6 @@ fn mark_success(value: &mut Value) {
     if let Value::Object(meta) = entry {
         meta.insert("success".to_string(), Value::Bool(true));
     }
-}
-
-/// Returns true if the parser's info says it is a streaming parser.
-pub fn parser_is_streaming(parser: &dyn Parser) -> bool {
-    parser.info().has_tag(Tag::Streaming)
 }
 
 /// Returns true if the parser supports slurp.

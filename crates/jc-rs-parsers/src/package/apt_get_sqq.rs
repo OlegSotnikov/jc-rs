@@ -132,9 +132,9 @@ mod tests {
             include_str!("../../../../tests/fixtures/generic/apt_get_sqq--sample.json");
 
         let parser = AptGetSqqParser;
-        let result = parser.parse(&fixture_out, false).unwrap();
+        let result = parser.parse(fixture_out, false).unwrap();
         let expected: serde_json::Value =
-            serde_json::from_str(&fixture_json).expect("invalid fixture JSON");
+            serde_json::from_str(fixture_json).expect("invalid fixture JSON");
 
         let got = serde_json::to_value(&result).unwrap();
         assert_eq!(got, expected, "apt_get_sqq fixture mismatch");

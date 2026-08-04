@@ -59,13 +59,14 @@ impl Parser for ProcNetNetstatParser {
             let row_name = line[..colon_pos].trim().to_string();
             let rest = line[colon_pos + 1..].trim();
 
-            if !seen.contains_key(&row_name) {
-                // header row
+            // The first line for a name is its header; the second carries the
+            // values under it.
+            let Some(keys) = seen.get(&row_name) else {
                 let keys: Vec<String> = rest.split_whitespace().map(|s| s.to_string()).collect();
                 seen.insert(row_name, keys);
-            } else {
-                // data row
-                let keys = seen.get(&row_name).unwrap();
+                continue;
+            };
+            {
                 let values: Vec<&str> = rest.split_whitespace().collect();
 
                 let mut map = Map::new();

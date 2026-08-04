@@ -162,16 +162,16 @@ fn is_freebsd_osx(first_line: &str) -> bool {
 
 /// Split Linux `addr:port` (handles IPv6 `[::]:22`)
 fn split_linux_addr(addr_port: &str) -> (String, String) {
-    if addr_port.starts_with('[') {
-        if let Some(i) = addr_port.rfind(']') {
-            let addr = addr_port[..=i].to_string();
-            let port = if addr_port.len() > i + 1 {
-                addr_port[i + 2..].to_string()
-            } else {
-                String::new()
-            };
-            return (addr, port);
-        }
+    if addr_port.starts_with('[')
+        && let Some(i) = addr_port.rfind(']')
+    {
+        let addr = addr_port[..=i].to_string();
+        let port = if addr_port.len() > i + 1 {
+            addr_port[i + 2..].to_string()
+        } else {
+            String::new()
+        };
+        return (addr, port);
     }
     if let Some(i) = addr_port.rfind(':') {
         (addr_port[..i].to_string(), addr_port[i + 1..].to_string())
@@ -312,20 +312,20 @@ fn linux_parse_socket(
 
     // Normalise bracket notation: [ ] → ---, [ ACC ] → space-delimited ACC
     let mut entry = line.replace("[ ]", "---");
-    entry = entry.replace('[', " ").replace(']', " ");
+    entry = entry.replace(['[', ']'], " ");
 
     // Protect spaces inside program_name column
     let pn_start = header_text.find("program_name");
     let path_start = header_text.find("path");
-    if let (Some(ps), Some(pe)) = (pn_start, path_start) {
-        if pe > ps + 1 {
-            let pn_end = (pe - 1).min(entry.len());
-            let ps_clamped = ps.min(entry.len());
-            if pn_end > ps_clamped {
-                let old_pn = entry[ps_clamped..pn_end].to_string();
-                let new_pn = old_pn.replace(' ', "\u{2063}");
-                entry = format!("{}{}{}", &entry[..ps_clamped], new_pn, &entry[pn_end..]);
-            }
+    if let (Some(ps), Some(pe)) = (pn_start, path_start)
+        && pe > ps + 1
+    {
+        let pn_end = (pe - 1).min(entry.len());
+        let ps_clamped = ps.min(entry.len());
+        if pn_end > ps_clamped {
+            let old_pn = entry[ps_clamped..pn_end].to_string();
+            let new_pn = old_pn.replace(' ', "\u{2063}");
+            entry = format!("{}{}{}", &entry[..ps_clamped], new_pn, &entry[pn_end..]);
         }
     }
 
@@ -461,32 +461,32 @@ fn linux_post_process(entries: Vec<Map<String, Value>>) -> Vec<Map<String, Value
             }
 
             // local_address → split
-            if let Some(la) = obj.remove("local_address") {
-                if let Some(s) = la.as_str() {
-                    if !s.is_empty() {
-                        let (addr, port) = split_linux_addr(s);
-                        obj.insert("local_address".to_string(), Value::String(addr));
-                        if !port.is_empty() {
-                            obj.insert("local_port".to_string(), Value::String(port));
-                        }
-                    } else {
-                        obj.insert("local_address".to_string(), Value::Null);
+            if let Some(la) = obj.remove("local_address")
+                && let Some(s) = la.as_str()
+            {
+                if !s.is_empty() {
+                    let (addr, port) = split_linux_addr(s);
+                    obj.insert("local_address".to_string(), Value::String(addr));
+                    if !port.is_empty() {
+                        obj.insert("local_port".to_string(), Value::String(port));
                     }
+                } else {
+                    obj.insert("local_address".to_string(), Value::Null);
                 }
             }
 
             // foreign_address → split
-            if let Some(fa) = obj.remove("foreign_address") {
-                if let Some(s) = fa.as_str() {
-                    if !s.is_empty() {
-                        let (addr, port) = split_linux_addr(s);
-                        obj.insert("foreign_address".to_string(), Value::String(addr));
-                        if !port.is_empty() {
-                            obj.insert("foreign_port".to_string(), Value::String(port));
-                        }
-                    } else {
-                        obj.insert("foreign_address".to_string(), Value::Null);
+            if let Some(fa) = obj.remove("foreign_address")
+                && let Some(s) = fa.as_str()
+            {
+                if !s.is_empty() {
+                    let (addr, port) = split_linux_addr(s);
+                    obj.insert("foreign_address".to_string(), Value::String(addr));
+                    if !port.is_empty() {
+                        obj.insert("foreign_port".to_string(), Value::String(port));
                     }
+                } else {
+                    obj.insert("foreign_address".to_string(), Value::Null);
                 }
             }
 
@@ -534,19 +534,17 @@ fn linux_post_process(entries: Vec<Map<String, Value>>) -> Vec<Map<String, Value
                 .get("local_port")
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string())
+                && let Some(n) = port_num(&lp)
             {
-                if let Some(n) = port_num(&lp) {
-                    obj.insert("local_port_num".to_string(), Value::Number(n.into()));
-                }
+                obj.insert("local_port_num".to_string(), Value::Number(n.into()));
             }
             if let Some(fp) = obj
                 .get("foreign_port")
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string())
+                && let Some(n) = port_num(&fp)
             {
-                if let Some(n) = port_num(&fp) {
-                    obj.insert("foreign_port_num".to_string(), Value::Number(n.into()));
-                }
+                obj.insert("foreign_port_num".to_string(), Value::Number(n.into()));
             }
 
             coerce_types(&mut obj);
@@ -651,10 +649,8 @@ fn parse_linux(cleandata: &[&str]) -> Vec<Map<String, Value>> {
             }
             continue;
         }
-        if interface_table {
-            if let Some(e) = linux_parse_interface(&headers, line) {
-                result.push(e);
-            }
+        if interface_table && let Some(e) = linux_parse_interface(&headers, line) {
+            result.push(e);
         }
     }
 
@@ -831,32 +827,32 @@ fn bsd_post_process(entries: Vec<Map<String, Value>>) -> Vec<Map<String, Value>>
 
             if obj.get("kind").and_then(|v| v.as_str()) == Some("network") {
                 // local_address → split on last '.'
-                if let Some(la) = obj.remove("local_address") {
-                    if let Some(s) = la.as_str() {
-                        if !s.is_empty() {
-                            let (addr, port) = split_bsd_addr(s);
-                            obj.insert("local_address".to_string(), Value::String(addr));
-                            if !port.is_empty() {
-                                obj.insert("local_port".to_string(), Value::String(port));
-                            }
-                        } else {
-                            obj.insert("local_address".to_string(), Value::Null);
+                if let Some(la) = obj.remove("local_address")
+                    && let Some(s) = la.as_str()
+                {
+                    if !s.is_empty() {
+                        let (addr, port) = split_bsd_addr(s);
+                        obj.insert("local_address".to_string(), Value::String(addr));
+                        if !port.is_empty() {
+                            obj.insert("local_port".to_string(), Value::String(port));
                         }
+                    } else {
+                        obj.insert("local_address".to_string(), Value::Null);
                     }
                 }
 
                 // foreign_address → split on last '.'
-                if let Some(fa) = obj.remove("foreign_address") {
-                    if let Some(s) = fa.as_str() {
-                        if !s.is_empty() {
-                            let (addr, port) = split_bsd_addr(s);
-                            obj.insert("foreign_address".to_string(), Value::String(addr));
-                            if !port.is_empty() {
-                                obj.insert("foreign_port".to_string(), Value::String(port));
-                            }
-                        } else {
-                            obj.insert("foreign_address".to_string(), Value::Null);
+                if let Some(fa) = obj.remove("foreign_address")
+                    && let Some(s) = fa.as_str()
+                {
+                    if !s.is_empty() {
+                        let (addr, port) = split_bsd_addr(s);
+                        obj.insert("foreign_address".to_string(), Value::String(addr));
+                        if !port.is_empty() {
+                            obj.insert("foreign_port".to_string(), Value::String(port));
                         }
+                    } else {
+                        obj.insert("foreign_address".to_string(), Value::Null);
                     }
                 }
 
@@ -897,19 +893,17 @@ fn bsd_post_process(entries: Vec<Map<String, Value>>) -> Vec<Map<String, Value>>
                 .get("local_port")
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string())
+                && let Some(n) = port_num(&lp)
             {
-                if let Some(n) = port_num(&lp) {
-                    obj.insert("local_port_num".to_string(), Value::Number(n.into()));
-                }
+                obj.insert("local_port_num".to_string(), Value::Number(n.into()));
             }
             if let Some(fp) = obj
                 .get("foreign_port")
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string())
+                && let Some(n) = port_num(&fp)
             {
-                if let Some(n) = port_num(&fp) {
-                    obj.insert("foreign_port_num".to_string(), Value::Number(n.into()));
-                }
+                obj.insert("foreign_port_num".to_string(), Value::Number(n.into()));
             }
 
             coerce_types(&mut obj);
@@ -1127,10 +1121,10 @@ fn parse_freebsd_osx(cleandata: &[&str]) -> Vec<Map<String, Value>> {
             }
             continue;
         }
-        if interface_table {
-            if let Some(e) = bsd_parse_item(&headers, line, "interface", false, false, false) {
-                result.push(e);
-            }
+        if interface_table
+            && let Some(e) = bsd_parse_item(&headers, line, "interface", false, false, false)
+        {
+            result.push(e);
         }
     }
 

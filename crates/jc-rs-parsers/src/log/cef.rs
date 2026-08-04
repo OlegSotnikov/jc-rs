@@ -136,10 +136,7 @@ fn find_key_positions(ext: &str) -> Vec<(String, usize, usize)> {
             if i < bytes.len() && bytes[i] == b'=' {
                 let key_raw = &ext[key_start..i];
                 // Normalize key: replace ., -, / with _
-                let key = key_raw
-                    .replace('.', "_")
-                    .replace('-', "_")
-                    .replace('/', "_");
+                let key = key_raw.replace(['.', '-', '/'], "_");
                 positions.push((key, key_start, i + 1));
                 i += 1; // skip '='
             }
@@ -201,14 +198,15 @@ fn add_epoch_fields(map: &mut Map<String, Value>, field_prefix: &str, ts_value: 
     // If the value is a pure integer (possibly ms epoch), parse numerically
     let trimmed = ts_value.trim();
 
-    if trimmed.chars().all(|c| c.is_ascii_digit()) && !trimmed.is_empty() {
-        if let Ok(n) = trimmed.parse::<i64>() {
-            // If > 1e12, treat as milliseconds
-            let epoch = if n > 1_000_000_000_000 { n / 1000 } else { n };
-            map.insert(format!("{field_prefix}_epoch"), Value::Number(epoch.into()));
-            map.insert(format!("{field_prefix}_epoch_utc"), Value::Null);
-            return;
-        }
+    if trimmed.chars().all(|c| c.is_ascii_digit())
+        && !trimmed.is_empty()
+        && let Ok(n) = trimmed.parse::<i64>()
+    {
+        // If > 1e12, treat as milliseconds
+        let epoch = if n > 1_000_000_000_000 { n / 1000 } else { n };
+        map.insert(format!("{field_prefix}_epoch"), Value::Number(epoch.into()));
+        map.insert(format!("{field_prefix}_epoch_utc"), Value::Null);
+        return;
     }
 
     let parsed = parse_timestamp(
@@ -356,7 +354,7 @@ pub fn parse_cef_line(line: &str) -> Map<String, Value> {
                             .trim()
                             .parse::<f64>()
                             .ok()
-                            .and_then(|f| serde_json::Number::from_f64(f))
+                            .and_then(serde_json::Number::from_f64)
                             .map(Value::Number)
                             .unwrap_or_else(|| Value::String(orig_val.clone())),
                         _ => Value::String(orig_val.clone()),
@@ -529,6 +527,8 @@ mod tests {
     }
 
     #[test]
+    // `3.14` here is test data, not an approximation of pi.
+    #[allow(clippy::approx_constant)]
     fn test_cef_float_label() {
         let line = "CEF:0|Vendor|Product|1.0|1|name|6|cfp1=3.14 cfp1Label=myFloat";
         let map = parse_cef_line(line);

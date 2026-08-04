@@ -105,17 +105,27 @@ fn parse_iftop(input: &str) -> Vec<Map<String, Value>> {
         }
 
         if line.starts_with("interface:") {
-            let device = line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string();
+            let device = line
+                .split_once(':')
+                .map(|x| x.1)
+                .unwrap_or("")
+                .trim()
+                .to_string();
             interface_item.insert("device".to_string(), Value::String(device));
         } else if line.starts_with("IP address is:") {
-            let ip = line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string();
+            let ip = line
+                .split_once(':')
+                .map(|x| x.1)
+                .unwrap_or("")
+                .trim()
+                .to_string();
             interface_item.insert("ip_address".to_string(), Value::String(ip));
         } else if line.starts_with("MAC address is:") {
             // "MAC address is: 08:00:27:c0:4a:4f"
             // Split on first ': ' to get everything after "MAC address is:"
             let mac = line
-                .splitn(2, "MAC address is:")
-                .nth(1)
+                .split_once("MAC address is:")
+                .map(|x| x.1)
                 .unwrap_or("")
                 .trim()
                 .to_string();

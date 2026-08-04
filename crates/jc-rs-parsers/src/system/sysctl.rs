@@ -75,23 +75,23 @@ pub fn parse_sysctl(input: &str) -> Map<String, Value> {
                 // Check for key sanity: no spaces and has at least one dot (or is known key format)
                 if key.contains(' ') || !key.contains('.') {
                     // This is a continuation value on a new line
-                    if let Some(ref lk) = last_key {
-                        if let Some(Value::String(existing)) = raw.get_mut(lk) {
-                            existing.push('\n');
-                            existing.push_str(line);
-                        }
+                    if let Some(ref lk) = last_key
+                        && let Some(Value::String(existing)) = raw.get_mut(lk)
+                    {
+                        existing.push('\n');
+                        existing.push_str(line);
                     }
                     continue;
                 }
 
                 // Duplicate key: append
-                if raw.contains_key(&key) {
-                    if let Some(Value::String(existing)) = raw.get_mut(&key) {
-                        existing.push('\n');
-                        existing.push_str(&value);
-                        last_key = Some(key);
-                        continue;
-                    }
+                if raw.contains_key(&key)
+                    && let Some(Value::String(existing)) = raw.get_mut(&key)
+                {
+                    existing.push('\n');
+                    existing.push_str(&value);
+                    last_key = Some(key);
+                    continue;
                 }
 
                 last_key = Some(key.clone());
@@ -99,11 +99,11 @@ pub fn parse_sysctl(input: &str) -> Map<String, Value> {
             }
             None => {
                 // No delimiter: continuation of previous value
-                if let Some(ref lk) = last_key {
-                    if let Some(Value::String(existing)) = raw.get_mut(lk) {
-                        existing.push('\n');
-                        existing.push_str(line);
-                    }
+                if let Some(ref lk) = last_key
+                    && let Some(Value::String(existing)) = raw.get_mut(lk)
+                {
+                    existing.push('\n');
+                    existing.push_str(line);
                 }
             }
         }

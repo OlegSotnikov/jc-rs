@@ -61,7 +61,7 @@ inventory::submit! {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
     use jc_rs_core::registry::find_parser;
 
     #[test]

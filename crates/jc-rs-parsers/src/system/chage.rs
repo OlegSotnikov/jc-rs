@@ -69,14 +69,13 @@ impl Parser for ChageParser {
                 };
 
                 // Convert integer fields
-                if field == "min_days_between_password_change"
+                if (field == "min_days_between_password_change"
                     || field == "max_days_between_password_change"
-                    || field == "warning_days_before_password_expires"
+                    || field == "warning_days_before_password_expires")
+                    && let Ok(n) = val.parse::<i64>()
                 {
-                    if let Ok(n) = val.parse::<i64>() {
-                        out.insert(field.to_string(), Value::Number(n.into()));
-                        continue;
-                    }
+                    out.insert(field.to_string(), Value::Number(n.into()));
+                    continue;
                 }
 
                 out.insert(field.to_string(), Value::String(val));

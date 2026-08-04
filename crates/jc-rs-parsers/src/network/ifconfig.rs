@@ -82,17 +82,17 @@ fn convert_hex_mask(mask: &str) -> String {
         }
     }
     // CIDR notation -> dotted quad
-    if let Ok(cidr) = mask.parse::<u8>() {
-        if cidr <= 32 {
-            let n: u32 = if cidr == 0 { 0 } else { !0u32 << (32 - cidr) };
-            return format!(
-                "{}.{}.{}.{}",
-                (n >> 24) & 0xff,
-                (n >> 16) & 0xff,
-                (n >> 8) & 0xff,
-                n & 0xff
-            );
-        }
+    if let Ok(cidr) = mask.parse::<u8>()
+        && cidr <= 32
+    {
+        let n: u32 = if cidr == 0 { 0 } else { !0u32 << (32 - cidr) };
+        return format!(
+            "{}.{}.{}.{}",
+            (n >> 24) & 0xff,
+            (n >> 16) & 0xff,
+            (n >> 8) & 0xff,
+            n & 0xff
+        );
     }
     mask.to_string()
 }
@@ -324,15 +324,15 @@ impl Parser for IfconfigParser {
                     }
                     // empty <> → leave state as null
                 }
-                if let Some(m) = caps.name("mtu") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("mtu".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("mtu")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("mtu".to_string(), Value::Number(n.into()));
                 }
-                if let Some(mt) = caps.name("metric") {
-                    if let Ok(n) = mt.as_str().parse::<i64>() {
-                        interface_item.insert("metric".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(mt) = caps.name("metric")
+                    && let Ok(n) = mt.as_str().parse::<i64>()
+                {
+                    interface_item.insert("metric".to_string(), Value::Number(n.into()));
                 }
                 if let Some(t) = caps.name("type") {
                     interface_item.insert(
@@ -532,34 +532,34 @@ impl Parser for IfconfigParser {
             // FreeBSD lane info
             if let Some(caps) = re_freebsd_lane.captures(line) {
                 let mut lane_obj = Map::new();
-                if let Some(m) = caps.name("lane") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        lane_obj.insert("lane".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("lane")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    lane_obj.insert("lane".to_string(), Value::Number(n.into()));
                 }
-                if let Some(m) = caps.name("rx_power_mw") {
-                    if let Ok(f) = m.as_str().parse::<f64>() {
-                        lane_obj.insert(
-                            "rx_power_mw".to_string(),
-                            Value::Number(serde_json::Number::from_f64(f).unwrap()),
-                        );
-                    }
+                if let Some(m) = caps.name("rx_power_mw")
+                    && let Ok(f) = m.as_str().parse::<f64>()
+                {
+                    lane_obj.insert(
+                        "rx_power_mw".to_string(),
+                        Value::Number(serde_json::Number::from_f64(f).unwrap()),
+                    );
                 }
-                if let Some(m) = caps.name("rx_power_dbm") {
-                    if let Ok(f) = m.as_str().parse::<f64>() {
-                        lane_obj.insert(
-                            "rx_power_dbm".to_string(),
-                            Value::Number(serde_json::Number::from_f64(f).unwrap()),
-                        );
-                    }
+                if let Some(m) = caps.name("rx_power_dbm")
+                    && let Ok(f) = m.as_str().parse::<f64>()
+                {
+                    lane_obj.insert(
+                        "rx_power_dbm".to_string(),
+                        Value::Number(serde_json::Number::from_f64(f).unwrap()),
+                    );
                 }
-                if let Some(m) = caps.name("tx_bias_ma") {
-                    if let Ok(f) = m.as_str().parse::<f64>() {
-                        lane_obj.insert(
-                            "tx_bias_ma".to_string(),
-                            Value::Number(serde_json::Number::from_f64(f).unwrap()),
-                        );
-                    }
+                if let Some(m) = caps.name("tx_bias_ma")
+                    && let Ok(f) = m.as_str().parse::<f64>()
+                {
+                    lane_obj.insert(
+                        "tx_bias_ma".to_string(),
+                        Value::Number(serde_json::Number::from_f64(f).unwrap()),
+                    );
                 }
                 lane_info.push(Value::Object(lane_obj));
                 continue;
@@ -577,15 +577,15 @@ impl Parser for IfconfigParser {
                         interface_item.insert("state".to_string(), Value::Array(state_vec));
                     }
                 }
-                if let Some(m) = caps.name("mtu") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("mtu".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("mtu")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("mtu".to_string(), Value::Number(n.into()));
                 }
-                if let Some(mt) = caps.name("metric") {
-                    if let Ok(n) = mt.as_str().parse::<i64>() {
-                        interface_item.insert("metric".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(mt) = caps.name("metric")
+                    && let Ok(n) = mt.as_str().parse::<i64>()
+                {
+                    interface_item.insert("metric".to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
@@ -598,10 +598,10 @@ impl Parser for IfconfigParser {
                     "rx_overruns",
                     "rx_frame",
                 ] {
-                    if let Some(m) = caps.name(field) {
-                        if let Ok(n) = m.as_str().parse::<i64>() {
-                            interface_item.insert(field.to_string(), Value::Number(n.into()));
-                        }
+                    if let Some(m) = caps.name(field)
+                        && let Ok(n) = m.as_str().parse::<i64>()
+                    {
+                        interface_item.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 continue;
@@ -615,34 +615,34 @@ impl Parser for IfconfigParser {
                     "tx_overruns",
                     "tx_carrier",
                 ] {
-                    if let Some(m) = caps.name(field) {
-                        if let Ok(n) = m.as_str().parse::<i64>() {
-                            interface_item.insert(field.to_string(), Value::Number(n.into()));
-                        }
+                    if let Some(m) = caps.name(field)
+                        && let Ok(n) = m.as_str().parse::<i64>()
+                    {
+                        interface_item.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 continue;
             }
 
             if let Some(caps) = re_linux_bytes.captures(line) {
-                if let Some(m) = caps.name("rx_bytes") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("rx_bytes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("rx_bytes")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("rx_bytes".to_string(), Value::Number(n.into()));
                 }
-                if let Some(m) = caps.name("tx_bytes") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("tx_bytes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("tx_bytes")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("tx_bytes".to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
 
             if let Some(caps) = re_linux_tx_stats.captures(line) {
-                if let Some(m) = caps.name("tx_collisions") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("tx_collisions".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("tx_collisions")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("tx_collisions".to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
@@ -662,40 +662,40 @@ impl Parser for IfconfigParser {
             }
 
             if let Some(caps) = re_openbsd_rx.captures(line) {
-                if let Some(m) = caps.name("rx_packets") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("rx_packets".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("rx_packets")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("rx_packets".to_string(), Value::Number(n.into()));
                 }
-                if let Some(m) = caps.name("rx_bytes") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("rx_bytes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("rx_bytes")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("rx_bytes".to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
 
             if let Some(caps) = re_openbsd_rx_stats.captures(line) {
                 for field in &["rx_errors", "rx_dropped", "rx_overruns", "rx_frame"] {
-                    if let Some(m) = caps.name(field) {
-                        if let Ok(n) = m.as_str().parse::<i64>() {
-                            interface_item.insert(field.to_string(), Value::Number(n.into()));
-                        }
+                    if let Some(m) = caps.name(field)
+                        && let Ok(n) = m.as_str().parse::<i64>()
+                    {
+                        interface_item.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 continue;
             }
 
             if let Some(caps) = re_openbsd_tx.captures(line) {
-                if let Some(m) = caps.name("tx_packets") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("tx_packets".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("tx_packets")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("tx_packets".to_string(), Value::Number(n.into()));
                 }
-                if let Some(m) = caps.name("tx_bytes") {
-                    if let Ok(n) = m.as_str().parse::<i64>() {
-                        interface_item.insert("tx_bytes".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(m) = caps.name("tx_bytes")
+                    && let Ok(n) = m.as_str().parse::<i64>()
+                {
+                    interface_item.insert("tx_bytes".to_string(), Value::Number(n.into()));
                 }
                 continue;
             }
@@ -708,10 +708,10 @@ impl Parser for IfconfigParser {
                     "tx_carrier",
                     "tx_collisions",
                 ] {
-                    if let Some(m) = caps.name(field) {
-                        if let Ok(n) = m.as_str().parse::<i64>() {
-                            interface_item.insert(field.to_string(), Value::Number(n.into()));
-                        }
+                    if let Some(m) = caps.name(field)
+                        && let Ok(n) = m.as_str().parse::<i64>()
+                    {
+                        interface_item.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 continue;
@@ -736,10 +736,10 @@ impl Parser for IfconfigParser {
             }
 
             if let Some(caps) = re_freebsd_nd6.captures(line) {
-                if let Some(opts) = caps.name("nd6_options") {
-                    if let Ok(n) = opts.as_str().parse::<i64>() {
-                        interface_item.insert("nd6_options".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(opts) = caps.name("nd6_options")
+                    && let Ok(n) = opts.as_str().parse::<i64>()
+                {
+                    interface_item.insert("nd6_options".to_string(), Value::Number(n.into()));
                 }
                 if let Some(flags) = caps.name("nd6_flags") {
                     let flag_vec: Vec<Value> = flags

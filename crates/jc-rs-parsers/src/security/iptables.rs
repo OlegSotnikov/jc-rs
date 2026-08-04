@@ -211,24 +211,24 @@ impl Parser for IptablesParser {
                 }
 
                 // Fix invisible char target
-                if let Some(Value::String(t)) = rule.get("target") {
-                    if t == "\u{2063}" {
-                        rule.insert("target".to_string(), Value::String(String::new()));
-                    }
+                if let Some(Value::String(t)) = rule.get("target")
+                    && t == "\u{2063}"
+                {
+                    rule.insert("target".to_string(), Value::String(String::new()));
                 }
 
                 // Process: convert types
                 // num -> int
-                if let Some(Value::String(s)) = rule.get("num").cloned() {
-                    if let Ok(n) = s.trim().parse::<i64>() {
-                        rule.insert("num".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(Value::String(s)) = rule.get("num").cloned()
+                    && let Ok(n) = s.trim().parse::<i64>()
+                {
+                    rule.insert("num".to_string(), Value::Number(n.into()));
                 }
                 // pkts -> int
-                if let Some(Value::String(s)) = rule.get("pkts").cloned() {
-                    if let Ok(n) = s.trim().parse::<i64>() {
-                        rule.insert("pkts".to_string(), Value::Number(n.into()));
-                    }
+                if let Some(Value::String(s)) = rule.get("pkts").cloned()
+                    && let Ok(n) = s.trim().parse::<i64>()
+                {
+                    rule.insert("pkts".to_string(), Value::Number(n.into()));
                 }
                 // bytes -> size int
                 if let Some(Value::String(s)) = rule.get("bytes").cloned() {
@@ -236,22 +236,22 @@ impl Parser for IptablesParser {
                     rule.insert("bytes".to_string(), convert_size_to_int(&s));
                 }
                 // opt "--" -> null
-                if let Some(Value::String(s)) = rule.get("opt").cloned() {
-                    if s == "--" {
-                        rule.insert("opt".to_string(), Value::Null);
-                    }
+                if let Some(Value::String(s)) = rule.get("opt").cloned()
+                    && s == "--"
+                {
+                    rule.insert("opt".to_string(), Value::Null);
                 }
                 // target "" -> null
-                if let Some(Value::String(s)) = rule.get("target").cloned() {
-                    if s.is_empty() {
-                        rule.insert("target".to_string(), Value::Null);
-                    }
+                if let Some(Value::String(s)) = rule.get("target").cloned()
+                    && s.is_empty()
+                {
+                    rule.insert("target".to_string(), Value::Null);
                 }
 
-                if let Some(c) = chain.as_mut() {
-                    if let Some(Value::Array(rules)) = c.get_mut("rules") {
-                        rules.push(Value::Object(rule));
-                    }
+                if let Some(c) = chain.as_mut()
+                    && let Some(Value::Array(rules)) = c.get_mut("rules")
+                {
+                    rules.push(Value::Object(rule));
                 }
             }
         }
@@ -263,10 +263,10 @@ impl Parser for IptablesParser {
 
         // Process chain-level fields
         for chain_obj in raw_output.iter_mut() {
-            if let Some(Value::String(s)) = chain_obj.get("default_packets").cloned() {
-                if let Ok(n) = s.trim().parse::<i64>() {
-                    chain_obj.insert("default_packets".to_string(), Value::Number(n.into()));
-                }
+            if let Some(Value::String(s)) = chain_obj.get("default_packets").cloned()
+                && let Ok(n) = s.trim().parse::<i64>()
+            {
+                chain_obj.insert("default_packets".to_string(), Value::Number(n.into()));
             }
             if let Some(Value::String(s)) = chain_obj.get("default_bytes").cloned() {
                 let s = s.clone();

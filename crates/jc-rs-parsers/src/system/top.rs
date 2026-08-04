@@ -218,12 +218,12 @@ impl TopSession {
 impl LineParser for TopSession {
     fn parse_line(&mut self, line: &str, _quiet: bool) -> Result<Option<Record>, ParseError> {
         let mut finished = None;
-        if line.starts_with("top - ") {
+        if let Some(rest) = line.strip_prefix("top - ") {
             // Flush previous snapshot
             finished = self.flush();
 
             // Parse "top - HH:MM:SS up ..." line
-            let rest = &line[6..]; // strip "top - "
+            // strip "top - "
             if let Some(caps) = top_line_re().captures(rest) {
                 let time_str = caps[1].to_string();
                 let uptime_str = caps[2].trim().to_string();
@@ -442,7 +442,7 @@ fn process_snapshot(raw: Map<String, Value>) -> Map<String, Value> {
                         .unwrap_or(Value::Null)
                 } else if root_float_list.contains(&key.as_str()) {
                     convert_to_float(s)
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null)
                 } else {
@@ -524,18 +524,17 @@ fn parse_process_table(table_str: &str) -> Vec<Value> {
                 };
 
                 // Handle bytes fields
-                if BYTES_KEYS.contains(&key.as_str()) {
-                    if let Some(s) = val_str_clean {
-                        let last_char = s.chars().last();
-                        let unit = match last_char {
-                            Some(c) if !c.is_ascii_digit() => c.to_string(),
-                            _ => "b".to_string(),
-                        };
-                        if let Some(bytes) = convert_size_to_int(s, true) {
-                            extra_fields.push((format!("{}_unit", key), Value::String(unit)));
-                            extra_fields
-                                .push((format!("{}_bytes", key), Value::Number(bytes.into())));
-                        }
+                if BYTES_KEYS.contains(&key.as_str())
+                    && let Some(s) = val_str_clean
+                {
+                    let last_char = s.chars().last();
+                    let unit = match last_char {
+                        Some(c) if !c.is_ascii_digit() => c.to_string(),
+                        _ => "b".to_string(),
+                    };
+                    if let Some(bytes) = convert_size_to_int(s, true) {
+                        extra_fields.push((format!("{}_unit", key), Value::String(unit)));
+                        extra_fields.push((format!("{}_bytes", key), Value::Number(bytes.into())));
                     }
                 }
 
@@ -547,7 +546,7 @@ fn parse_process_table(table_str: &str) -> Vec<Value> {
                             .unwrap_or(Value::Null)
                     } else if FLOAT_KEYS.contains(&key.as_str()) {
                         convert_to_float(s)
-                            .and_then(|f| serde_json::Number::from_f64(f))
+                            .and_then(serde_json::Number::from_f64)
                             .map(Value::Number)
                             .unwrap_or(Value::Null)
                     } else {

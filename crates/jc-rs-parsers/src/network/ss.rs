@@ -135,24 +135,24 @@ impl Parser for SsParser {
             }
 
             // For contains_colon netids: rsplit ':' on local (idx 4) and peer (idx 6)
-            if let Some(netid) = entry_list.first().map(|s| s.as_str()) {
-                if CONTAINS_COLON.contains(&netid) {
-                    // Split local_address:port at index 4
-                    if let Some(local) = entry_list.get(4).cloned() {
-                        if local.contains(':') {
-                            let (addr, port) = rsplit_colon(&local);
-                            entry_list[4] = addr;
-                            entry_list.insert(5, port);
-                        }
-                    }
-                    // Split peer_address:port at index 6
-                    if let Some(peer) = entry_list.get(6).cloned() {
-                        if peer.contains(':') {
-                            let (addr, port) = rsplit_colon(&peer);
-                            entry_list[6] = addr;
-                            entry_list.insert(7, port);
-                        }
-                    }
+            if let Some(netid) = entry_list.first().map(|s| s.as_str())
+                && CONTAINS_COLON.contains(&netid)
+            {
+                // Split local_address:port at index 4
+                if let Some(local) = entry_list.get(4).cloned()
+                    && local.contains(':')
+                {
+                    let (addr, port) = rsplit_colon(&local);
+                    entry_list[4] = addr;
+                    entry_list.insert(5, port);
+                }
+                // Split peer_address:port at index 6
+                if let Some(peer) = entry_list.get(6).cloned()
+                    && peer.contains(':')
+                {
+                    let (addr, port) = rsplit_colon(&peer);
+                    entry_list[6] = addr;
+                    entry_list.insert(7, port);
                 }
             }
 
@@ -317,13 +317,13 @@ fn post_process_ss(obj: &mut Map<String, Value>) {
     // Handle '%' in local_address → extract interface (matches jc: if '%' in output_line['local_address'])
     if let Some(la_val) = obj.get("local_address").cloned() {
         let la = la_val.as_str().unwrap_or("");
-        if la.contains('%') {
-            if let Some(pct) = la.rfind('%') {
-                let addr = la[..pct].to_string();
-                let iface = la[pct + 1..].to_string();
-                obj.insert("local_address".to_string(), Value::String(addr));
-                obj.insert("interface".to_string(), Value::String(iface));
-            }
+        if la.contains('%')
+            && let Some(pct) = la.rfind('%')
+        {
+            let addr = la[..pct].to_string();
+            let iface = la[pct + 1..].to_string();
+            obj.insert("local_address".to_string(), Value::String(addr));
+            obj.insert("interface".to_string(), Value::String(iface));
         }
     }
 
@@ -402,20 +402,20 @@ fn process_ss(obj: &mut Map<String, Value>) {
     // local_port_num
     if let Some(lp_val) = obj.get("local_port").cloned() {
         let s = lp_val.as_str().unwrap_or("");
-        if let Ok(n) = s.parse::<i64>() {
-            if n >= 0 {
-                obj.insert("local_port_num".to_string(), Value::Number(n.into()));
-            }
+        if let Ok(n) = s.parse::<i64>()
+            && n >= 0
+        {
+            obj.insert("local_port_num".to_string(), Value::Number(n.into()));
         }
     }
 
     // peer_port_num
     if let Some(pp_val) = obj.get("peer_port").cloned() {
         let s = pp_val.as_str().unwrap_or("");
-        if let Ok(n) = s.parse::<i64>() {
-            if n >= 0 {
-                obj.insert("peer_port_num".to_string(), Value::Number(n.into()));
-            }
+        if let Ok(n) = s.parse::<i64>()
+            && n >= 0
+        {
+            obj.insert("peer_port_num".to_string(), Value::Number(n.into()));
         }
     }
 }

@@ -30,23 +30,6 @@ inventory::submit! {
     ParserEntry::new(&HCICONFIG_PARSER)
 }
 
-const INT_KEYS: &[&str] = &[
-    "acl_mtu",
-    "acl_mtu_packets",
-    "sco_mtu",
-    "sco_mtu_packets",
-    "rx_bytes",
-    "rx_acl",
-    "rx_sco",
-    "rx_events",
-    "rx_errors",
-    "tx_bytes",
-    "tx_acl",
-    "tx_sco",
-    "tx_commands",
-    "tx_errors",
-];
-
 impl Parser for HciconfigParser {
     fn info(&self) -> &'static ParserInfo {
         &INFO
@@ -188,12 +171,12 @@ impl Parser for HciconfigParser {
                     d.insert("link_mode".to_string(), Value::Array(modes));
                 } else if trimmed.starts_with("Name:") {
                     // Name: 'kbrazil-ubuntu'
-                    let name_part = trimmed.splitn(2, ':').nth(1).unwrap_or("").trim();
+                    let name_part = trimmed.split_once(':').map(|x| x.1).unwrap_or("").trim();
                     // Strip surrounding single quotes
                     let name = name_part.trim_matches('\'');
                     d.insert("name".to_string(), Value::String(name.to_string()));
                 } else if trimmed.starts_with("Class:") {
-                    let class = trimmed.splitn(2, ':').nth(1).unwrap_or("").trim();
+                    let class = trimmed.split_once(':').map(|x| x.1).unwrap_or("").trim();
                     d.insert("class".to_string(), Value::String(class.to_string()));
                 } else if trimmed.starts_with("Service Classes:") {
                     let raw: Vec<&str> = trimmed.split_whitespace().skip(2).collect();
@@ -238,7 +221,7 @@ impl Parser for HciconfigParser {
                         );
                     }
                 } else if trimmed.starts_with("Manufacturer:") {
-                    let mfr = trimmed.splitn(2, ':').nth(1).unwrap_or("").trim();
+                    let mfr = trimmed.split_once(':').map(|x| x.1).unwrap_or("").trim();
                     d.insert("manufacturer".to_string(), Value::String(mfr.to_string()));
                 }
             }

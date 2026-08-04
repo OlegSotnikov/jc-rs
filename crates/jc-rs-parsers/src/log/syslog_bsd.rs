@@ -53,11 +53,11 @@ pub fn parse_syslog_bsd_line(line: &str) -> Map<String, Value> {
         .name("priority")
         .and_then(|m| m.as_str().parse::<i64>().ok());
     // Validate: RFC 3164 max priority = 191
-    if let Some(p) = priority {
-        if p > 191 {
-            map.insert("unparsable".to_string(), Value::String(line.to_string()));
-            return map;
-        }
+    if let Some(p) = priority
+        && p > 191
+    {
+        map.insert("unparsable".to_string(), Value::String(line.to_string()));
+        return map;
     }
     map.insert(
         "priority".to_string(),

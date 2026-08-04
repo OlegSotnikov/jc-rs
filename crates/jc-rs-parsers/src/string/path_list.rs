@@ -64,10 +64,7 @@ mod tests {
         let parser = PathListParser;
         let result = parser.parse(input, false).unwrap();
         match result {
-            ParseOutput::Array(arr) => arr
-                .into_iter()
-                .map(|m| serde_json::Value::Object(m))
-                .collect(),
+            ParseOutput::Array(arr) => arr.into_iter().map(serde_json::Value::Object).collect(),
             _ => panic!("expected array"),
         }
     }

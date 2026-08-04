@@ -228,10 +228,10 @@ impl Parser for X509CrlParser {
         // Try PEM first
         let pem_crls = decode_pem(input, "X509 CRL");
 
-        if !pem_crls.is_empty() {
-            if let Some(crl) = parse_crl(&pem_crls[0]) {
-                return Ok(ParseOutput::Object(crl));
-            }
+        if !pem_crls.is_empty()
+            && let Some(crl) = parse_crl(&pem_crls[0])
+        {
+            return Ok(ParseOutput::Object(crl));
         }
 
         // Try as raw DER

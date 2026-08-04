@@ -84,10 +84,10 @@ fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
             for field in &["%cpu", "%mem", "cpu_percent", "mem_percent"] {
                 if let Some(Value::String(s)) = row.get(*field) {
                     let s = s.clone();
-                    if let Ok(f) = s.trim().parse::<f64>() {
-                        if let Some(n) = serde_json::Number::from_f64(f) {
-                            row.insert(field.to_string(), Value::Number(n));
-                        }
+                    if let Ok(f) = s.trim().parse::<f64>()
+                        && let Some(n) = serde_json::Number::from_f64(f)
+                    {
+                        row.insert(field.to_string(), Value::Number(n));
                     }
                 }
             }

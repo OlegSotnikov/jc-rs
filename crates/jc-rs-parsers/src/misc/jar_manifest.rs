@@ -45,10 +45,10 @@ impl Parser for JarManifestParser {
         let mut lines: Vec<&str> = input.lines().collect();
 
         // Strip trailing "N archives were successfully processed." line
-        if let Some(last) = lines.last() {
-            if last.ends_with("archives were successfully processed.") {
-                lines.pop();
-            }
+        if let Some(last) = lines.last()
+            && last.ends_with("archives were successfully processed.")
+        {
+            lines.pop();
         }
 
         // Split into archive blocks on empty lines

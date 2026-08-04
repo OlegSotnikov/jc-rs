@@ -119,53 +119,53 @@ fn process_output(raw: Map<String, Value>) -> Map<String, Value> {
 
     for (key, val) in &raw {
         // acceptenv: flatten list of strings split on whitespace
-        if key == "acceptenv" {
-            if let Value::Array(items) = val {
-                let mut flat: Vec<Value> = Vec::new();
-                for item in items {
-                    if let Value::String(s) = item {
-                        for part in s.split_whitespace() {
-                            flat.push(Value::String(part.to_string()));
-                        }
+        if key == "acceptenv"
+            && let Value::Array(items) = val
+        {
+            let mut flat: Vec<Value> = Vec::new();
+            for item in items {
+                if let Value::String(s) = item {
+                    for part in s.split_whitespace() {
+                        flat.push(Value::String(part.to_string()));
                     }
                 }
-                result.insert(key.clone(), Value::Array(flat));
-                continue;
             }
+            result.insert(key.clone(), Value::Array(flat));
+            continue;
         }
 
         // include: flatten list
-        if key == "include" {
-            if let Value::Array(items) = val {
-                let mut flat: Vec<Value> = Vec::new();
-                for item in items {
-                    if let Value::String(s) = item {
-                        for part in s.split_whitespace() {
-                            flat.push(Value::String(part.to_string()));
-                        }
+        if key == "include"
+            && let Value::Array(items) = val
+        {
+            let mut flat: Vec<Value> = Vec::new();
+            for item in items {
+                if let Value::String(s) = item {
+                    for part in s.split_whitespace() {
+                        flat.push(Value::String(part.to_string()));
                     }
                 }
-                result.insert(key.clone(), Value::Array(flat));
-                continue;
             }
+            result.insert(key.clone(), Value::Array(flat));
+            continue;
         }
 
         // port: convert list of strings to list of ints
-        if key == "port" {
-            if let Value::Array(items) = val {
-                let port_list: Vec<Value> = items
-                    .iter()
-                    .filter_map(|v| {
-                        if let Value::String(s) = v {
-                            s.parse::<i64>().ok().map(|n| Value::Number(n.into()))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                result.insert(key.clone(), Value::Array(port_list));
-                continue;
-            }
+        if key == "port"
+            && let Value::Array(items) = val
+        {
+            let port_list: Vec<Value> = items
+                .iter()
+                .filter_map(|v| {
+                    if let Value::String(s) = v {
+                        s.parse::<i64>().ok().map(|n| Value::Number(n.into()))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            result.insert(key.clone(), Value::Array(port_list));
+            continue;
         }
 
         // Other array fields (hostkey, listenaddress) stay as-is
@@ -334,17 +334,16 @@ impl Parser for SshdConfParser {
                 continue;
             }
 
-            if modified.contains(key.as_str()) {
-                if let Some(first_char) = val.chars().next() {
-                    if modifiers.contains(&first_char) {
-                        raw_output.insert(key.clone(), Value::String(val[1..].to_string()));
-                        raw_output.insert(
-                            format!("{}_strategy", key),
-                            Value::String(first_char.to_string()),
-                        );
-                        continue;
-                    }
-                }
+            if modified.contains(key.as_str())
+                && let Some(first_char) = val.chars().next()
+                && modifiers.contains(&first_char)
+            {
+                raw_output.insert(key.clone(), Value::String(val[1..].to_string()));
+                raw_output.insert(
+                    format!("{}_strategy", key),
+                    Value::String(first_char.to_string()),
+                );
+                continue;
             }
 
             raw_output.insert(key, Value::String(val.to_string()));
@@ -373,7 +372,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sshd_T_golden() {
+    fn test_sshd_t_golden() {
         let input = include_str!("../../../../tests/fixtures/generic/sshd-T.out");
         let expected: serde_json::Value = serde_json::from_str(include_str!(
             "../../../../tests/fixtures/generic/sshd-T.json"
@@ -386,7 +385,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sshd_T_2_golden() {
+    fn test_sshd_t_2_golden() {
         let input = include_str!("../../../../tests/fixtures/generic/sshd-T-2.out");
         let expected: serde_json::Value = serde_json::from_str(include_str!(
             "../../../../tests/fixtures/generic/sshd-T-2.json"

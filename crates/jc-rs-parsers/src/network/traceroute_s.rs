@@ -331,7 +331,7 @@ impl LineParser for TracerouteSession {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
+    use jc_rs_core::traits::Parser;
 
     #[test]
     fn test_traceroute_s_ipv4_golden() {

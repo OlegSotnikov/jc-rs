@@ -155,7 +155,7 @@ fn apply_linux_field(line: &str, obj: &mut Map<String, Value>) {
         return;
     }
     if line.starts_with("Access: (") {
-        let cleaned = line.replace('(', " ").replace(')', " ").replace('/', " ");
+        let cleaned = line.replace(['(', ')', '/'], " ");
         let parts: Vec<&str> = cleaned.split_whitespace().collect();
         if parts.len() >= 9 {
             obj.insert("access".to_string(), Value::String(parts[1].to_string()));
@@ -181,24 +181,35 @@ fn apply_linux_field(line: &str, obj: &mut Map<String, Value>) {
         || line.starts_with("Access: 1")
         || line.starts_with("Access: -")
     {
-        let after = line.splitn(2, "Access: ").nth(1).unwrap_or("").trim();
+        let after = line
+            .split_once("Access: ")
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim();
         parse_time_field(after, obj, "access_time");
         return;
     }
     if line.starts_with("Modify:") {
-        let after = line.splitn(2, "Modify: ").nth(1).unwrap_or("").trim();
+        let after = line
+            .split_once("Modify: ")
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim();
         parse_time_field(after, obj, "modify_time");
         return;
     }
     if line.starts_with("Change:") {
-        let after = line.splitn(2, "Change: ").nth(1).unwrap_or("").trim();
+        let after = line
+            .split_once("Change: ")
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim();
         parse_time_field(after, obj, "change_time");
         return;
     }
     if line.starts_with(" Birth:") {
-        let after = line.splitn(2, "Birth: ").nth(1).unwrap_or("").trim();
+        let after = line.split_once("Birth: ").map(|x| x.1).unwrap_or("").trim();
         parse_time_field(after, obj, "birth_time");
-        return;
     }
 }
 
@@ -290,7 +301,7 @@ impl LineParser for StatSession {
         if line.find("File:") == Some(2) {
             let previous = (!self.obj.is_empty()).then(|| std::mem::take(&mut self.obj));
 
-            let after = line.splitn(2, "File:").nth(1).unwrap_or("").trim();
+            let after = line.split_once("File:").map(|x| x.1).unwrap_or("").trim();
             // Split before unquoting. GNU stat writes a symlink with each side
             // quoted separately, so stripping the quotes off the whole field
             // first leaves one dangling on each side of the arrow.

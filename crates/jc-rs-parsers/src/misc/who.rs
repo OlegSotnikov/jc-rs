@@ -60,10 +60,10 @@ fn time_to_epoch(time_str: &str) -> Value {
     // Try YYYY-MM-DD HH:MM format
     let fmts = ["%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"];
     for fmt in &fmts {
-        if let Ok(dt) = NaiveDateTime::parse_from_str(time_str, fmt) {
-            if let Some(local_dt) = Local.from_local_datetime(&dt).single() {
-                return Value::Number(local_dt.timestamp().into());
-            }
+        if let Ok(dt) = NaiveDateTime::parse_from_str(time_str, fmt)
+            && let Some(local_dt) = Local.from_local_datetime(&dt).single()
+        {
+            return Value::Number(local_dt.timestamp().into());
         }
     }
     Value::Null
@@ -115,10 +115,10 @@ impl Parser for WhoParser {
                     obj.insert("time".to_string(), Value::String(time_str));
                     obj.insert("epoch".to_string(), epoch);
                 }
-                if tokens.len() >= 7 {
-                    if let Ok(pid) = tokens[6].parse::<i64>() {
-                        obj.insert("pid".to_string(), Value::Number(pid.into()));
-                    }
+                if tokens.len() >= 7
+                    && let Ok(pid) = tokens[6].parse::<i64>()
+                {
+                    obj.insert("pid".to_string(), Value::Number(pid.into()));
                 }
                 result.push(obj);
                 continue;
@@ -147,10 +147,10 @@ impl Parser for WhoParser {
                     obj.insert("time".to_string(), Value::String(time_str));
                     obj.insert("epoch".to_string(), epoch);
                 }
-                if tokens.len() >= 5 {
-                    if let Ok(pid) = tokens[4].parse::<i64>() {
-                        obj.insert("pid".to_string(), Value::Number(pid.into()));
-                    }
+                if tokens.len() >= 5
+                    && let Ok(pid) = tokens[4].parse::<i64>()
+                {
+                    obj.insert("pid".to_string(), Value::Number(pid.into()));
                 }
                 if tokens.len() > 5 {
                     obj.insert("comment".to_string(), Value::String(tokens[5..].join(" ")));
@@ -186,10 +186,10 @@ impl Parser for WhoParser {
                     obj.insert("time".to_string(), Value::String(time_str));
                     obj.insert("epoch".to_string(), epoch);
                 }
-                if tokens.len() >= 4 {
-                    if let Ok(pid) = tokens[3].parse::<i64>() {
-                        obj.insert("pid".to_string(), Value::Number(pid.into()));
-                    }
+                if tokens.len() >= 4
+                    && let Ok(pid) = tokens[3].parse::<i64>()
+                {
+                    obj.insert("pid".to_string(), Value::Number(pid.into()));
                 }
                 if tokens.len() > 4 {
                     obj.insert("comment".to_string(), Value::String(tokens[4..].join(" ")));
@@ -243,8 +243,7 @@ impl Parser for WhoParser {
                 tokens.drain(0..2);
                 t
             } else {
-                let t = tokens.remove(0);
-                t
+                tokens.remove(0)
             };
             obj.insert("time".to_string(), Value::String(time_str.clone()));
 
@@ -342,15 +341,15 @@ mod tests {
                         assert_eq!(g, e, "row {} field '{}' mismatch", i, field);
                     }
                     // For pid, compare if present in expected
-                    if exp.get("pid") != Some(&Value::Null) {
-                        if let Some(exp_pid) = exp.get("pid") {
-                            assert_eq!(
-                                got.get("pid").unwrap_or(&Value::Null),
-                                exp_pid,
-                                "row {} field 'pid' mismatch",
-                                i
-                            );
-                        }
+                    if exp.get("pid") != Some(&Value::Null)
+                        && let Some(exp_pid) = exp.get("pid")
+                    {
+                        assert_eq!(
+                            got.get("pid").unwrap_or(&Value::Null),
+                            exp_pid,
+                            "row {} field 'pid' mismatch",
+                            i
+                        );
                     }
                     // epoch: if expected is null, we should also be null
                     if let Some(Value::Null) = exp.get("epoch") {
@@ -362,15 +361,15 @@ mod tests {
                         );
                     }
                     // If expected epoch is non-null, just check our epoch is also non-null
-                    if let Some(exp_epoch) = exp.get("epoch") {
-                        if exp_epoch != &Value::Null {
-                            let got_epoch = got.get("epoch").unwrap_or(&Value::Null);
-                            assert!(
-                                got_epoch != &Value::Null,
-                                "row {} epoch should not be null",
-                                i
-                            );
-                        }
+                    if let Some(exp_epoch) = exp.get("epoch")
+                        && exp_epoch != &Value::Null
+                    {
+                        let got_epoch = got.get("epoch").unwrap_or(&Value::Null);
+                        assert!(
+                            got_epoch != &Value::Null,
+                            "row {} epoch should not be null",
+                            i
+                        );
                     }
                 }
             }
@@ -419,5 +418,21 @@ mod tests {
         } else {
             panic!("expected Array");
         }
+    }
+
+    #[test]
+    fn test_who_login_screen() {
+        // `from` reads "login screen" for a seat, and a plain local login has
+        // no `from` at all. The epoch is timezone-dependent, so this asserts
+        // structure rather than a number.
+        let input = include_str!("../../../../tests/fixtures/generic/who-login-screen.out");
+        let ParseOutput::Array(rows) = WhoParser.parse(input, false).unwrap() else {
+            panic!("expected an array");
+        };
+        assert_eq!(rows.len(), 3);
+        assert_eq!(rows[0]["user"], "atemu");
+        assert_eq!(rows[0]["tty"], "seat0");
+        assert_eq!(rows[0]["from"], "login screen");
+        assert!(!rows[2].contains_key("from"));
     }
 }

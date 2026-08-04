@@ -95,7 +95,7 @@ fn parse_header(line: &str) -> Map<String, Value> {
     obj
 }
 
-fn p_after<'a>(parts: &[&'a str], idx: usize) -> String {
+fn p_after(parts: &[&str], idx: usize) -> String {
     parts.get(idx + 1).copied().unwrap_or("").to_string()
 }
 
@@ -126,7 +126,7 @@ fn parse_flags_line(line: &str) -> Map<String, Value> {
     obj.insert("flags".to_string(), Value::Array(flags));
 
     // Extract counts
-    let rest = line.replace(',', " ").replace(':', " ");
+    let rest = line.replace([',', ':'], " ");
     let parts: Vec<&str> = rest.split_whitespace().collect();
     let find_after = |needle: &str| -> Option<i64> {
         parts
@@ -269,7 +269,7 @@ fn parse_axfr_record(line: &str) -> Map<String, Value> {
 fn parse_footer(line: &str) -> Option<(String, Value)> {
     if line.starts_with(";; Query time:") {
         // ";; Query time: 49 msec" -> extract integer
-        let after = line.splitn(2, ':').nth(1).unwrap_or("").trim();
+        let after = line.split_once(':').map(|x| x.1).unwrap_or("").trim();
         // after = "49 msec"
         let num_str = after.split_whitespace().next().unwrap_or("");
         if let Ok(n) = num_str.parse::<i64>() {
@@ -296,17 +296,32 @@ fn parse_footer(line: &str) -> Option<(String, Value)> {
         return Some(("when".to_string(), Value::String(val)));
     }
     if line.starts_with(";; MSG SIZE  rcvd:") {
-        let val = line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string();
+        let val = line
+            .split_once(':')
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim()
+            .to_string();
         if let Ok(n) = val.parse::<i64>() {
             return Some(("rcvd".to_string(), Value::Number(n.into())));
         }
     }
     if line.starts_with(";; XFR size:") {
-        let val = line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string();
+        let val = line
+            .split_once(':')
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim()
+            .to_string();
         return Some(("size".to_string(), Value::String(val)));
     }
     if line.starts_with(";; QUERY SIZE:") {
-        let val = line.splitn(2, ':').nth(1).unwrap_or("").trim().to_string();
+        let val = line
+            .split_once(':')
+            .map(|x| x.1)
+            .unwrap_or("")
+            .trim()
+            .to_string();
         if let Ok(n) = val.parse::<i64>() {
             return Some(("query_size".to_string(), Value::Number(n.into())));
         }

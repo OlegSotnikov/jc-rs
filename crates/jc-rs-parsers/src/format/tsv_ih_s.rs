@@ -1,6 +1,6 @@
 //! TSV streaming parser for files with no header row.
 
-use super::delimited::{DelimitedSession, parse_delimited};
+use super::delimited::DelimitedSession;
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::{LineParser, Parser, StreamingParser, parse_via_session};

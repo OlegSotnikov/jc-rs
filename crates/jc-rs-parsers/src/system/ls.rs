@@ -192,10 +192,10 @@ fn parse_long_format(lines: &[&str], initial_parent: &str, output: &mut Vec<Map<
             // jc unconditionally does raw_output[-1]['filename'] = raw_output[-1]['filename'][:-1]
             // which removes the '\n' added by the continuation logic, but also removes a real
             // character if called again (e.g. for empty dirs that have two consecutive headers).
-            if let Some(last) = output.last_mut() {
-                if let Some(Value::String(s)) = last.get_mut("filename") {
-                    s.pop();
-                }
+            if let Some(last) = output.last_mut()
+                && let Some(Value::String(s)) = last.get_mut("filename")
+            {
+                s.pop();
             }
             parent = line.trim_end_matches(':').to_string();
             new_section = true;
@@ -210,11 +210,11 @@ fn parse_long_format(lines: &[&str], initial_parent: &str, output: &mut Vec<Map<
 
         // Continuation line for filenames with newlines (including blank lines)
         if !new_section && !is_long_entry(line) {
-            if let Some(last) = output.last_mut() {
-                if let Some(Value::String(s)) = last.get_mut("filename") {
-                    s.push('\n');
-                    s.push_str(line);
-                }
+            if let Some(last) = output.last_mut()
+                && let Some(Value::String(s)) = last.get_mut("filename")
+            {
+                s.push('\n');
+                s.push_str(line);
             }
             continue;
         }

@@ -99,13 +99,13 @@ impl Parser for TracepathParser {
 
                 // If this line contains the overall pmtu (e.g., "pmtu 1500" at start),
                 // and we haven't seen a ttl_host yet, store as top-level pmtu
-                if top_pmtu.is_none() {
-                    if let Some(p) = &pmtu {
-                        // Only set if this is a header-style line (no hop info yet)
-                        if ttl.is_none() {
-                            top_pmtu = Some(*p);
-                            continue;
-                        }
+                if top_pmtu.is_none()
+                    && let Some(p) = &pmtu
+                {
+                    // Only set if this is a header-style line (no hop info yet)
+                    if ttl.is_none() {
+                        top_pmtu = Some(*p);
+                        continue;
                     }
                 }
 
@@ -129,7 +129,7 @@ impl Parser for TracepathParser {
                 hop.insert(
                     "reply_ms".to_string(),
                     reply_ms
-                        .and_then(|f| serde_json::Number::from_f64(f))
+                        .and_then(serde_json::Number::from_f64)
                         .map(Value::Number)
                         .unwrap_or(Value::Null),
                 );
@@ -155,14 +155,12 @@ impl Parser for TracepathParser {
         }
 
         // If we never found a summary line, try to get pmtu from first hop
-        if top_pmtu.is_none() {
-            if let Some(first_hop) = hops.first() {
-                if let Some(obj) = first_hop.as_object() {
-                    if let Some(p) = obj.get("pmtu") {
-                        top_pmtu = p.as_i64();
-                    }
-                }
-            }
+        if top_pmtu.is_none()
+            && let Some(first_hop) = hops.first()
+            && let Some(obj) = first_hop.as_object()
+            && let Some(p) = obj.get("pmtu")
+        {
+            top_pmtu = p.as_i64();
         }
 
         let mut result = Map::new();

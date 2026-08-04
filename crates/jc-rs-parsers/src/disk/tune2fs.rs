@@ -84,7 +84,6 @@ fn normalize_key(key: &str) -> String {
 /// Try to parse a ctime-style date string into a Unix epoch.
 /// Format: "Mon Apr  6 15:10:37 2020"
 fn parse_date_epoch(s: &str) -> Option<i64> {
-    use chrono::NaiveDateTime;
     // Try common ctime format
     let s = s.trim();
     // ctime format: "Mon Apr  6 15:10:37 2020" — normalize double spaces

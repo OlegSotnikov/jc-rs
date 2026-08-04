@@ -48,7 +48,7 @@ const INOTIFY_INT_FIELDS: &[&str] = &["wd"];
 /// Parse a "(sec,nsec)" string into a Vec<i64>.
 fn parse_time_tuple(s: &str) -> Vec<Value> {
     // Format: "(0, 49406829)" or "(1, 0)"
-    let cleaned = s.replace('(', "").replace(')', "").replace(',', "");
+    let cleaned = s.replace(['(', ')', ','], "");
     cleaned
         .split_whitespace()
         .filter_map(|x| x.parse::<i64>().ok())
@@ -107,12 +107,11 @@ impl Parser for ProcPidFdinfoParser {
                 }
                 // Convert integer fields in epoll
                 for field in EPOLL_INT_FIELDS {
-                    if let Some(v) = epoll_map.get(*field) {
-                        if let Value::String(s) = v {
-                            if let Ok(n) = s.parse::<i64>() {
-                                epoll_map.insert(field.to_string(), Value::Number(n.into()));
-                            }
-                        }
+                    if let Some(v) = epoll_map.get(*field)
+                        && let Value::String(s) = v
+                        && let Ok(n) = s.parse::<i64>()
+                    {
+                        epoll_map.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 map.insert("epoll".to_string(), Value::Object(epoll_map));
@@ -132,12 +131,11 @@ impl Parser for ProcPidFdinfoParser {
                 }
                 // Convert integer fields in inotify
                 for field in INOTIFY_INT_FIELDS {
-                    if let Some(v) = inotify_map.get(*field) {
-                        if let Value::String(s) = v {
-                            if let Ok(n) = s.parse::<i64>() {
-                                inotify_map.insert(field.to_string(), Value::Number(n.into()));
-                            }
-                        }
+                    if let Some(v) = inotify_map.get(*field)
+                        && let Value::String(s) = v
+                        && let Ok(n) = s.parse::<i64>()
+                    {
+                        inotify_map.insert(field.to_string(), Value::Number(n.into()));
                     }
                 }
                 map.insert("inotify".to_string(), Value::Object(inotify_map));
@@ -186,12 +184,11 @@ impl Parser for ProcPidFdinfoParser {
 
         // Convert root-level integer fields
         for field in ROOT_INT_FIELDS {
-            if let Some(v) = map.get(*field) {
-                if let Value::String(s) = v {
-                    if let Ok(n) = s.parse::<i64>() {
-                        map.insert(field.to_string(), Value::Number(n.into()));
-                    }
-                }
+            if let Some(v) = map.get(*field)
+                && let Value::String(s) = v
+                && let Ok(n) = s.parse::<i64>()
+            {
+                map.insert(field.to_string(), Value::Number(n.into()));
             }
         }
 

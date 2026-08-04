@@ -55,7 +55,7 @@ impl Parser for ResolveConfParser {
             }
 
             // Strip comments: split on # or ;
-            let userdata_str = if let Some(pos) = line.find(|c| c == '#' || c == ';') {
+            let userdata_str = if let Some(pos) = line.find(['#', ';']) {
                 let before_comment = line[..pos].trim();
                 if before_comment.is_empty() {
                     continue;
@@ -87,10 +87,10 @@ impl Parser for ResolveConfParser {
                     }
                 }
                 "nameserver" => {
-                    if let Some(val) = parts.get(1) {
-                        if let Some(ns) = val.split_whitespace().next() {
-                            nameservers.push(Value::String(ns.to_string()));
-                        }
+                    if let Some(val) = parts.get(1)
+                        && let Some(ns) = val.split_whitespace().next()
+                    {
+                        nameservers.push(Value::String(ns.to_string()));
                     }
                 }
                 "options" => {

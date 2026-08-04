@@ -92,25 +92,6 @@ fn parse_interface_list(lines: &[&str]) -> Vec<Map<String, Value>> {
     interfaces
 }
 
-fn is_hex_pair(s: &str) -> bool {
-    s.len() == 2 && s.chars().all(|c| c.is_ascii_hexdigit())
-}
-
-fn extract_description(line: &str) -> String {
-    // Description appears after the MAC/dot section
-    // Find last sequence of dots and take everything after
-    let parts: Vec<&str> = line.splitn(2, "......").collect();
-    if parts.len() > 1 {
-        return parts[1].trim().to_string();
-    }
-    // Try with fewer dots
-    let parts: Vec<&str> = line.splitn(2, "...").collect();
-    if parts.len() > 1 {
-        return parts[1].trim_start_matches('.').trim().to_string();
-    }
-    line.trim().to_string()
-}
-
 fn parse_ipv4_route_table(lines: &[&str]) -> (Vec<Map<String, Value>>, Vec<Map<String, Value>>) {
     let mut active: Vec<Map<String, Value>> = Vec::new();
     let mut persistent: Vec<Map<String, Value>> = Vec::new();
@@ -254,10 +235,10 @@ fn parse_ipv6_route_table(lines: &[&str]) -> (Vec<Map<String, Value>>, Vec<Map<S
         }
         if line.starts_with("Persistent Routes:") {
             // Flush pending
-            if let Some(p) = pending.take() {
-                if section == "active" {
-                    active.push(p);
-                }
+            if let Some(p) = pending.take()
+                && section == "active"
+            {
+                active.push(p);
             }
             section = "persistent";
             skip_header = true;
@@ -356,56 +337,6 @@ fn parse_ipv6_route_table(lines: &[&str]) -> (Vec<Map<String, Value>>, Vec<Map<S
     }
 
     (active, persistent)
-}
-
-/// Parse interface list from route print output.
-/// The format is:
-///   INDEX...MAC_BYTES......DESCRIPTION
-/// where INDEX is right-padded to 5 chars, MAC is 6 space-separated hex bytes (25 chars), desc is the rest.
-fn find_dot_separator(line: &str) -> Option<usize> {
-    // Find position of "......" (6+ dots) in line
-    let bytes = line.as_bytes();
-    let mut dot_count = 0;
-    let mut start = 0;
-    for (i, &b) in bytes.iter().enumerate() {
-        if b == b'.' {
-            if dot_count == 0 {
-                start = i;
-            }
-            dot_count += 1;
-            if dot_count >= 6 {
-                return Some(i + 1); // position after the dots
-            }
-        } else {
-            dot_count = 0;
-        }
-    }
-    None
-}
-
-fn extract_mac(line: &str) -> Option<String> {
-    // Look for pattern of 6 space-separated 2-char hex values
-    let parts: Vec<&str> = line.split_whitespace().collect();
-    // Skip the first (index)
-    let mut consecutive_hex = Vec::new();
-    for part in parts.iter().skip(1) {
-        if is_hex_pair(part) {
-            consecutive_hex.push(part.to_lowercase());
-            if consecutive_hex.len() == 6 {
-                // Check it's not all zeros (placeholder)
-                let all_zero = consecutive_hex.iter().all(|h| h == "00");
-                let special = consecutive_hex.iter().any(|h| h == "e0"); // special adapter
-                let mac = consecutive_hex.join(":");
-                if mac == "00:00:00:00:00:00" || (all_zero && special) {
-                    return None;
-                }
-                return Some(mac);
-            }
-        } else {
-            consecutive_hex.clear();
-        }
-    }
-    None
 }
 
 impl Parser for RoutePrintParser {

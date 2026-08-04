@@ -190,24 +190,24 @@ fn parse_default(input: &str) -> Map<String, Value> {
         // Handle continuation lines
         match mode.as_str() {
             "supported_link_modes" => {
-                supported_link_modes.extend(line.trim().split_whitespace().map(|s| s.to_string()));
+                supported_link_modes.extend(line.split_whitespace().map(|s| s.to_string()));
                 continue;
             }
             "supported_fec_modes" => {
-                supported_fec_modes.extend(line.trim().split_whitespace().map(|s| s.to_string()));
+                supported_fec_modes.extend(line.split_whitespace().map(|s| s.to_string()));
                 continue;
             }
             "advertised_link_modes" => {
-                advertised_link_modes.extend(line.trim().split_whitespace().map(|s| s.to_string()));
+                advertised_link_modes.extend(line.split_whitespace().map(|s| s.to_string()));
                 continue;
             }
             "link_partner_advertised_link_modes" => {
                 link_partner_advertised_link_modes
-                    .extend(line.trim().split_whitespace().map(|s| s.to_string()));
+                    .extend(line.split_whitespace().map(|s| s.to_string()));
                 continue;
             }
             "advertised_fec_modes" => {
-                advertised_fec_modes.extend(line.trim().split_whitespace().map(|s| s.to_string()));
+                advertised_fec_modes.extend(line.split_whitespace().map(|s| s.to_string()));
                 continue;
             }
             "current_message_level" => {
@@ -241,11 +241,11 @@ fn parse_default(input: &str) -> Map<String, Value> {
 
     for (list, key) in list_vals {
         // Check if raw_output had "Not reported" stored as string
-        if let Some(Value::String(s)) = raw_output.get(key as &str) {
-            if s.to_lowercase() == "not reported" {
-                raw_output.insert(key.to_string(), Value::Array(vec![]));
-                continue;
-            }
+        if let Some(Value::String(s)) = raw_output.get(key as &str)
+            && s.to_lowercase() == "not reported"
+        {
+            raw_output.insert(key.to_string(), Value::Array(vec![]));
+            continue;
         }
         if not_reported.contains(key) {
             raw_output.insert(key.to_string(), Value::Array(vec![]));
@@ -271,10 +271,10 @@ fn process(obj: &mut Map<String, Value>) {
     ];
 
     // Convert speed to speed_bps
-    if let Some(Value::String(speed)) = obj.get("speed") {
-        if let Some(bps) = speed_to_bps(speed) {
-            obj.insert("speed_bps".to_string(), Value::Number(bps.into()));
-        }
+    if let Some(Value::String(speed)) = obj.get("speed")
+        && let Some(bps) = speed_to_bps(speed)
+    {
+        obj.insert("speed_bps".to_string(), Value::Number(bps.into()));
     }
 
     // Convert boolean fields
@@ -298,59 +298,59 @@ fn process(obj: &mut Map<String, Value>) {
         };
 
         // degrees C / degrees F
-        if let Some(caps) = degrees_re.captures(&val) {
-            if let (Ok(c), Ok(f)) = (
+        if let Some(caps) = degrees_re.captures(&val)
+            && let (Ok(c), Ok(f)) = (
                 caps["deg_c"].trim().parse::<f64>(),
                 caps["deg_f"].trim().parse::<f64>(),
-            ) {
-                obj.remove(&key);
-                if let Some(n) = serde_json::Number::from_f64(c) {
-                    obj.insert(format!("{}_celsius", key), Value::Number(n));
-                }
-                if let Some(n) = serde_json::Number::from_f64(f) {
-                    obj.insert(format!("{}_farenheit", key), Value::Number(n));
-                }
-                continue;
+            )
+        {
+            obj.remove(&key);
+            if let Some(n) = serde_json::Number::from_f64(c) {
+                obj.insert(format!("{}_celsius", key), Value::Number(n));
             }
+            if let Some(n) = serde_json::Number::from_f64(f) {
+                obj.insert(format!("{}_farenheit", key), Value::Number(n));
+            }
+            continue;
         }
 
         // mW / dBm
-        if let Some(caps) = power_re.captures(&val) {
-            if let (Ok(mw), Ok(dbm)) = (
+        if let Some(caps) = power_re.captures(&val)
+            && let (Ok(mw), Ok(dbm)) = (
                 caps["pow_mw"].trim().parse::<f64>(),
                 caps["pow_dbm"].trim().parse::<f64>(),
-            ) {
-                obj.remove(&key);
-                if let Some(n) = serde_json::Number::from_f64(mw) {
-                    obj.insert(format!("{}_mw", key), Value::Number(n));
-                }
-                if let Some(n) = serde_json::Number::from_f64(dbm) {
-                    obj.insert(format!("{}_dbm", key), Value::Number(n));
-                }
-                continue;
+            )
+        {
+            obj.remove(&key);
+            if let Some(n) = serde_json::Number::from_f64(mw) {
+                obj.insert(format!("{}_mw", key), Value::Number(n));
             }
+            if let Some(n) = serde_json::Number::from_f64(dbm) {
+                obj.insert(format!("{}_dbm", key), Value::Number(n));
+            }
+            continue;
         }
 
         // Voltage: ends with " V"
-        if val.ends_with(" V") {
-            if let Some(f) = convert_to_float(&val) {
-                obj.remove(&key);
-                if let Some(n) = serde_json::Number::from_f64(f) {
-                    obj.insert(format!("{}_v", key), Value::Number(n));
-                }
-                continue;
+        if val.ends_with(" V")
+            && let Some(f) = convert_to_float(&val)
+        {
+            obj.remove(&key);
+            if let Some(n) = serde_json::Number::from_f64(f) {
+                obj.insert(format!("{}_v", key), Value::Number(n));
             }
+            continue;
         }
 
         // Current: ends with " mA"
-        if val.ends_with(" mA") {
-            if let Some(f) = convert_to_float(&val) {
-                obj.remove(&key);
-                if let Some(n) = serde_json::Number::from_f64(f) {
-                    obj.insert(format!("{}_ma", key), Value::Number(n));
-                }
-                continue;
+        if val.ends_with(" mA")
+            && let Some(f) = convert_to_float(&val)
+        {
+            obj.remove(&key);
+            if let Some(n) = serde_json::Number::from_f64(f) {
+                obj.insert(format!("{}_ma", key), Value::Number(n));
             }
+            continue;
         }
     }
 }

@@ -94,11 +94,13 @@ pub fn parse_ini_str(input: &str) -> Result<ParsedIni, ParseError> {
             let section_name = trimmed[1..trimmed.len() - 1].trim().to_string();
             current_section = Some(section_name.clone());
 
-            if !section_index.contains_key(&section_name) {
-                let idx = sections.len();
-                sections.push((section_name.clone(), BTreeMap::new()));
-                section_index.insert(section_name, idx);
-            }
+            section_index
+                .entry(section_name.clone())
+                .or_insert_with(|| {
+                    let idx = sections.len();
+                    sections.push((section_name.clone(), BTreeMap::new()));
+                    idx
+                });
             continue;
         }
 

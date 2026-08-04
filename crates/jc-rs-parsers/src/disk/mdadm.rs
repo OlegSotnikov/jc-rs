@@ -94,7 +94,7 @@ fn normalize_key(key: &str) -> String {
 /// the machine's offset -- seven hours under the `TZ=PST8PDT` the corpus is
 /// pinned to, and a different number of hours everywhere else.
 fn parse_date_epoch(s: &str) -> Option<i64> {
-    let normalized = s.trim().split_whitespace().collect::<Vec<&str>>().join(" ");
+    let normalized = s.split_whitespace().collect::<Vec<&str>>().join(" ");
     jc_rs_utils::parse_timestamp(&normalized, &[jc_rs_utils::timestamp::formats::F1000]).naive_epoch
 }
 
@@ -307,7 +307,7 @@ fn insert_container_field(map: &mut Map<String, Value>, col_name: &str, val: Opt
         "Number" => {
             map.insert(
                 "Number".to_string(),
-                match val.as_deref().and_then(|s| convert_to_int(s)) {
+                match val.as_deref().and_then(convert_to_int) {
                     Some(n) => Value::Number(n.into()),
                     None => Value::Null,
                 },
@@ -570,44 +570,44 @@ fn process_device_table_row(
 
 fn process_derived_fields(record: &mut Map<String, Value>) {
     // array_size_num: extract leading number
-    if let Some(Value::String(s)) = record.get("array_size") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert("array_size_num".to_string(), Value::String(num.to_string()));
-        }
+    if let Some(Value::String(s)) = record.get("array_size")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert("array_size_num".to_string(), Value::String(num.to_string()));
     }
 
     // used_dev_size_num
-    if let Some(Value::String(s)) = record.get("used_dev_size") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert(
-                "used_dev_size_num".to_string(),
-                Value::String(num.to_string()),
-            );
-        }
+    if let Some(Value::String(s)) = record.get("used_dev_size")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert(
+            "used_dev_size_num".to_string(),
+            Value::String(num.to_string()),
+        );
     }
 
     // avail_dev_size_num
-    if let Some(Value::String(s)) = record.get("avail_dev_size") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert(
-                "avail_dev_size_num".to_string(),
-                Value::String(num.to_string()),
-            );
-        }
+    if let Some(Value::String(s)) = record.get("avail_dev_size")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert(
+            "avail_dev_size_num".to_string(),
+            Value::String(num.to_string()),
+        );
     }
 
     // data_offset: extract leading integer, store as string first then convert
-    if let Some(Value::String(s)) = record.get("data_offset") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert("data_offset".to_string(), Value::String(num.to_string()));
-        }
+    if let Some(Value::String(s)) = record.get("data_offset")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert("data_offset".to_string(), Value::String(num.to_string()));
     }
 
     // super_offset: extract leading integer
-    if let Some(Value::String(s)) = record.get("super_offset") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert("super_offset".to_string(), Value::String(num.to_string()));
-        }
+    if let Some(Value::String(s)) = record.get("super_offset")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert("super_offset".to_string(), Value::String(num.to_string()));
     }
 
     // unused_space: "before=X sectors, after=Y sectors" → unused_space_before/after
@@ -761,10 +761,10 @@ fn process_derived_fields(record: &mut Map<String, Value>) {
     }
 
     // chunk_size_num: extract leading number from chunk_size (e.g. "512K" → 512)
-    if let Some(Value::String(s)) = record.get("chunk_size") {
-        if let Some(num) = extract_leading_number(s) {
-            record.insert("chunk_size_num".to_string(), Value::String(num.to_string()));
-        }
+    if let Some(Value::String(s)) = record.get("chunk_size")
+        && let Some(num) = extract_leading_number(s)
+    {
+        record.insert("chunk_size_num".to_string(), Value::String(num.to_string()));
     }
 
     // resync_status_percent: extract number before '%'

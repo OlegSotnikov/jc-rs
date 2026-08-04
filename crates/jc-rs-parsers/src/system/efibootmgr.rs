@@ -156,7 +156,7 @@ mod tests {
             }
             if let Some(Value::Array(opts)) = obj.get("boot_options") {
                 assert_eq!(opts.len(), 3);
-                if let Some(Value::Object(opt)) = opts.get(0) {
+                if let Some(Value::Object(opt)) = opts.first() {
                     assert_eq!(
                         opt.get("boot_option_reference"),
                         Some(&Value::String("Boot0000".to_string()))

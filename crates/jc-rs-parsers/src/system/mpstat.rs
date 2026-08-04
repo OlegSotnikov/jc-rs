@@ -127,13 +127,10 @@ impl LineParser for MpstatSession {
                 .to_lowercase();
 
             // Find the position of "cpu " or "node " in the original line
-            self.header_start = if let Some(pos) = line.find("CPU ") {
-                pos
-            } else if let Some(pos) = line.find("NODE ") {
-                pos
-            } else {
-                0
-            };
+            self.header_start = line
+                .find("CPU ")
+                .or_else(|| line.find("NODE "))
+                .unwrap_or_default();
 
             self.header_text = normalized[self.header_start..].to_string();
             return Ok(None);
@@ -177,7 +174,7 @@ impl LineParser for MpstatSession {
                                 .unwrap_or(false));
                     if is_float_key {
                         convert_to_float(s)
-                            .and_then(|f| serde_json::Number::from_f64(f))
+                            .and_then(serde_json::Number::from_f64)
                             .map(Value::Number)
                             .unwrap_or(Value::Null)
                     } else {

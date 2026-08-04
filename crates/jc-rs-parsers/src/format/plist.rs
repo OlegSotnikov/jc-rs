@@ -266,7 +266,7 @@ mod tests {
             serde_json::Value::Object(parse_json_obj(&load_fixture_str("plist-alltypes.json")));
         let parser = PlistParser;
         let result = parser.parse(&input, false).unwrap();
-        if let ParseOutput::Object(mut map) = result {
+        if let ParseOutput::Object(map) = result {
             // Remove timezone-dependent timestamp fields; compare only iso strings and non-date values
             remove_timestamp_fields(&mut serde_json::Value::Object(map.clone()));
             remove_timestamp_fields(&mut expected);

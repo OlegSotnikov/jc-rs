@@ -6,6 +6,7 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 
 pub struct OpenvpnParser;
 
@@ -42,7 +43,6 @@ fn split_addr(addr_str: &str) -> (String, Option<String>, Option<String>) {
 
     let mut address = addr_str.to_string();
     let mut prefix: Option<String> = None;
-    let port: Option<String>;
 
     // Try splitting on '/' for prefix
     if let Some(slash_pos) = address.rfind('/') {
@@ -51,37 +51,24 @@ fn split_addr(addr_str: &str) -> (String, Option<String>, Option<String>) {
         prefix = Some(pref);
     }
 
-    // Try splitting IPv4 address with port (contains ':' and left side is valid IPv4)
-    if address.contains(':') {
-        // Check if it looks like IPv4:port
-        let ipv4_re = Regex::new(r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)$").unwrap();
-        if let Some(caps) = ipv4_re.captures(&address) {
-            let ip = caps[1].to_string();
-            let p = caps[2].to_string();
-            return (ip, prefix, Some(p));
-        }
-        // Otherwise assume IPv6
-        port = None;
-    } else {
-        port = None;
+    // `1.2.3.4:1194` carries a port; a bare `:` otherwise means IPv6, which
+    // never does here.
+    if address.contains(':')
+        && let Some(caps) = IPV4_PORT_RE.captures(&address)
+    {
+        return (caps[1].to_string(), prefix, Some(caps[2].to_string()));
     }
 
-    (address, prefix, port)
+    (address, prefix, None)
 }
+
+static IPV4_PORT_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)$").expect("valid ipv4:port pattern")
+});
 
 /// `Thu Jun 18 04:23:03 2015`, read in the local zone the way jc reads it.
 fn parse_openvpn_date(s: &str) -> Option<i64> {
     jc_rs_utils::parse_timestamp(s.trim(), &[jc_rs_utils::timestamp::formats::F1000]).naive_epoch
-}
-
-fn days_since_epoch(y: i64, m: i64, d: i64) -> Option<i64> {
-    let y = if m <= 2 { y - 1 } else { y };
-    let m = if m <= 2 { m + 9 } else { m - 3 };
-    let era = y.div_euclid(400);
-    let yoe = y.rem_euclid(400);
-    let doy = (153 * m + 2) / 5 + d - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    Some(era * 146097 + doe - 719468)
 }
 
 impl Parser for OpenvpnParser {
@@ -124,7 +111,7 @@ impl Parser for OpenvpnParser {
             }
 
             if section == "clients" && line.starts_with("Updated,") {
-                updated = line.splitn(2, ',').nth(1).unwrap_or("").to_string();
+                updated = line.split_once(',').map(|x| x.1).unwrap_or("").to_string();
                 continue;
             }
 
@@ -269,7 +256,12 @@ impl Parser for OpenvpnParser {
             }
 
             if section == "stats" && line.starts_with("Max bcast/mcast queue length") {
-                let val = line.splitn(2, ',').nth(1).unwrap_or("0").trim().to_string();
+                let val = line
+                    .split_once(',')
+                    .map(|x| x.1)
+                    .unwrap_or("0")
+                    .trim()
+                    .to_string();
                 if let Ok(n) = val.parse::<i64>() {
                     global_stats.insert(
                         "max_bcast_mcast_queue_len".to_string(),

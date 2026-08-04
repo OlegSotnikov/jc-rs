@@ -62,7 +62,7 @@ fn parse_linux(cleandata: &[&str]) -> Vec<Map<String, Value>> {
                 obj = Map::new();
             }
 
-            let after = line.splitn(2, "File:").nth(1).unwrap_or("").trim();
+            let after = line.split_once("File:").map(|x| x.1).unwrap_or("").trim();
             // Handle symlinks: "'/bin/apropos' -> 'whatis'"
             let after = after
                 .trim_matches('\'')
@@ -136,7 +136,7 @@ fn parse_linux(cleandata: &[&str]) -> Vec<Map<String, Value>> {
 
         // Line 4: "Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)"
         if line.starts_with("Access: (") {
-            let cleaned = line.replace('(', " ").replace(')', " ").replace('/', " ");
+            let cleaned = line.replace(['(', ')', '/'], " ");
             let parts: Vec<&str> = cleaned.split_whitespace().collect();
             // After replace: "Access:  0755  -rwxr-xr-x   Uid:      0     root    Gid:      0     root"
             // indices:         0       1      2            3        4      5        6        7      8
@@ -166,28 +166,40 @@ fn parse_linux(cleandata: &[&str]) -> Vec<Map<String, Value>> {
             || line.starts_with("Access: 1")
             || line.starts_with("Access: -")
         {
-            let after = line.splitn(2, "Access: ").nth(1).unwrap_or("").trim();
+            let after = line
+                .split_once("Access: ")
+                .map(|x| x.1)
+                .unwrap_or("")
+                .trim();
             parse_time_field(after, &mut obj, "access_time");
             continue;
         }
 
         // Modify time
         if line.starts_with("Modify:") {
-            let after = line.splitn(2, "Modify: ").nth(1).unwrap_or("").trim();
+            let after = line
+                .split_once("Modify: ")
+                .map(|x| x.1)
+                .unwrap_or("")
+                .trim();
             parse_time_field(after, &mut obj, "modify_time");
             continue;
         }
 
         // Change time
         if line.starts_with("Change:") {
-            let after = line.splitn(2, "Change: ").nth(1).unwrap_or("").trim();
+            let after = line
+                .split_once("Change: ")
+                .map(|x| x.1)
+                .unwrap_or("")
+                .trim();
             parse_time_field(after, &mut obj, "change_time");
             continue;
         }
 
         // Birth time
         if line.starts_with(" Birth:") {
-            let after = line.splitn(2, "Birth: ").nth(1).unwrap_or("").trim();
+            let after = line.split_once("Birth: ").map(|x| x.1).unwrap_or("").trim();
             parse_time_field(after, &mut obj, "birth_time");
             continue;
         }

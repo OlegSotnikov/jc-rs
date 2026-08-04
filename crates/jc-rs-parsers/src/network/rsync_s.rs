@@ -413,7 +413,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "bytes_sec".to_string(),
                 parse_size_to_float(caps.get(3).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -429,7 +429,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "speedup".to_string(),
                 parse_size_to_float(caps.get(2).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -453,7 +453,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "bytes_sec".to_string(),
                 parse_size_to_float(caps.get(3).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -469,7 +469,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "speedup".to_string(),
                 parse_size_to_float(caps.get(2).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -576,7 +576,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "bytes_sec".to_string(),
                 parse_size_to_float(caps.get(6).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -592,7 +592,7 @@ impl LineParser for RsyncSession {
             self.summary.insert(
                 "speedup".to_string(),
                 parse_size_to_float(caps.get(5).map_or("", |m| m.as_str()))
-                    .and_then(|f| serde_json::Number::from_f64(f))
+                    .and_then(serde_json::Number::from_f64)
                     .map(Value::Number)
                     .unwrap_or(Value::Null),
             );
@@ -643,7 +643,7 @@ impl StreamingParser for RsyncStreamParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jc_rs_core::traits::{LineParser, Parser, Record, StreamingParser, parse_via_session};
+    use jc_rs_core::traits::Parser;
 
     #[test]
     fn test_rsync_s_i_golden() {

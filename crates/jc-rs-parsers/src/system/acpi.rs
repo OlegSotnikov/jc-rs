@@ -85,7 +85,7 @@ impl Parser for AcpiParser {
                             Value::String("Not charging".to_string()),
                         );
                         if let Some(pct) = words.last() {
-                            let pct = pct.trim_end_matches(|c| c == '%' || c == ',');
+                            let pct = pct.trim_end_matches(['%', ',']);
                             if let Ok(n) = pct.parse::<i64>() {
                                 output_line
                                     .insert("charge_percent".to_string(), Value::Number(n.into()));
@@ -101,7 +101,7 @@ impl Parser for AcpiParser {
                                 .insert("state".to_string(), Value::String(state.to_string()));
                         }
                         if words.len() > 3 {
-                            let pct = words[3].trim_end_matches(|c| c == '%' || c == ',');
+                            let pct = words[3].trim_end_matches(['%', ',']);
                             if let Ok(n) = pct.parse::<i64>() {
                                 output_line
                                     .insert("charge_percent".to_string(), Value::Number(n.into()));
@@ -166,21 +166,17 @@ impl Parser for AcpiParser {
                         }
                     } else if line.contains("design capacity") {
                         // "Battery 0: design capacity 2110 mAh, last full capacity 2271 mAh = 100%"
-                        if words.len() > 4 {
-                            if let Ok(n) = words[4].parse::<i64>() {
-                                output_line.insert(
-                                    "design_capacity_mah".to_string(),
-                                    Value::Number(n.into()),
-                                );
-                            }
+                        if words.len() > 4
+                            && let Ok(n) = words[4].parse::<i64>()
+                        {
+                            output_line
+                                .insert("design_capacity_mah".to_string(), Value::Number(n.into()));
                         }
-                        if words.len() > 9 {
-                            if let Ok(n) = words[9].parse::<i64>() {
-                                output_line.insert(
-                                    "last_full_capacity".to_string(),
-                                    Value::Number(n.into()),
-                                );
-                            }
+                        if words.len() > 9
+                            && let Ok(n) = words[9].parse::<i64>()
+                        {
+                            output_line
+                                .insert("last_full_capacity".to_string(), Value::Number(n.into()));
                         }
                         if let Some(last) = words.last() {
                             let pct = last.trim_end_matches('%');
@@ -214,10 +210,10 @@ impl Parser for AcpiParser {
                     if line.contains("trip point") {
                         // "Thermal 0: trip point 0 switches to mode critical at temperature 127.0 degrees C"
                         let mut tp = Map::new();
-                        if words.len() > 4 {
-                            if let Ok(n) = words[4].parse::<i64>() {
-                                tp.insert("id".to_string(), Value::Number(n.into()));
-                            }
+                        if words.len() > 4
+                            && let Ok(n) = words[4].parse::<i64>()
+                        {
+                            tp.insert("id".to_string(), Value::Number(n.into()));
                         }
                         if words.len() > 8 {
                             tp.insert(
@@ -227,10 +223,10 @@ impl Parser for AcpiParser {
                         }
                         if words.len() > 11 {
                             let temp_str = words[11];
-                            if let Ok(f) = temp_str.parse::<f64>() {
-                                if let Some(n) = Number::from_f64(f) {
-                                    tp.insert("temperature".to_string(), Value::Number(n));
-                                }
+                            if let Ok(f) = temp_str.parse::<f64>()
+                                && let Some(n) = Number::from_f64(f)
+                            {
+                                tp.insert("temperature".to_string(), Value::Number(n));
                             }
                         }
                         if let Some(last) = words.last() {
@@ -248,10 +244,10 @@ impl Parser for AcpiParser {
                         }
                         if words.len() > 3 {
                             let temp_str = words[3];
-                            if let Ok(f) = temp_str.parse::<f64>() {
-                                if let Some(n) = Number::from_f64(f) {
-                                    output_line.insert("temperature".to_string(), Value::Number(n));
-                                }
+                            if let Ok(f) = temp_str.parse::<f64>()
+                                && let Some(n) = Number::from_f64(f)
+                            {
+                                output_line.insert("temperature".to_string(), Value::Number(n));
                             }
                         }
                         if let Some(last) = words.last() {

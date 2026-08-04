@@ -54,8 +54,8 @@ impl Parser for NtpqParser {
         }
 
         // Process data lines (index 1..n after removal)
-        for i in 1..lines.len() {
-            let line = &lines[i].clone();
+        for slot in lines.iter_mut().skip(1) {
+            let line = slot.clone();
             let processed = if line.starts_with(' ') {
                 // Space prefix = no state = null (~)
                 format!("~  {}", &line[1..])
@@ -68,7 +68,7 @@ impl Parser for NtpqParser {
             };
             // Replace " (" with "_(" to handle hostnames with parentheses
             let processed = processed.replace(" (", "_(");
-            lines[i] = processed;
+            *slot = processed;
         }
 
         let table_str = lines.join("\n");
@@ -111,7 +111,7 @@ impl Parser for NtpqParser {
             let st = row
                 .get("st")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_int(s))
+                .and_then(convert_to_int)
                 .map(Value::from)
                 .unwrap_or(Value::Null);
             obj.insert("st".to_string(), st);
@@ -143,7 +143,7 @@ impl Parser for NtpqParser {
             let poll = row
                 .get("poll")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_int(s))
+                .and_then(convert_to_int)
                 .map(Value::from)
                 .unwrap_or(Value::Null);
             obj.insert("poll".to_string(), poll);
@@ -152,7 +152,7 @@ impl Parser for NtpqParser {
             let reach = row
                 .get("reach")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_int(s))
+                .and_then(convert_to_int)
                 .map(Value::from)
                 .unwrap_or(Value::Null);
             obj.insert("reach".to_string(), reach);
@@ -161,8 +161,8 @@ impl Parser for NtpqParser {
             let delay = row
                 .get("delay")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_float(s))
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(convert_to_float)
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null);
             obj.insert("delay".to_string(), delay);
@@ -171,8 +171,8 @@ impl Parser for NtpqParser {
             let offset = row
                 .get("offset")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_float(s))
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(convert_to_float)
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null);
             obj.insert("offset".to_string(), offset);
@@ -181,8 +181,8 @@ impl Parser for NtpqParser {
             let jitter = row
                 .get("jitter")
                 .and_then(|v| v.as_str())
-                .and_then(|s| convert_to_float(s))
-                .and_then(|f| serde_json::Number::from_f64(f))
+                .and_then(convert_to_float)
+                .and_then(serde_json::Number::from_f64)
                 .map(Value::Number)
                 .unwrap_or(Value::Null);
             obj.insert("jitter".to_string(), jitter);

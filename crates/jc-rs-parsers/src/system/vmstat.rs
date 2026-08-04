@@ -155,7 +155,7 @@ impl LineParser for VmstatSession {
             let p = &parts;
 
             let mut record = Map::new();
-            record.insert("runnable_procs".to_string(), int_val(p.get(0)));
+            record.insert("runnable_procs".to_string(), int_val(p.first()));
             record.insert(
                 "uninterruptible_sleeping_procs".to_string(),
                 int_val(p.get(1)),
@@ -240,7 +240,7 @@ impl LineParser for VmstatSession {
             let p = &parts;
 
             let mut record = Map::new();
-            record.insert("disk".to_string(), opt_str(p.get(0)));
+            record.insert("disk".to_string(), opt_str(p.first()));
             record.insert("total_reads".to_string(), int_val(p.get(1)));
             record.insert("merged_reads".to_string(), int_val(p.get(2)));
             record.insert("sectors_read".to_string(), int_val(p.get(3)));

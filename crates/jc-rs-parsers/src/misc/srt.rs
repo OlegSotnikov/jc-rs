@@ -118,11 +118,11 @@ impl Parser for SrtParser {
 
             // Try to parse index from first line
             let mut index_val: Option<i64> = None;
-            if get_index_re().is_match(lines[line_idx]) {
-                if let Ok(n) = lines[line_idx].trim().parse::<i64>() {
-                    index_val = Some(n);
-                    line_idx += 1;
-                }
+            if get_index_re().is_match(lines[line_idx])
+                && let Ok(n) = lines[line_idx].trim().parse::<i64>()
+            {
+                index_val = Some(n);
+                line_idx += 1;
             }
 
             if line_idx >= lines.len() {

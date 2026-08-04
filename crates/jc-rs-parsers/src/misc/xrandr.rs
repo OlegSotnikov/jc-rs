@@ -238,126 +238,126 @@ impl Parser for XrandrParser {
             }
 
             // Device line (no indentation, starts with device name)
-            if indent == 0 && !trimmed.is_empty() {
-                if let Some(caps) = get_device_re().captures(line) {
-                    // Flush current device
-                    flush_device(
-                        &mut current_device,
-                        &mut current_screen,
-                        &mut prop_key,
-                        &mut prop_values,
-                        &mut props_obj,
-                        &mut in_props,
-                    );
-                    in_props = false;
+            if indent == 0
+                && !trimmed.is_empty()
+                && let Some(caps) = get_device_re().captures(line)
+            {
+                // Flush current device
+                flush_device(
+                    &mut current_device,
+                    &mut current_screen,
+                    &mut prop_key,
+                    &mut prop_values,
+                    &mut props_obj,
+                    &mut in_props,
+                );
+                in_props = false;
 
-                    let device_name = caps[1].to_string();
-                    let is_connected = &caps[2] == "connected";
-                    let is_primary = caps
-                        .get(3)
-                        .map(|m| !m.as_str().trim().is_empty())
-                        .unwrap_or(false);
+                let device_name = caps[1].to_string();
+                let is_connected = &caps[2] == "connected";
+                let is_primary = caps
+                    .get(3)
+                    .map(|m| !m.as_str().trim().is_empty())
+                    .unwrap_or(false);
 
-                    let mut dev = Map::new();
-                    dev.insert("props".to_string(), Value::Object(Map::new()));
-                    dev.insert("resolution_modes".to_string(), Value::Array(vec![]));
-                    dev.insert("is_connected".to_string(), Value::Bool(is_connected));
-                    dev.insert("is_primary".to_string(), Value::Bool(is_primary));
-                    dev.insert("device_name".to_string(), Value::String(device_name));
+                let mut dev = Map::new();
+                dev.insert("props".to_string(), Value::Object(Map::new()));
+                dev.insert("resolution_modes".to_string(), Value::Array(vec![]));
+                dev.insert("is_connected".to_string(), Value::Bool(is_connected));
+                dev.insert("is_primary".to_string(), Value::Bool(is_primary));
+                dev.insert("device_name".to_string(), Value::String(device_name));
 
-                    // rotation (default "normal")
-                    let rotation = caps
-                        .get(8)
-                        .map(|m| m.as_str().to_string())
-                        .filter(|s| !s.is_empty())
-                        .unwrap_or_else(|| "normal".to_string());
-                    dev.insert("rotation".to_string(), Value::String(rotation));
+                // rotation (default "normal")
+                let rotation = caps
+                    .get(8)
+                    .map(|m| m.as_str().to_string())
+                    .filter(|s| !s.is_empty())
+                    .unwrap_or_else(|| "normal".to_string());
+                dev.insert("rotation".to_string(), Value::String(rotation));
 
-                    // reflection (default "normal")
-                    let reflection = caps
-                        .get(9)
-                        .map(|m| m.as_str().to_string())
-                        .filter(|s| !s.is_empty())
-                        .unwrap_or_else(|| "normal".to_string());
-                    dev.insert("reflection".to_string(), Value::String(reflection));
+                // reflection (default "normal")
+                let reflection = caps
+                    .get(9)
+                    .map(|m| m.as_str().to_string())
+                    .filter(|s| !s.is_empty())
+                    .unwrap_or_else(|| "normal".to_string());
+                dev.insert("reflection".to_string(), Value::String(reflection));
 
-                    // Optional resolution+offset
-                    if let (Some(rw), Some(rh), Some(ow), Some(oh)) =
-                        (caps.get(4), caps.get(5), caps.get(6), caps.get(7))
-                    {
-                        if let (Ok(rw), Ok(rh), Ok(ow), Ok(oh)) = (
-                            rw.as_str().parse::<i64>(),
-                            rh.as_str().parse::<i64>(),
-                            ow.as_str().parse::<i64>(),
-                            oh.as_str().parse::<i64>(),
-                        ) {
-                            dev.insert("resolution_width".to_string(), Value::Number(rw.into()));
-                            dev.insert("resolution_height".to_string(), Value::Number(rh.into()));
-                            dev.insert("offset_width".to_string(), Value::Number(ow.into()));
-                            dev.insert("offset_height".to_string(), Value::Number(oh.into()));
-                        }
-                    }
-
-                    // Optional dimensions
-                    if let (Some(dw), Some(dh)) = (caps.get(10), caps.get(11)) {
-                        if let (Ok(dw), Ok(dh)) =
-                            (dw.as_str().parse::<i64>(), dh.as_str().parse::<i64>())
-                        {
-                            dev.insert("dimension_width".to_string(), Value::Number(dw.into()));
-                            dev.insert("dimension_height".to_string(), Value::Number(dh.into()));
-                        }
-                    }
-
-                    current_device = Some(dev);
-                    continue;
+                // Optional resolution+offset
+                if let (Some(rw), Some(rh), Some(ow), Some(oh)) =
+                    (caps.get(4), caps.get(5), caps.get(6), caps.get(7))
+                    && let (Ok(rw), Ok(rh), Ok(ow), Ok(oh)) = (
+                        rw.as_str().parse::<i64>(),
+                        rh.as_str().parse::<i64>(),
+                        ow.as_str().parse::<i64>(),
+                        oh.as_str().parse::<i64>(),
+                    )
+                {
+                    dev.insert("resolution_width".to_string(), Value::Number(rw.into()));
+                    dev.insert("resolution_height".to_string(), Value::Number(rh.into()));
+                    dev.insert("offset_width".to_string(), Value::Number(ow.into()));
+                    dev.insert("offset_height".to_string(), Value::Number(oh.into()));
                 }
+
+                // Optional dimensions
+                if let (Some(dw), Some(dh)) = (caps.get(10), caps.get(11))
+                    && let (Ok(dw), Ok(dh)) =
+                        (dw.as_str().parse::<i64>(), dh.as_str().parse::<i64>())
+                {
+                    dev.insert("dimension_width".to_string(), Value::Number(dw.into()));
+                    dev.insert("dimension_height".to_string(), Value::Number(dh.into()));
+                }
+
+                current_device = Some(dev);
+                continue;
             }
 
             // Resolution mode line (starts with spaces, has WxH format)
-            if indent > 0 && indent <= 4 {
-                if let Some(caps) = get_resolution_re().captures(line) {
-                    let rw: i64 = caps[1].parse().unwrap_or(0);
-                    let rh: i64 = caps[2].parse().unwrap_or(0);
-                    let is_high_res = caps.get(3).is_some_and(|m| !m.as_str().is_empty());
-                    let rest = &caps[4];
+            if indent > 0
+                && indent <= 4
+                && let Some(caps) = get_resolution_re().captures(line)
+            {
+                let rw: i64 = caps[1].parse().unwrap_or(0);
+                let rh: i64 = caps[2].parse().unwrap_or(0);
+                let is_high_res = caps.get(3).is_some_and(|m| !m.as_str().is_empty());
+                let rest = &caps[4];
 
-                    let freqs = parse_frequencies(rest);
+                let freqs = parse_frequencies(rest);
 
-                    let mut mode = Map::new();
-                    mode.insert("resolution_width".to_string(), Value::Number(rw.into()));
-                    mode.insert("resolution_height".to_string(), Value::Number(rh.into()));
-                    mode.insert("is_high_resolution".to_string(), Value::Bool(is_high_res));
-                    mode.insert(
-                        "frequencies".to_string(),
-                        Value::Array(freqs.into_iter().map(Value::Object).collect()),
-                    );
+                let mut mode = Map::new();
+                mode.insert("resolution_width".to_string(), Value::Number(rw.into()));
+                mode.insert("resolution_height".to_string(), Value::Number(rh.into()));
+                mode.insert("is_high_resolution".to_string(), Value::Bool(is_high_res));
+                mode.insert(
+                    "frequencies".to_string(),
+                    Value::Array(freqs.into_iter().map(Value::Object).collect()),
+                );
 
-                    if let Some(ref mut dev) = current_device {
-                        let modes = dev
-                            .entry("resolution_modes".to_string())
-                            .or_insert_with(|| Value::Array(vec![]));
-                        if let Value::Array(arr) = modes {
-                            arr.push(Value::Object(mode));
-                        }
+                if let Some(ref mut dev) = current_device {
+                    let modes = dev
+                        .entry("resolution_modes".to_string())
+                        .or_insert_with(|| Value::Array(vec![]));
+                    if let Value::Array(arr) = modes {
+                        arr.push(Value::Object(mode));
                     }
-                    in_props = false;
-                    continue;
                 }
+                in_props = false;
+                continue;
             }
 
             // Property key line (single tab = 4-8 spaces indent)
-            if indent >= 4 && indent < 8 {
-                if let Some(caps) = get_prop_key_re().captures(line) {
-                    flush_prop(&mut prop_key, &mut prop_values, &mut props_obj);
-                    in_props = true;
-                    let key = caps[1].trim().to_string();
-                    let maybe_val = caps[2].trim().to_string();
-                    prop_key = Some(key);
-                    if !maybe_val.is_empty() {
-                        prop_values.push(maybe_val);
-                    }
-                    continue;
+            if (4..8).contains(&indent)
+                && let Some(caps) = get_prop_key_re().captures(line)
+            {
+                flush_prop(&mut prop_key, &mut prop_values, &mut props_obj);
+                in_props = true;
+                let key = caps[1].trim().to_string();
+                let maybe_val = caps[2].trim().to_string();
+                prop_key = Some(key);
+                if !maybe_val.is_empty() {
+                    prop_values.push(maybe_val);
                 }
+                continue;
             }
 
             // Property value line (double tab = 8+ spaces)
