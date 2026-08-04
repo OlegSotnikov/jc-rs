@@ -8,10 +8,10 @@ Everything else is listed below rather than dropped.
 | Metric | Count |
 |---|---|
 | Pairs tested | 934 |
-| Match | 913 |
-| Mismatch | 21 |
+| Match | 917 |
+| Mismatch | 17 |
 | Error | 0 |
-| **Match rate** | **97.75%** |
+| **Match rate** | **98.18%** |
 | Excluded: jc could not reproduce its own fixture | 9 |
 | Excluded: fixture name maps to no parser | 149 |
 | Excluded: no input file found | 18 |
@@ -23,19 +23,15 @@ Everything else is listed below rather than dropped.
 | `cbt` | 4 | 3 | 1 | 0 |
 | `certbot` | 3 | 1 | 2 | 0 |
 | `date` | 4 | 2 | 2 | 0 |
-| `env` | 4 | 3 | 1 | 0 |
-| `git_ls_remote` | 2 | 1 | 1 | 0 |
 | `iptables` | 12 | 11 | 1 | 0 |
 | `iwconfig` | 4 | 3 | 1 | 0 |
 | `m3u` | 2 | 1 | 1 | 0 |
 | `openvpn` | 1 | 0 | 1 | 0 |
-| `pkg_index_apk` | 2 | 1 | 1 | 0 |
 | `plist` | 4 | 2 | 2 | 0 |
 | `route` | 7 | 5 | 2 | 0 |
 | `rsync` | 13 | 12 | 1 | 0 |
 | `stat_s` | 5 | 4 | 1 | 0 |
 | `traceroute_s` | 11 | 9 | 2 | 0 |
-| `xml` | 4 | 3 | 1 | 0 |
 
 ## Failing fixtures
 
@@ -49,16 +45,12 @@ Everything else is listed below rather than dropped.
 | `certbot` | generic/certbot-certs | mismatch | 2 diffs: 2× value_mismatch |
 | `date` | generic/date-after-midnight | mismatch | 1 diffs: 1× value_mismatch |
 | `date` | generic/date-before-midnight | mismatch | 1 diffs: 1× value_mismatch |
-| `env` | generic/env-multiline-raw | mismatch | 1 diffs: 1× type_mismatch |
-| `git_ls_remote` | generic/git-ls-remote-raw | mismatch | 1 diffs: 1× type_mismatch |
 | `iptables` | generic/iptables-no-jump2 | mismatch | 5 diffs: 1× missing_key, 2× type_mismatch, 2× value_mismatch |
 | `iwconfig` | generic/iwconfig-raw | mismatch | 14 diffs: 14× type_mismatch |
 | `m3u` | generic/m3u-dirty | mismatch | 12 diffs: 12× value_mismatch |
 | `openvpn` | generic/openvpn-status | mismatch | 23 diffs: 23× value_mismatch |
-| `pkg_index_apk` | generic/pkg-index-apk-raw | mismatch | 56 diffs: 28× missing_key, 28× extra_key |
 | `plist` | generic/plist-alltypes | mismatch | 1 diffs: 1× value_mismatch |
 | `plist` | generic/plist-nextstep | mismatch | 43 diffs: 38× type_mismatch, 5× value_mismatch |
 | `rsync` | generic/rsync-i-stats | mismatch | 18 diffs: 4× value_mismatch, 14× missing_key |
 | `traceroute_s` | generic/traceroute-n-ipv6-streaming | mismatch | 36 diffs: 36× type_mismatch |
-| `xml` | generic/xml-nmap-raw | mismatch | 98 diffs: 49× extra_key, 49× missing_key |
 | `traceroute_s` | osx-10.14.6/traceroute-asn-streaming | mismatch | 6 diffs: 6× type_mismatch |

@@ -45,6 +45,20 @@ impl Parser for EnvParser {
         let rows = parse_env(input);
         Ok(ParseOutput::Array(rows))
     }
+
+    /// jc's raw form is the environment as a single object; `_process` turns it
+    /// into one `{name, value}` record per variable.
+    fn parse_raw(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+        let mut obj = Map::new();
+        for row in parse_env(input) {
+            let (Some(Value::String(name)), Some(value)) = (row.get("name"), row.get("value"))
+            else {
+                continue;
+            };
+            obj.insert(name.clone(), value.clone());
+        }
+        Ok(ParseOutput::Object(obj))
+    }
 }
 
 /// Parse env output.

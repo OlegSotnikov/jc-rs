@@ -39,31 +39,35 @@ impl Parser for GitLsRemoteParser {
 
     /// Default (processed) output: a single Object mapping reference -> commit hash.
     fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
-        if input.trim().is_empty() {
-            return Ok(ParseOutput::Object(Map::new()));
-        }
-
         let mut obj = Map::new();
-
-        for line in input.lines() {
-            let line = line.trim();
-            if line.is_empty() {
-                continue;
-            }
-
-            let parts: Vec<&str> = line.splitn(2, char::is_whitespace).collect();
-            if parts.len() != 2 {
-                continue;
-            }
-
-            let commit = parts[0].trim();
-            let reference = parts[1].trim();
-
-            obj.insert(reference.to_string(), Value::String(commit.to_string()));
+        for (reference, commit) in refs(input) {
+            obj.insert(reference, Value::String(commit));
         }
-
         Ok(ParseOutput::Object(obj))
     }
+
+    /// jc's raw form keeps one record per ref; `_process` collapses them into a
+    /// single `{reference: commit}` object.
+    fn parse_raw(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+        let records = refs(input)
+            .map(|(reference, commit)| {
+                let mut record = Map::with_capacity(2);
+                record.insert("reference".to_string(), Value::String(reference));
+                record.insert("commit".to_string(), Value::String(commit));
+                record
+            })
+            .collect();
+        Ok(ParseOutput::Array(records))
+    }
+}
+
+/// `<commit>\t<reference>` per line, blank and malformed lines skipped.
+fn refs(input: &str) -> impl Iterator<Item = (String, String)> + '_ {
+    input.lines().filter_map(|line| {
+        let line = line.trim();
+        let (commit, reference) = line.split_once(char::is_whitespace)?;
+        Some((reference.trim().to_string(), commit.trim().to_string()))
+    })
 }
 
 #[cfg(test)]

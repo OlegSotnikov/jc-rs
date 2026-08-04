@@ -21,7 +21,7 @@ have to think about that.
 
 **Version 0.0.0 reserves the name; it is not a release.** jc-rs is pre-release
 software: compatibility with [jc](https://github.com/kellyjonbrazil/jc) is
-currently 97.8% of its fixture corpus, measured by `make differential` and
+currently 98.2% of its fixture corpus, measured by `make differential` and
 published whatever it says. The first usable release will be 0.1.0, cut when
 that number reaches 100%.
 

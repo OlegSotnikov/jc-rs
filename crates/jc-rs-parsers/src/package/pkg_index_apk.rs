@@ -48,40 +48,41 @@ impl Parser for PkgIndexApkParser {
     }
 
     fn parse(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
-        if input.trim().is_empty() {
-            return Ok(ParseOutput::Array(Vec::new()));
-        }
+        Ok(ParseOutput::Array(
+            packages(input).map(convert_package).collect(),
+        ))
+    }
 
-        let mut results: Vec<Map<String, Value>> = Vec::new();
-        let mut raw_pkg: Map<String, Value> = Map::new();
+    /// jc's raw form keeps APKINDEX's single-letter field names and their
+    /// values as written; `_process` is what renames `P` to `package` and
+    /// turns sizes into integers.
+    fn parse_raw(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+        Ok(ParseOutput::Array(packages(input).collect()))
+    }
+}
 
-        for line in input.lines() {
+/// APKINDEX records are `K:value` lines separated by blank lines.
+fn packages(input: &str) -> impl Iterator<Item = Map<String, Value>> + '_ {
+    let mut current: Map<String, Value> = Map::new();
+    let mut lines = input.lines();
+    std::iter::from_fn(move || {
+        for line in lines.by_ref() {
             let line = line.trim();
             if line.is_empty() {
-                if !raw_pkg.is_empty() {
-                    let processed = convert_package(raw_pkg);
-                    results.push(processed);
-                    raw_pkg = Map::new();
+                if !current.is_empty() {
+                    return Some(std::mem::take(&mut current));
                 }
                 continue;
             }
-
             if line.len() < 2 {
                 continue;
             }
-
             let key = &line[..1];
             let value = if line.len() > 2 { line[2..].trim() } else { "" };
-            raw_pkg.insert(key.to_string(), Value::String(value.to_string()));
+            current.insert(key.to_string(), Value::String(value.to_string()));
         }
-
-        if !raw_pkg.is_empty() {
-            let processed = convert_package(raw_pkg);
-            results.push(processed);
-        }
-
-        Ok(ParseOutput::Array(results))
-    }
+        (!current.is_empty()).then(|| std::mem::take(&mut current))
+    })
 }
 
 fn convert_package(raw: Map<String, Value>) -> Map<String, Value> {

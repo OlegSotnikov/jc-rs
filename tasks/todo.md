@@ -4,11 +4,11 @@ Last updated: 2026-08-04
 
 ## Where this stands
 
-**Compatibility right now: 913/934 = 97.8%.** The imported codebase measured
+**Compatibility right now: 917/934 = 98.2%.** The imported codebase measured
 80.0%. Run `make differential` to regenerate; `tests/differential/REPORT.md` has
 the per-fixture breakdown, `report.json` the per-case diffs.
 
-No fixture errors out any more: every pair produces output, and the 21 that
+No fixture errors out any more: every pair produces output, and the 17 that
 remain are mismatches in the detail.
 
 ## Done
@@ -76,16 +76,18 @@ remain are mismatches in the detail.
 
 ## Next, in order
 
-- [ ] **The last 21 mismatches.** `route` (2, an IPv6 row dropped), `certbot`
+- [ ] **The last 17 mismatches.** `route` (2, an IPv6 row dropped), `certbot`
       (2), `date` (2, `week_of_year` off by one), `plist` (2),
-      `traceroute_s` (2), and one each in `stat_s`, `cbt`, `env`,
-      `git_ls_remote`, `iptables`, `iwconfig`, `m3u`, `openvpn`,
-      `pkg_index_apk`, `rsync`, `xml`.
-- [ ] **`-r/--raw` is not implemented.** jc's parsers skip `_process()` in raw
-      mode; ours apply their conversions unconditionally and the flag reaches
-      no parser. Two fixtures fail on this alone (`env-multiline-raw`,
-      `iwconfig-raw`), and every `-r` invocation is quietly wrong. Needs a
-      `raw` parameter threaded through `Parser::parse`.
+      `traceroute_s` (2), and one each in `stat_s`, `cbt`, `iptables`,
+      `iwconfig`, `m3u`, `openvpn`, `rsync`.
+- [ ] **`-r/--raw` is implemented for four parsers, defaulted for the rest.**
+      `Parser::parse_raw` defaults to forwarding to `parse`, which is *correct*
+      for every parser whose jc `_process` returns its input unchanged, and
+      wrong for the rest. Done: `env`, `git_ls_remote`, `pkg_index_apk`, `xml`.
+      Still processed-when-raw-was-asked: `cbt` (cells list vs map) and
+      `iwconfig` (string values vs coerced) are the two the corpus catches;
+      others exist but no fixture proves them. Overriding `parse_raw` is the
+      fix, one parser at a time.
 - [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
       Values agree but no two outputs ever `diff` clean.
       **`serde_json`'s `preserve_order` feature is not the answer — measured.**
