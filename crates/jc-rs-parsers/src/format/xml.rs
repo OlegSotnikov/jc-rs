@@ -45,7 +45,7 @@ enum XmlNode {
 }
 
 /// Parse the XML input into a tree of XmlNode.
-fn parse_xml_tree(input: &str) -> Result<Vec<XmlNode>, ParseError> {
+fn parse_xml_tree(input: &str, attr_prefix: char) -> Result<Vec<XmlNode>, ParseError> {
     let mut reader = Reader::from_str(input);
     reader.config_mut().trim_text(true);
 
@@ -62,7 +62,7 @@ fn parse_xml_tree(input: &str) -> Result<Vec<XmlNode>, ParseError> {
                         attr.map_err(|e| ParseError::Generic(format!("XML attr error: {e}")))?;
                     let key = String::from_utf8_lossy(attr.key.local_name().as_ref()).to_string();
                     let val = String::from_utf8_lossy(&attr.value).to_string();
-                    attrs.push((format!("@{key}"), val));
+                    attrs.push((format!("{attr_prefix}{key}"), val));
                 }
                 stack.push((name, attrs, Vec::new()));
             }
@@ -88,7 +88,7 @@ fn parse_xml_tree(input: &str) -> Result<Vec<XmlNode>, ParseError> {
                         attr.map_err(|e| ParseError::Generic(format!("XML attr error: {e}")))?;
                     let key = String::from_utf8_lossy(attr.key.local_name().as_ref()).to_string();
                     let val = String::from_utf8_lossy(&attr.value).to_string();
-                    attrs.push((format!("@{key}"), val));
+                    attrs.push((format!("{attr_prefix}{key}"), val));
                 }
                 let node = XmlNode::Element {
                     name,
@@ -234,10 +234,16 @@ fn node_to_json(node: &XmlNode) -> serde_json::Value {
 }
 
 /// Parse XML input into a JSON map, matching jc/xmltodict output.
+/// jc marks attributes with `@` in processed output and `_` in raw output --
+/// xmltodict's `attr_prefix`, and the only difference between the two forms.
+pub const ATTR_PREFIX: char = '@';
+pub const ATTR_PREFIX_RAW: char = '_';
+
 pub fn parse_xml_input(
     input: &str,
+    attr_prefix: char,
 ) -> Result<serde_json::Map<String, serde_json::Value>, ParseError> {
-    let nodes = parse_xml_tree(input)?;
+    let nodes = parse_xml_tree(input, attr_prefix)?;
 
     let mut map = serde_json::Map::new();
 
@@ -266,7 +272,15 @@ impl Parser for XmlParser {
         if input.trim().is_empty() {
             return Err(ParseError::InvalidInput("empty input".to_string()));
         }
-        let map = parse_xml_input(input)?;
+        let map = parse_xml_input(input, ATTR_PREFIX)?;
+        Ok(ParseOutput::Object(map))
+    }
+
+    fn parse_raw(&self, input: &str, _quiet: bool) -> Result<ParseOutput, ParseError> {
+        if input.trim().is_empty() {
+            return Err(ParseError::InvalidInput("empty input".to_string()));
+        }
+        let map = parse_xml_input(input, ATTR_PREFIX_RAW)?;
         Ok(ParseOutput::Object(map))
     }
 }

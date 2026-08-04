@@ -2,12 +2,12 @@
  "jc_version": "1.25.7",
  "summary": {
   "oracle_ok": 934,
-  "match": 913,
-  "mismatch": 21,
+  "match": 917,
+  "mismatch": 17,
   "oracle_reject": 9
  },
  "tested": 934,
- "match_rate": 97.75,
+ "match_rate": 98.18,
  "per_parser": {
   "acpi": {
    "total": 7,
@@ -130,8 +130,7 @@
   },
   "env": {
    "total": 4,
-   "match": 3,
-   "mismatch": 1
+   "match": 4
   },
   "ethtool": {
    "total": 5,
@@ -171,8 +170,7 @@
   },
   "git_ls_remote": {
    "total": 2,
-   "mismatch": 1,
-   "match": 1
+   "match": 2
   },
   "gpg": {
    "total": 1,
@@ -383,8 +381,7 @@
   },
   "pkg_index_apk": {
    "total": 2,
-   "mismatch": 1,
-   "match": 1
+   "match": 2
   },
   "pkg_index_deb": {
    "total": 1,
@@ -801,8 +798,7 @@
   },
   "xml": {
    "total": 4,
-   "match": 3,
-   "mismatch": 1
+   "match": 4
   },
   "xrandr": {
    "total": 1,
@@ -1006,42 +1002,6 @@
   },
   {
    "platform": "generic",
-   "base": "env-multiline-raw",
-   "parser": "env",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "type_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "type_mismatch",
-     "expected": "{'TERM_PROGRAM': 'Apple_Terminal', 'SHELL': '/bin/zsh', 'TERM': 'xterm-256color', 'TMPDIR': '/var/folders/8g/r6tdh9kj6z3",
-     "actual": "[{'name': 'TERM_PROGRAM', 'value': 'Apple_Terminal'}, {'name': 'SHELL', 'value': '/bin/zsh'}, {'name': 'TERM', 'value': "
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "git-ls-remote-raw",
-   "parser": "git_ls_remote",
-   "status": "mismatch",
-   "diff_count": 1,
-   "kinds": {
-    "type_mismatch": 1
-   },
-   "sample": [
-    {
-     "path": "$",
-     "kind": "type_mismatch",
-     "expected": "[{'reference': 'HEAD', 'commit': '214cd6b9e09603b3c4fa02203b24fb2bc3d4e338'}, {'reference': 'refs/heads/dev', 'commit': ",
-     "actual": "{'HEAD': '214cd6b9e09603b3c4fa02203b24fb2bc3d4e338', 'refs/heads/dev': 'b884f6aacca39e05994596d8fdfa7e7c4f1e0389', 'refs"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "iptables-no-jump2",
    "parser": "iptables",
    "status": "mismatch",
@@ -1210,39 +1170,6 @@
   },
   {
    "platform": "generic",
-   "base": "pkg-index-apk-raw",
-   "parser": "pkg_index_apk",
-   "status": "mismatch",
-   "diff_count": 56,
-   "kinds": {
-    "missing_key": 28,
-    "extra_key": 28
-   },
-   "sample": [
-    {
-     "path": "$[0].A",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].C",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].D",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].I",
-     "kind": "missing_key"
-    },
-    {
-     "path": "$[0].L",
-     "kind": "missing_key"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
    "base": "plist-alltypes",
    "parser": "plist",
    "status": "mismatch",
@@ -1376,39 +1303,6 @@
      "kind": "type_mismatch",
      "expected": "'2605:9000:0:400a::f1'",
      "actual": "None"
-    }
-   ]
-  },
-  {
-   "platform": "generic",
-   "base": "xml-nmap-raw",
-   "parser": "xml",
-   "status": "mismatch",
-   "diff_count": 98,
-   "kinds": {
-    "extra_key": 49,
-    "missing_key": 49
-   },
-   "sample": [
-    {
-     "path": "$.nmaprun.@args",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.nmaprun.@scanner",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.nmaprun.@start",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.nmaprun.@startstr",
-     "kind": "extra_key"
-    },
-    {
-     "path": "$.nmaprun.@version",
-     "kind": "extra_key"
     }
    ]
   },

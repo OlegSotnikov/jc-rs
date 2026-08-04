@@ -17,7 +17,7 @@ That premise decides most design arguments:
 - Never exclude an awkward fixture from the count; report it in a category.
 - Publish the number even when it is bad.
 
-Current state: 913/934 = 97.8% (`tests/differential/REPORT.md`), workspace
+Current state: 917/934 = 98.2% (`tests/differential/REPORT.md`), workspace
 version `0.0.0` (the crates.io releases exist only to hold the names).
 
 ## Commands
@@ -38,7 +38,7 @@ Narrower runs:
 TZ=PST8PDT cargo test -p jc-rs-parsers disk::mdadm          # one module's tests
 TZ=PST8PDT cargo test -p jc-rs --test integration           # CLI integration tests
 python3 tests/differential/validate.py --parser mdadm -v    # differential for one parser
-python3 tests/differential/validate.py --fail-under 97.7    # the CI floor
+python3 tests/differential/validate.py --fail-under 98.1    # the CI floor
 ```
 
 `TZ=PST8PDT` is mandatory and non-obvious: jc's fixtures carry `*_epoch` fields
@@ -58,7 +58,7 @@ defects, exposed when `tests/fixtures/` became a verbatim mirror of jc's corpus)
 passing — when you fix a parser, delete its line in the same commit. The file
 should only ever get shorter. `make test` on its own is red by design.
 
-**`--fail-under 97.7`** in `.github/workflows/ci.yml`. Raise the floor in the
+**`--fail-under 98.1`** in `.github/workflows/ci.yml`. Raise the floor in the
 same commit that raises the number; never lower it silently.
 
 ## Architecture
@@ -118,10 +118,9 @@ the number to move, and update the CI floor.
 
 ## Known structural gaps
 
-- **`-r/--raw` reaches no parser.** jc's parsers skip `_process()` in raw mode;
-  ours apply their conversions unconditionally, so every `-r` invocation is
-  quietly wrong (two fixtures fail on this alone). Fixing it means threading a
-  `raw` parameter through `Parser::parse`.
+- **`-r/--raw` is partial.** `Parser::parse_raw` defaults to forwarding to
+  `parse`, which is correct only where jc's `_process` is a no-op. Four parsers
+  override it; `cbt` and `iwconfig` still return processed output under `-r`.
 - **Key order.** Keys serialise alphabetically; jc preserves schema order. Values
   agree so the differential passes, but no two outputs ever `diff` clean. Fixing
   it needs `serde_json`'s `preserve_order` plus per-parser key sequences.

@@ -723,7 +723,11 @@ fn run() -> i32 {
     };
 
     // Parse
-    let parse_result = parser.parse(&sliced_input, args.quiet);
+    let parse_result = if args.raw {
+        parser.parse_raw(&sliced_input, args.quiet)
+    } else {
+        parser.parse(&sliced_input, args.quiet)
+    };
 
     let output = match parse_result {
         Ok(out) => out,

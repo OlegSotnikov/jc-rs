@@ -47,6 +47,19 @@ pub trait Parser: Send + Sync {
     /// - `quiet`: if `true`, suppress warning messages to stderr.
     fn parse(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError>;
 
+    /// Parse without the conversions that shape output to jc's schema.
+    ///
+    /// This is jc's `-r`: its parsers build a raw structure and then run
+    /// `_process()` over it to coerce types, rename keys and add derived
+    /// fields. For the many parsers whose `_process` returns its input
+    /// unchanged, raw and processed output are identical -- which is why the
+    /// default here forwards to [`Parser::parse`]. A parser whose conversions
+    /// do change the shape must override this, or `-r` quietly returns
+    /// processed output.
+    fn parse_raw(&self, input: &str, quiet: bool) -> Result<ParseOutput, ParseError> {
+        self.parse(input, quiet)
+    }
+
     /// Upcast to the streaming interface, if this parser has one.
     ///
     /// The registry stores parsers as `&'static dyn Parser`, and a trait object

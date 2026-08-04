@@ -262,3 +262,51 @@ fn slice_output_is_still_valid_json() {
         .unwrap_or_else(|e| panic!("sliced arp output is not valid JSON: {e}"));
     assert!(v.is_array(), "sliced output should be a JSON array");
 }
+
+// ── -r/--raw ─────────────────────────────────────────────────────────────────
+
+#[test]
+fn test_raw_env_is_a_single_object_not_records() {
+    // jc's raw env is the environment as one object; processed output is one
+    // {name, value} record per variable. The flag has to actually reach the
+    // parser for this to differ at all.
+    let input = b"SHELL=/bin/zsh\nTERM=xterm-256color\n";
+    let (code, stdout, _) = run(&["--env", "-r"], Some(input));
+    assert_eq!(code, 0);
+    let value: serde_json::Value = serde_json::from_str(&stdout).expect("valid JSON");
+    assert_eq!(value["SHELL"], "/bin/zsh");
+
+    let (_, processed, _) = run(&["--env"], Some(input));
+    let value: serde_json::Value = serde_json::from_str(&processed).expect("valid JSON");
+    assert_eq!(value[0]["name"], "SHELL");
+    assert_eq!(value[0]["value"], "/bin/zsh");
+}
+
+#[test]
+fn test_raw_xml_marks_attributes_with_underscore() {
+    let input = b"<a href=\"x\">t</a>";
+    let (code, stdout, _) = run(&["--xml", "-r"], Some(input));
+    assert_eq!(code, 0);
+    let value: serde_json::Value = serde_json::from_str(&stdout).expect("valid JSON");
+    assert_eq!(value["a"]["_href"], "x");
+
+    let (_, processed, _) = run(&["--xml"], Some(input));
+    let value: serde_json::Value = serde_json::from_str(&processed).expect("valid JSON");
+    assert_eq!(value["a"]["@href"], "x");
+}
+
+#[test]
+fn test_unknown_parser_suggests_close_names() {
+    let (code, _, stderr) = run(&["--pss"], Some(b""));
+    assert_eq!(code, 100);
+    assert!(stderr.contains("Did you mean"), "stderr was: {stderr}");
+    assert!(stderr.contains("--ps"), "stderr was: {stderr}");
+}
+
+#[test]
+fn test_fish_completion_is_generated() {
+    let (code, stdout, _) = run(&["--fish-comp"], None);
+    assert_eq!(code, 0);
+    assert!(stdout.contains("complete -c jc-rs"));
+    assert!(stdout.contains("'df'"), "parser completions are included");
+}
