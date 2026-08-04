@@ -126,6 +126,32 @@ The binary is `jc-rs`, not `jc`. Release archives contain a `jc` alias you can
 enable deliberately; nothing installs it by default, because it would shadow the
 original jc in `PATH`.
 
+## Use it as a library
+
+```rust
+let output = jc_rs_parsers::parse("df", df_output)?;
+
+// Streaming parsers hand back a session you feed a line at a time.
+let mut session = jc_rs_parsers::session("clf_s").unwrap();
+for line in reader.lines() {
+    if let Some(record) = session.parse_line(&line?, true)? {
+        handle(record);
+    }
+}
+```
+
+Parsers register themselves at link time, so depending on `jc-rs-parsers` is
+what fills the registry — `parse`, `find`, `parsers` and `session` exist so you
+never have to think about that.
+
+## Shell completions
+
+```sh
+jc-rs -B > /etc/bash_completion.d/jc-rs
+jc-rs -Z > "${fpath[1]}/_jc-rs"
+jc-rs -F > ~/.config/fish/completions/jc-rs.fish
+```
+
 ## Build from source
 
 ```console

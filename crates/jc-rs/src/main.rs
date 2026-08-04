@@ -70,6 +70,10 @@ fn options_text() -> String {
         ),
         ("-C,  --force-color", "force color output (overrides -m)"),
         ("-d,  --debug", "debug (double for verbose debug)"),
+        (
+            "-F,  --fish-comp",
+            "gen Fish completion: jc-rs -F > ~/.config/fish/completions/jc-rs.fish",
+        ),
         ("-h,  --help", "help (--help --parser-name for parser docs)"),
         ("-l,  --list", "list available parsers"),
         ("-L,  --list-all", "list all parsers including hidden"),
@@ -319,6 +323,67 @@ fn parse_slice(s: &str) -> Result<(Option<i64>, Option<i64>), String> {
     Ok((start, end))
 }
 
+// ─── Parser-name suggestions ─────────────────────────────────────────────────
+
+/// Parser names close enough to a typo to be worth printing.
+///
+/// With 238 parsers, "unknown parser, see -h" sends the user to a 238-line list
+/// to find a one-character mistake. A prefix match catches `--ip` for
+/// `--ip-address`, and an edit distance of two catches `--pss` for `--ps`.
+fn suggest_parsers(input: &str) -> Vec<&'static str> {
+    let needle = input.trim_start_matches('-').replace('-', "_");
+    let budget = if needle.len() <= 4 { 1 } else { 2 };
+
+    let mut scored: Vec<(usize, &'static str)> = all_parsers()
+        .filter(|p| !p.info().deprecated)
+        .map(|p| p.info().name)
+        .filter_map(|name| {
+            if name.starts_with(&needle) || needle.starts_with(name) {
+                return Some((0, name));
+            }
+            let distance = edit_distance(&needle, name, budget)?;
+            Some((distance, name))
+        })
+        .collect();
+
+    scored.sort_unstable();
+    scored.truncate(5);
+    scored.into_iter().map(|(_, name)| name).collect()
+}
+
+/// Levenshtein distance, abandoned once it exceeds `budget`.
+///
+/// Bailing out early is what keeps this cheap enough to run against every
+/// parser name on an error path.
+fn edit_distance(a: &str, b: &str, budget: usize) -> Option<usize> {
+    if a.len().abs_diff(b.len()) > budget {
+        return None;
+    }
+
+    let b_chars: Vec<char> = b.chars().collect();
+    let mut previous: Vec<usize> = (0..=b_chars.len()).collect();
+    let mut current = vec![0usize; b_chars.len() + 1];
+
+    for (i, a_char) in a.chars().enumerate() {
+        current[0] = i + 1;
+        let mut row_best = current[0];
+        for (j, &b_char) in b_chars.iter().enumerate() {
+            let cost = usize::from(a_char != b_char);
+            current[j + 1] = (previous[j] + cost)
+                .min(previous[j + 1] + 1)
+                .min(current[j] + 1);
+            row_best = row_best.min(current[j + 1]);
+        }
+        if row_best > budget {
+            return None;
+        }
+        std::mem::swap(&mut previous, &mut current);
+    }
+
+    let distance = previous[b_chars.len()];
+    (distance <= budget).then_some(distance)
+}
+
 // ─── Streaming runtime ───────────────────────────────────────────────────────
 
 /// Drive a streaming parser and print records as they appear.
@@ -473,6 +538,11 @@ fn run() -> i32 {
         return EXIT_OK;
     }
 
+    if args.fish_comp {
+        print!("{}", completions::fish_completion());
+        return EXIT_OK;
+    }
+
     if args.list_parsers {
         print_parser_list(false);
         return EXIT_OK;
@@ -582,10 +652,15 @@ fn run() -> i32 {
                 (p, buf)
             }
             None => {
-                eprintln!(
-                    "jc-rs: error - Unknown parser: --{}. Use \"jc-rs -h\" for help.",
-                    pname
-                );
+                eprintln!("jc-rs: error - Unknown parser: --{}.", pname);
+                let suggestions = suggest_parsers(pname);
+                if !suggestions.is_empty() {
+                    eprintln!("Did you mean:");
+                    for name in &suggestions {
+                        eprintln!("    --{}", name.replace('_', "-"));
+                    }
+                }
+                eprintln!("Use \"jc-rs -h\" for the full list.");
                 return EXIT_ERROR;
             }
         }

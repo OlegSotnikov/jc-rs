@@ -171,7 +171,6 @@ static FORMATS: &[FmtEntry] = &[
     }, // id 8300
 ];
 
-
 /// jc's datetime formats, addressed by the same numeric ids jc uses so a call
 /// site here can be read against the jc parser it mirrors.
 ///
