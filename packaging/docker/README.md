@@ -67,13 +67,15 @@ binary.
 - `latest` — the most recent release
 - `vX.Y.Z` — a specific release
 
-Only `linux/amd64` today.
+2.3 MB compressed, `linux/amd64` only today.
 
 ## Elsewhere
 
 ```sh
-cargo binstall jc-rs      # prebuilt binary, no compile
-cargo install jc-rs       # from source
+cargo binstall jc-rs                    # prebuilt binary, no compile
+cargo install jc-rs                     # from source
+brew install OlegSotnikov/tap/jc-rs     # macOS and Linux
+npm install jc-rs-wasm                  # WebAssembly, browser or Node
 ```
 
 Static binaries for five targets, with shell completions and `SHA256SUMS`, are
