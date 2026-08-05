@@ -88,6 +88,11 @@ bench-vs-jc: build submodule ## time jc-rs against jc on the same inputs
 check: lint check-fixtures ratchet differential ## universal verification: lint + fixture sync + test ratchet + differential
 	@echo "check complete"
 
+.PHONY: release
+release: ## cut a release: make release VERSION=0.2.0 (bumps, tags, pushes; publishing follows)
+	@test -n "$(VERSION)" || { echo "usage: make release VERSION=0.2.0"; exit 1; }
+	@./ci/release.sh $(VERSION)
+
 .PHONY: clean
 clean:
 	cargo clean
