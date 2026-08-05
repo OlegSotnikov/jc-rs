@@ -138,41 +138,38 @@ do:
       the package itself. Without it the job builds and smoke-tests the package
       and stops there. Worth checking npm's Trusted Publishing (OIDC) first —
       it would remove this credential the way it removed the crates.io one.
-- [x] **`homebrew` and `npm` environments are protected like the other two.**
-      They had been created implicitly by the first release run and carried no
-      rules at all, while `crates-io` and `dockerhub` required a review and
-      accepted deployments only from `v*` tags. All four now match: reviewer
-      `OlegSotnikov`, tag policy `v*`. Worth knowing before putting a
-      write-capable token in one of them.
-- [ ] **Decide how the Homebrew formula gets updated.** It needs a credential
-      only because a workflow in `jc-rs` cannot write to `homebrew-tap` —
-      `GITHUB_TOKEN` is scoped to its own repository. Three ways out, in
-      increasing order of machinery:
-      1. **By hand**, one command: `make homebrew-formula` writes
-         `Formula/jc-rs.rb` from the published release's own SHA256SUMS, then
-         commit it in the tap. Releases are rare; this is probably enough.
-      2. **A workflow in the tap** on `schedule` + `workflow_dispatch` that
-         reads the latest jc-rs release from the public API and commits the
-         formula with the tap's *own* `GITHUB_TOKEN`. No cross-repo secret
-         exists at all. Costs a lag between release and formula.
-      3. **`HOMEBREW_TAP_TOKEN`** in the `homebrew` environment — immediate,
-         but it is a long-lived cross-repo credential, and this project has
-         been deliberate about not keeping those. If you go this way, the job
-         needs exactly one permission and nothing else:
+- [x] **All four environments carry the same rule: deployments only from `v*`
+      tags.** `homebrew` and `npm` had been created implicitly by the first
+      release run and carried no rules at all. The approval gate that
+      `crates-io` and `dockerhub` used to have was removed rather than copied
+      across: on a single-owner repository it asks the person who pushed the
+      tag to confirm that they pushed the tag. What the environments still buy
+      is free — the tag restriction, and a secret visible to one job instead of
+      every workflow. That second property is why a write-capable token can sit
+      in one at all.
+- [x] **Homebrew formula updates automatically.** `HOMEBREW_TAP_TOKEN` is in
+      the `homebrew` environment and verified end to end: cloned the tap over
+      `https://x-access-token:$TOKEN@...`, pushed a throwaway branch, deleted
+      it. The tap is back to `main` alone.
 
-         > Fine-grained PAT · resource owner `OlegSotnikov` · repository access
-         > **only `OlegSotnikov/homebrew-tap`** · repository permissions
-         > **Contents: Read and write**. That is the whole list — the job
-         > clones, writes one file and pushes. It never touches
-         > `.github/workflows/` in the tap, so the `Workflows` permission is
-         > not needed, and a classic PAT with `repo` scope would hand out
-         > every repository instead of one.
+      The token is a fine-grained PAT but broader than the job needs — it
+      reaches all four repositories rather than `homebrew-tap` alone, and has
+      **no expiry**. It also passed through a chat transcript, which is enough
+      on its own to retire it. When replacing it:
 
-         Set an expiry. An expired token fails the clone, so the release goes
-         red rather than silently skipping — that is the behaviour you want.
+      > resource owner `OlegSotnikov` · repository access **only
+      > `OlegSotnikov/homebrew-tap`** · repository permissions **Contents: Read
+      > and write** · an expiry date. That is the whole list — the job clones,
+      > writes one file and pushes. It never touches `.github/workflows/` in
+      > the tap, so `Workflows` is not needed.
 
-      The release job is wired for (3) and reports-and-skips without it. If you
-      pick (1) or (2), delete that job rather than leaving it skipping forever.
+      An expired token fails the clone, so the release goes red rather than
+      silently skipping. That is the behaviour to want.
+
+      A cross-repo secret exists here only because `GITHUB_TOKEN` is scoped to
+      its own repository. `make homebrew-formula` still writes the formula from
+      a published release's SHA256SUMS with no credential at all, if the token
+      ever becomes more trouble than the automation is worth.
 - [ ] **The Docker Hub description is still empty.** The stored
       `DOCKER_HUB_TOKEN` is a push/pull PAT: editing repository metadata
       answers `access denied: insufficient scope`. The text is ready in
