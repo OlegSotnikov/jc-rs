@@ -123,10 +123,9 @@ jobs:
         if: github.event.inputs.dry_run == 'true' || steps.creds.outputs.mode == 'none'
         run: |
           set -euo pipefail
-          # Full verification works while the published version matches what
-          # these ask for; right after a version bump it does not, and this
-          # has to drop to `cargo package --list`. See ci.yml.
-          for crate in jc-rs-core jc-rs-utils jc-rs-parsers jc-rs jc-rs-wasm; do
-            cargo package -p "$crate"
-          done
+          # `--workspace` verifies the members against each other through a
+          # temporary local registry rather than against crates.io, so this
+          # holds for a version that is not on the index -- which is every
+          # version at the moment a release is dry-run. See ci.yml.
+          cargo package --workspace --exclude jc-rs-bench
           echo "nothing was uploaded"

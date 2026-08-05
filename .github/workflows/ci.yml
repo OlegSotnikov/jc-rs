@@ -121,14 +121,12 @@ jobs:
       # Each crate is packaged AND the packaged copy compiled, which is what
       # catches a file the build needs sitting outside its crate directory.
       #
-      # This works because 0.1.0 of every dependency is on crates.io --
-      # `cargo package` resolves against the registry, not the workspace. Right
-      # after a version bump it does not, and the four dependent crates have to
-      # drop to `cargo package --list` until the new version is published.
-      - run: cargo package -p jc-rs-core
-      - run: cargo package -p jc-rs-utils
-      - run: cargo package -p jc-rs-parsers
-      - run: cargo package -p jc-rs
-      # jc-rs-wasm is not on crates.io yet, but it packages against the four
-      # that are.
-      - run: cargo package -p jc-rs-wasm
+      # One command, not five. Packaging a crate individually resolves its
+      # siblings against crates.io, so every one of these failed for the whole
+      # window between bumping the version and the new version reaching the
+      # index -- exactly when a release is being cut. `--workspace` instead
+      # builds a temporary local registry from the crates it has just packaged
+      # and verifies against that, so it holds at a version that has never been
+      # published. jc-rs-bench is excluded because it is the only member that
+      # is not published and its path dependencies carry no version.
+      - run: cargo package --workspace --exclude jc-rs-bench
