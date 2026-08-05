@@ -181,6 +181,16 @@ dependencies carry no version, and packaging refuses that.)
   job. Every failure on this path surfaces as `ENEEDAUTH` or a 404 regardless of
   cause, so read that as "check the trusted publisher", not "add a token".
   It needs npm >= 11.5.1, hence node 24; node 22 still ships npm 10.9.x.
+  **Still not registered.** The npm job has failed on every release so far,
+  including v0.2.0, because the trusted publisher does not exist yet. Create it
+  once at npmjs.com/package/jc-rs-wasm/access against organization
+  `OlegSotnikov`, repository `jc-rs`, workflow `release.yml`, environment `npm`,
+  then re-run the job. Until then npm stays at jc-rs-wasm@0.1.0 while every
+  other channel moves.
+- The Docker Hub overview does not update. `peter-evans/dockerhub-description`
+  reports success and changes nothing, because `DOCKERHUB_TOKEN` is a push/pull
+  PAT and editing repository metadata needs a wider scope. Give the `dockerhub`
+  environment a PAT with write access, or edit the description by hand.
 - Only one long-lived credential remains. `HOMEBREW_TAP_TOKEN` exists because
   `GITHUB_TOKEN` cannot reach another repository, and it is the only long-lived
   secret in the release path.
