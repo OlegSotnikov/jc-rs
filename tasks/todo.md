@@ -134,10 +134,27 @@ do:
       tap's first formula; everything else in it is a cask. Every URL in it
       returns 200 and the `test do` block was run against the real binary.
 
-- [ ] **`NPM_TOKEN` in the `npm` environment**, so the next release publishes
-      the package itself. Without it the job builds and smoke-tests the package
-      and stops there. Worth checking npm's Trusted Publishing (OIDC) first —
-      it would remove this credential the way it removed the crates.io one.
+- [ ] **Register the npm trusted publisher — one form, then no npm credential
+      ever.** The job is already converted to OIDC, so `NPM_TOKEN` is not
+      wanted: an authToken in the environment stops npm attempting OIDC at all.
+      What remains is a setting only the account owner can make, at
+      <https://www.npmjs.com/package/jc-rs-wasm/access>:
+
+      > organization or user `OlegSotnikov` · repository `jc-rs` · workflow
+      > filename `release.yml` · environment `npm`
+
+      The workflow filename is the one that *triggers* the run, not the job.
+      Until it is registered the npm job fails at publish; the job writes the
+      table above into the run summary so the fix is in front of whoever looks.
+
+      npm requires the package to exist before a trusted publisher can be
+      attached, which would have been a chicken-and-egg problem — but
+      `jc-rs-wasm@0.1.0` was published by hand during the v0.1.0 release, so
+      the form is there to fill in.
+
+      Not verifiable before the next tag: the environment only accepts `v*`
+      tags, so there is no dispatch that exercises the OIDC exchange without
+      cutting a release.
 - [x] **All four environments carry the same rule: deployments only from `v*`
       tags.** `homebrew` and `npm` had been created implicitly by the first
       release run and carried no rules at all. The approval gate that

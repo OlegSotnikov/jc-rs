@@ -305,19 +305,38 @@ jobs:
     name: npm package
     needs: [release]
     runs-on: ubuntu-latest
-    # Environment: restricts this to `v*` tags and keeps the npm token scoped
-    # to this job rather than the whole repository.
+    # Environment: restricts this to `v*` tags. npm knows the environment name
+    # too -- the trusted publisher is registered against workflow `release.yml`
+    # *and* environment `npm`, so a token minted by any other job is rejected.
     environment: npm
+    # id-token is what makes Trusted Publishing work, exactly as in
+    # publish-crates.yml: the job asks GitHub's OIDC provider for a signed
+    # statement of who it is, and npm exchanges that for a short-lived
+    # credential. Nothing long-lived is stored.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
         with:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      # Node 24 for npm >= 11.5.1, which is the floor for Trusted Publishing:
+      # node 22 still ships npm 10.9.x, which has no idea OIDC exists and fails
+      # with a plain authentication error.
+      #
+      # `registry-url` is deliberately NOT set. It makes setup-node write
+      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` into .npmrc
+      # unconditionally, and npm treats even an empty token as an attempt to
+      # authenticate rather than falling through to OIDC -- the failure is
+      # `ENEEDAUTH ... need auth`, which points at the wrong subsystem
+      # entirely. registry.npmjs.org is npm's default, so the line buys us
+      # nothing. For the same reason there is no NODE_AUTH_TOKEN and no
+      # NPM_TOKEN anywhere below: setting either would break the OIDC path.
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4
         with:
-          node-version: "22"
-          registry-url: "https://registry.npmjs.org"
+          node-version: "24"
       - name: install wasm-pack
         run: cargo install wasm-pack --locked
       - name: build
@@ -327,20 +346,58 @@ jobs:
         # matters: an earlier version built and typed correctly while every
         # record came back as an empty object.
         run: node crates/jc-rs-wasm/tests/smoke.mjs
-      - name: is an npm token configured?
-        id: creds
-        env:
-          TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: is this version already on npm?
+        id: state
+        working-directory: crates/jc-rs-wasm/pkg
         run: |
-          if [ -n "$TOKEN" ]; then
-            echo "have=true" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          # npm ships with node, but assert it rather than trusting the image:
+          # the whole job silently degrades to a confusing auth error below the
+          # floor, and the version is cheap to check.
+          npm_version=$(npm --version)
+          if [ "$(printf '%s\n11.5.1\n' "$npm_version" | sort -V | head -1)" != "11.5.1" ]; then
+            echo "::error::npm $npm_version is below 11.5.1 — Trusted Publishing needs at least that"
+            exit 1
+          fi
+          echo "npm $npm_version, node $(node --version)"
+
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          # Re-running a release must not fail because the version is already
+          # up; npm answers a republish with E403, which reads like a
+          # permissions problem and is not one.
+          if curl -sf "https://registry.npmjs.org/jc-rs-wasm/$version" > /dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "jc-rs-wasm@$version is already on npm — nothing to publish." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "have=false" >> "$GITHUB_OUTPUT"
-            echo "NPM_TOKEN is not set — built the package but did not publish." >> "$GITHUB_STEP_SUMMARY"
+            echo "published=false" >> "$GITHUB_OUTPUT"
           fi
       - name: publish
-        if: steps.creds.outputs.have == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
+        if: steps.state.outputs.published == 'false'
         working-directory: crates/jc-rs-wasm/pkg
+        # No token: the credential is minted from the OIDC claim above.
+        # Provenance is generated automatically on this path, and stating it
+        # keeps the intent visible -- the attestation is what lets anyone tie
+        # this tarball back to the workflow run that built it.
+        run: npm publish --access public --provenance
+      - name: what to fix if that failed
+        if: failure() && steps.state.outputs.published == 'false'
+        run: |
+          {
+            echo "### npm publish failed"
+            echo ""
+            echo "There is no npm token by design — publishing uses Trusted Publishing (OIDC)."
+            echo "npm reports every failure on this path as \`ENEEDAUTH\` or a 404, which"
+            echo "points at authentication regardless of the real cause. Check the trusted"
+            echo "publisher at <https://www.npmjs.com/package/jc-rs-wasm/access>:"
+            echo ""
+            echo "| field | must be |"
+            echo "|---|---|"
+            echo "| organization or user | \`OlegSotnikov\` |"
+            echo "| repository | \`jc-rs\` |"
+            echo "| workflow filename | \`release.yml\` |"
+            echo "| environment | \`npm\` |"
+            echo ""
+            echo "Adding \`NPM_TOKEN\` back does not fix this — an authToken in the"
+            echo "environment stops npm from attempting OIDC at all."
+          } >> "$GITHUB_STEP_SUMMARY"
