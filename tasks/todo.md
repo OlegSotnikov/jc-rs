@@ -122,9 +122,22 @@ do:
       manual publish fixes it permanently:
 
       ```sh
+      git clone https://github.com/OlegSotnikov/jc-rs && cd jc-rs
+      git checkout v0.1.0
       cargo login                      # a personal crates.io token
-      cargo publish -p jc-rs-wasm      # from a clean checkout of the tag
+      cargo publish -p jc-rs-wasm
       ```
+
+      Verified ready: `cargo package -p jc-rs-wasm` builds the tarball and
+      compiles it against the published 0.1.0 crates, so the publish itself
+      should be uneventful.
+
+      **There is no crates.io token on this box or in any CI store** — I looked:
+      GitHub repo secrets (0), all four GitHub environment secret sets (only
+      `DOCKERHUB_*`), every variable in all 15 GitLab groups, and
+      `~/.cargo/credentials.toml`. That is by design: the session that set up
+      Trusted Publishing deleted the fallback secret once OIDC was proven, and
+      wrote down that it did. So this step needs the token holder.
 
       The workflow no longer fails the whole release over this — it detects a
       crate that does not exist, writes the command above into the job summary,
@@ -143,11 +156,11 @@ do:
       environment. The package builds and its Node smoke test passes in CI.
 - [ ] **Homebrew: skipped.** `OlegSotnikov/homebrew-tap` does not exist and
       `HOMEBREW_TAP_TOKEN` is not set.
-- [ ] **Switch the packaging check back to full verification.** `cargo package`
-      resolves against the registry, so before 0.1.0 was out only `jc-rs-core`
-      could be verified. Now that four crates are published, ci.yml can drop
-      `--list` for `jc-rs-utils`, `jc-rs-parsers` and `jc-rs` — and for
-      `jc-rs-wasm` once it exists.
+- [x] **Packaging check restored to full verification.** All five package and
+      compile against the published 0.1.0 dependencies, `jc-rs-wasm` included.
+      Note for the next release: right after a version bump this breaks again
+      until the new version is on the index — drop the dependent crates to
+      `cargo package --list` for that one commit.
 - [ ] **`-r/--raw` beyond what the corpus proves.** Seven parsers override
       `parse_raw`; the default forwards to `parse`, which is correct wherever
       jc's `_process` is a no-op. A parser with conversions but no `-raw`
