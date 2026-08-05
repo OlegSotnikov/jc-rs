@@ -115,33 +115,17 @@ Landed:
 Did not land, each needing something only a person with the right account can
 do:
 
-- [ ] **`jc-rs-wasm` is not on crates.io.** Trusted Publishing cannot *create*
-      a crate, only publish new versions of one that exists:
-      `403 — Trusted Publishing tokens do not support creating new crates.`
-      The other four were fine because 0.0.0 had reserved their names. One
-      manual publish fixes it permanently:
+- [x] **`jc-rs-wasm` 0.1.0 is on crates.io.** Published by hand, because
+      Trusted Publishing cannot *create* a crate — it 403s with "Trusted
+      Publishing tokens do not support creating new crates". The other four
+      were only fine because 0.0.0 had reserved their names.
 
-      ```sh
-      git clone https://github.com/OlegSotnikov/jc-rs && cd jc-rs
-      git checkout v0.1.0
-      cargo login                      # a personal crates.io token
-      cargo publish -p jc-rs-wasm
-      ```
+      **Next: enable Trusted Publishing for `jc-rs-wasm`** on crates.io
+      (owner `OlegSotnikov`, repository `jc-rs`, workflow
+      `publish-crates.yml`, environment `crates-io`), so future versions go
+      out with the rest instead of by hand. Until that is set, the release
+      workflow will report it as skipped rather than fail.
 
-      Verified ready: `cargo package -p jc-rs-wasm` builds the tarball and
-      compiles it against the published 0.1.0 crates, so the publish itself
-      should be uneventful.
-
-      **There is no crates.io token on this box or in any CI store** — I looked:
-      GitHub repo secrets (0), all four GitHub environment secret sets (only
-      `DOCKERHUB_*`), every variable in all 15 GitLab groups, and
-      `~/.cargo/credentials.toml`. That is by design: the session that set up
-      Trusted Publishing deleted the fallback secret once OIDC was proven, and
-      wrote down that it did. So this step needs the token holder.
-
-      The workflow no longer fails the whole release over this — it detects a
-      crate that does not exist, writes the command above into the job summary,
-      and publishes everything else.
 - [ ] **The Docker image pushed but is private.** The job ran and both tags
       completed (`appmasterio/jc-rs:v0.1.0`, `:latest`), but an anonymous pull
       gets `repository does not exist` — Docker Hub created the repository
