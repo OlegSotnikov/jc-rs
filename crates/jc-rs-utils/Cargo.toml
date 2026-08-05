@@ -11,7 +11,7 @@ keywords = ["json", "utilities", "datetime"]
 categories = ["encoding"]
 
 [dependencies]
-jc-rs-core = { path = "../jc-rs-core", version = "0.1.0" }
+jc-rs-core = { path = "../jc-rs-core", version = "0.2.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { version = "0.4", features = ["serde"] }
