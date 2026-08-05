@@ -50,8 +50,8 @@ pub(crate) fn detect_delimiter(input: &str) -> u8 {
 
 /// Normalize CSV input so quoted fields are recognized properly.
 /// The csv spec requires quotes to start immediately after the delimiter.
-/// Some CSV files have spaces between the delimiter and the quote — we normalize
-/// those by stripping leading whitespace from unquoted fields only.
+/// Some CSV files have spaces between the delimiter and the quote, so we
+/// normalize those by stripping leading whitespace from unquoted fields only.
 pub(crate) fn normalize_csv_line(line: &str, delimiter: u8) -> String {
     let delim_char = delimiter as char;
     let mut result = String::with_capacity(line.len());

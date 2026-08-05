@@ -121,13 +121,13 @@ impl Parser for ProcNetTcpParser {
             // state
             map.insert("state".to_string(), Value::String(parts[3].to_string()));
 
-            // tx_queue:rx_queue  — format "XXXXXXXX:XXXXXXXX"
+            // tx_queue:rx_queue has the format "XXXXXXXX:XXXXXXXX"
             let queues = parts[4];
             let (tx, rx) = queues.split_once(':').unwrap_or((queues, "00000000"));
             map.insert("tx_queue".to_string(), Value::String(tx.to_string()));
             map.insert("rx_queue".to_string(), Value::String(rx.to_string()));
 
-            // timer_active:jiffies  — format "XX:XXXXXXXX"
+            // timer_active:jiffies has the format "XX:XXXXXXXX"
             let timer_field = parts[5];
             let (timer_hex, jiffies) = timer_field.split_once(':').unwrap_or(("00", "00000000"));
             let timer_active: i64 = i64::from_str_radix(timer_hex, 16).unwrap_or(0);

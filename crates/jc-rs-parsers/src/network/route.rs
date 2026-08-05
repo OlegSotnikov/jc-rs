@@ -105,7 +105,7 @@ impl Parser for RouteParser {
         let mut result = Vec::new();
         for line in &lines {
             // jc's route reads the table without filtering blank lines, so a
-            // trailing newline produces a row of nothing -- which its own
+            // trailing newline produces a row of nothing, which its own
             // fixtures record as `{}`. Skipping it here left us one record
             // short of every `route -6` fixture.
             let values: Vec<&str> = line.split_whitespace().collect();

@@ -1,7 +1,7 @@
 # jc-rs-parsers
 
-Parser implementations for jc-rs — the reuse surface for other tools that need
-command output as structured data.
+Parser implementations for jc-rs, and the reuse surface for other tools that
+need command output as structured data.
 
 ```rust
 let output = jc_rs_parsers::parse("df", df_output)?;

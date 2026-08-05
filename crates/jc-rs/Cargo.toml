@@ -2,7 +2,7 @@
 name = "jc-rs"
 version.workspace = true
 edition.workspace = true
-description = "jc-rs — convert CLI output, file types, and strings to JSON/YAML (Rust rewrite of jc)"
+description = "jc-rs: convert CLI output, file types, and strings to JSON/YAML (Rust rewrite of jc)"
 readme = "README.md"
 license.workspace = true
 repository.workspace = true

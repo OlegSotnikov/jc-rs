@@ -144,7 +144,7 @@ impl Parser for ProcPidFdinfoParser {
 
             // fanotify: line starts with "fanotify"
             if line_trimmed.starts_with("fanotify") {
-                // May have multiple "fanotify" lines — merge into one object
+                // May have multiple "fanotify" lines: merge into one object
                 let rest = &line_trimmed[8..]; // skip "fanotify"
                 let rest = rest.trim_start();
                 let fanotify_map = map

@@ -1,7 +1,7 @@
 # jc-rs
 
-Convert the output of command-line tools, file formats and strings to JSON — as a
-single static binary.
+Convert the output of command-line tools, file formats and strings to JSON, from
+a single static binary.
 
 ```console
 $ ps aux | jc-rs --ps | jq '.[0]'
@@ -11,7 +11,7 @@ $ dig example.com | jc-rs -p --dig
 
 > Compatibility with jc: **100%** (934 of 934 oracle-valid fixture pairs).
 > The code this started from measured 80.0%. The number comes from
-> `make differential` and is published whatever it says — see
+> `make differential` and is published whatever it says. See
 > [tests/differential/REPORT.md](tests/differential/REPORT.md).
 > CI fails below 100%, so it cannot quietly drift.
 
@@ -19,21 +19,20 @@ $ dig example.com | jc-rs -p --dig
 
 ## Why this project exists
 
-jc is the standard for this job and the reason the category exists — it decided
+jc is the standard for this job and the reason the category exists. It decided
 which commands are worth parsing and what the JSON for each should look like.
 Its one weakness is the Python runtime: ~160 ms of startup on every invocation,
 and a dependency you cannot put in a `scratch` container or on an embedded box.
 
-jc-rs is that tool as a single static binary, and it is built around one
-commitment:
+jc-rs is that tool as a single static binary:
 
-1. **A compatibility number you can check.** Published continuously, honest when
-   it is bad, never rounded up by excluding awkward fixtures. jc-rs invents no
-   schemas — jc is the authority, and where the two disagree jc-rs has the bug.
-2. **Streaming that actually streams.** jc emits NDJSON line-by-line as input
+1. A compatibility number you can check. Published continuously, honest when it
+   is bad, never rounded up by excluding awkward fixtures. jc-rs invents no
+   schemas. jc is the authority, and where the two disagree jc-rs has the bug.
+2. Streaming that actually streams. jc emits NDJSON line-by-line as input
    arrives, and so does jc-rs: `tail -f access.log | jc-rs -u --clf-s` prints
    each record as the log grows, rather than one array at EOF.
-3. **Distribution.** Static binaries for five targets, five crates, npm, brew and
+3. Distribution. Static binaries for five targets, five crates, npm, brew and
    a `scratch` Docker image.
 
 ## How the compatibility number is produced
@@ -44,19 +43,18 @@ source (submodule at `./jc`, currently **v1.25.7**) and applies one rule:
 > A fixture pair enters the denominator **only when jc itself reproduces that
 > fixture exactly.**
 
-Everything that does not qualify is reported by category — `oracle_reject`,
-`unmapped`, `no_input` — and never dropped from the count.
+Everything that does not qualify is reported by category (`oracle_reject`,
+`unmapped`, `no_input`) and never dropped from the count.
 
 Two details decide whether the number means anything:
 
-- **`tests/fixtures/` is a verbatim mirror of the submodule**, enforced by
-  `make check-fixtures`. Testing against a fixture copy you are free to edit is
-  not testing.
-- **The run is pinned to `TZ=PST8PDT`**, which is what jc's own `runtests.sh`
-  uses. jc's fixtures carry `*_epoch` fields computed in local time; in any
-  other zone the oracle rejects every timestamp-bearing fixture and 146 pairs
-  quietly leave the denominator — understating coverage exactly the way a
-  silent skip overstates it.
+- `tests/fixtures/` is a verbatim mirror of the submodule, enforced by
+  `make check-fixtures`. If this repo could edit its own copy, a failing parser
+  could be made to pass by rewriting the expected output.
+- The run is pinned to `TZ=PST8PDT`, which is what jc's own `runtests.sh` uses.
+  jc's fixtures carry `*_epoch` fields computed in local time; in any other zone
+  the oracle rejects every timestamp-bearing fixture and 146 pairs quietly leave
+  the denominator.
 
 ```console
 $ make differential
@@ -69,9 +67,8 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 ## Speed
 
 Measured by [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), which times both sides with
-one harness on the same inputs — median of 5–11 runs, Linux x86-64, jc 1.25.7 on
-Python 3.12. Re-run it yourself with `make bench-vs-jc`; a number you cannot
-reproduce is a number nobody should print.
+one harness on the same inputs: median of 5 to 11 runs, Linux x86-64, jc 1.25.7
+on Python 3.12. Re-run it yourself with `make bench-vs-jc`.
 
 | Scenario | jc | jc-rs | Speedup |
 |---|---|---|---|
@@ -83,8 +80,8 @@ reproduce is a number nobody should print.
 
 The gap is largest at startup, which is why it matters most in loops, git hooks
 and per-host automation rather than at an interactive prompt. On throughput it
-narrows to 3–5×: both implementations end up bound by the same per-field work,
-and `clf` — 22 fields and a timestamp per line — is the honest floor.
+narrows to 3× to 5×: both implementations end up bound by the same per-field
+work, and `clf`, at 22 fields and a timestamp per line, is the worst case.
 
 ## Usage
 
@@ -96,14 +93,14 @@ df -h    | jc-rs --df
 ps aux   | jc-rs --ps
 mount    | jc-rs --yaml-out --mount
 
-# magic syntax — jc-rs runs the command itself
+# magic syntax: jc-rs runs the command itself
 jc-rs -p df -h
 jc-rs -p /proc/meminfo
 
 # line slicing (zero-based, exclusive end)
 cat log.txt | jc-rs 2: --syslog
 
-# streaming — one JSON object per record, as it arrives (-u to flush per line)
+# streaming: one JSON object per record, as it arrives (-u to flush per line)
 tail -f access.log | jc-rs -u --clf-s
 ping example.com  | jc-rs -u --ping-s
 
@@ -117,7 +114,7 @@ ss -tlnp | jc-rs --ss | jq '[.[].local_port] | unique'
 |---|---|
 | [`jc-rs`](crates/jc-rs) | the CLI binary |
 | [`jc-rs-core`](crates/jc-rs-core) | parser traits, output and error types, registry |
-| [`jc-rs-parsers`](crates/jc-rs-parsers) | every parser — the reuse surface for other tools |
+| [`jc-rs-parsers`](crates/jc-rs-parsers) | every parser; the reuse surface for other tools |
 | [`jc-rs-utils`](crates/jc-rs-utils) | shared helpers: column tables, coercion, key normalisation |
 | [`jc-rs-wasm`](crates/jc-rs-wasm) | `wasm-bindgen` wrapper + npm package |
 
@@ -140,7 +137,7 @@ for line in reader.lines() {
 ```
 
 Parsers register themselves at link time, so depending on `jc-rs-parsers` is
-what fills the registry — `parse`, `find`, `parsers` and `session` exist so you
+what fills the registry. `parse`, `find`, `parsers` and `session` exist so you
 never have to think about that.
 
 ## Shell completions

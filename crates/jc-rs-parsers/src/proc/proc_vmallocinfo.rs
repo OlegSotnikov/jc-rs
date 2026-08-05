@@ -51,7 +51,7 @@ impl Parser for ProcVmallocinfoParser {
                 continue;
             }
 
-            // Split into: area, size, details — replicating Python's split(maxsplit=2).
+            // Split into: area, size, details; replicates Python's split(maxsplit=2).
             // We find the byte offsets by scanning for whitespace-separated tokens.
             let area;
             let size_str;

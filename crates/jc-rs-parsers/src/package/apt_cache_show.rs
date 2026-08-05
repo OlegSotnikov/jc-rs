@@ -1,6 +1,6 @@
 //! Parser for `apt-cache show` command output.
 //!
-//! This is an alias of the rpm_qi parser logic — both formats use the same
+//! This is an alias of the rpm_qi parser logic; both formats use the same
 //! "Key: value" colon-separated structure with a Description block.
 
 use jc_rs_core::error::ParseError;
@@ -60,7 +60,7 @@ fn parse_raw(input: &str) -> Vec<Map<String, Value>> {
     let mut in_desc_entry: bool = false;
 
     for line in input.lines() {
-        // Skip blank lines (record separator — we detect new records via "Package:" key)
+        // Skip blank lines (record separator; we detect new records via "Package:" key)
         if line.trim().is_empty() {
             continue;
         }
@@ -99,7 +99,7 @@ fn parse_raw(input: &str) -> Vec<Map<String, Value>> {
                 continue;
             }
 
-            // Store key-value (in_desc_entry stays set — Python bug replication)
+            // Store key-value (in_desc_entry stays set: Python bug replication)
             entry.insert(key, Value::String(split_line[1].trim().to_string()));
         }
         // (non-indented non-kv lines are ignored)

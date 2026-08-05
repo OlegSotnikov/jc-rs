@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// Output from a parser -- either a single JSON object or an array of objects.
+/// Output from a parser: either a single JSON object or an array of objects.
 ///
 /// Standard parsers return `Object` for single-record commands (e.g. `date`,
 /// `uname`) and `Array` for multi-record commands (e.g. `ps`, `ls`).

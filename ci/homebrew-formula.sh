@@ -31,7 +31,7 @@ sed \
   packaging/homebrew/jc-rs.rb.tmpl > "$OUT"
 
 if grep -q "__" "$OUT"; then
-  echo "a placeholder was left unfilled — is $TAG published with all five archives?" >&2
+  echo "a placeholder was left unfilled; is $TAG published with all five archives?" >&2
   grep -n "__" "$OUT" >&2
   exit 1
 fi

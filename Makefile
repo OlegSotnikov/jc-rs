@@ -14,7 +14,7 @@ build: ## release build
 	cargo build --release
 
 .PHONY: test
-test: ## cargo tests (unit + integration) — red by design, see ci/known-failures.txt
+test: ## cargo tests (unit + integration); red by design, see ci/known-failures.txt
 	TZ=PST8PDT cargo test --workspace
 
 .PHONY: ratchet
@@ -32,12 +32,12 @@ check-fixtures: submodule ## fail if any fixture we share with jc has been edite
 	@# Only files that exist on both sides are compared. A handful of fixtures
 	@# are this project's own test data and have no jc counterpart; those are
 	@# fine. What must never happen is a fixture jc DOES ship being edited here
-	@# to match our output — that is how a 100% compatibility claim gets made
+	@# to match our output; that is how a 100% compatibility claim gets made
 	@# without being true.
 	@drift=$$(diff -rq tests/fixtures $(JC)/tests/fixtures 2>/dev/null | grep '^Files ' || true); \
 	if [ -n "$$drift" ]; then \
 	  echo "$$drift"; \
-	  echo "a fixture shared with jc has been modified — run: make sync-fixtures"; \
+	  echo "a fixture shared with jc has been modified; run: make sync-fixtures"; \
 	  exit 1; \
 	fi; \
 	echo "fixtures in sync with jc"

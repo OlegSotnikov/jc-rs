@@ -9,7 +9,7 @@ to JSON, as a single static binary. It is a Rust implementation of the schemas
 defined by [jc](https://github.com/kellyjonbrazil/jc) (Python), pinned as a git
 submodule at `./jc` (v1.25.7).
 
-**The product is not speed — it is a compatibility number anyone can check.**
+**The product is a compatibility number anyone can check, not speed.**
 That premise decides most design arguments:
 
 - Never invent a schema. jc is the authority; where the two disagree, jc-rs has the bug.
@@ -18,15 +18,15 @@ That premise decides most design arguments:
 - Publish the number even when it is bad.
 
 Current state: 934/934 = 100% (`tests/differential/REPORT.md`), workspace
-version `0.1.0` — the first real release.
+version `0.1.0`, the first real release.
 
 ## Commands
 
 ```bash
 make build              # cargo build --release
-make check              # lint + fixture sync + test ratchet + differential — the universal gate
+make check              # lint + fixture sync + test ratchet + differential; the universal gate
 make lint               # cargo clippy --workspace --all-targets -- -D warnings; cargo fmt --check
-make ratchet            # unit tests as a ratchet (./ci/run-tests.sh) — the test gate, not `make test`
+make ratchet            # unit tests as a ratchet (./ci/run-tests.sh); the test gate, not `make test`
 make differential       # full jc corpus; rewrites tests/differential/{REPORT.md,report.json}
 make bench              # criterion, -p jc-rs-bench
 make wasm               # build + Node-test the npm package (needs wasm-pack)
@@ -53,7 +53,7 @@ The Makefile and both harnesses set it; hand-run cargo does not.
 Both fail the build in CI, and both exist because a plain green/red signal would
 be useless while the port is incomplete.
 
-**`ci/known-failures.txt`** is **empty** — every unit test passes. It stays as
+**`ci/known-failures.txt`** is **empty**: every unit test passes. It stays as
 the mechanism: `ci/run-tests.sh` fails on a new failure *and* on a listed test
 that starts passing, so adding a line to it is a deliberate act of deferring a
 regression, not a way to make the build green.
@@ -81,15 +81,15 @@ each parser declares a `static INFO: ParserInfo`, a `static X_PARSER`, and an
 Lookup goes through `find_parser()` (accepts `name`, `kebab-case`, or
 `--argument`) and `find_magic_parser()` (matches argv against `magic_commands`).
 
-**Streaming is a session, not a method.** The registry holds
+**Streaming state lives in a session object, not on the parser.** The registry holds
 `&'static dyn Parser`, which cannot be downcast, so `Parser::as_streaming()`
 hands back the sub-trait and `StreamingParser::session()` mints an owned
 `LineParser` carrying the per-run state. A streaming parser's `Parser::parse()`
-must be `parse_via_session(self, input, quiet)` — the batch path and the live
+must be `parse_via_session(self, input, quiet)`. The batch path and the live
 path have to be the same code, because the differential only exercises the
 batch one.
 
-`docs/api-contracts.md` is the authoritative spec for these interfaces — types,
+`docs/api-contracts.md` is the authoritative spec for these interfaces: types,
 error-variant semantics, naming conventions (`name` is snake_case, `argument` is
 `--kebab-case`), the `_jc_meta` object shape, and exit codes (0 ok, 100 error).
 Read it before adding to `jc-rs-core` or writing a parser.
@@ -110,7 +110,7 @@ category (`oracle_reject`, `unmapped`, `no_input`) and never dropped.
 `make check-fixtures` and refreshed with `make sync-fixtures`. Fixtures that are
 this project's own test data (no jc counterpart) are left alone; what must never
 happen is a fixture jc ships being edited here to match our output. The imported
-codebase's "100% (687/687)" claim came from exactly those two mechanisms — a
+codebase's "100% (687/687)" claim came from exactly those two mechanisms: a
 harness that dropped 39% of the corpus and 17 rewritten fixtures. Do not
 reintroduce either.
 
@@ -122,7 +122,7 @@ the number to move, and update the CI floor.
 - **`-r/--raw` is implemented where the corpus proves it.** `Parser::parse_raw`
   defaults to forwarding to `parse`, which is correct wherever jc's `_process`
   is a no-op; seven parsers override it. A parser with conversions but no raw
-  fixture is still unproven — if you add one, check `-r` too.
+  fixture is still unproven; if you add one, check `-r` too.
 - **Key order.** Keys serialise alphabetically; jc preserves schema order. Values
   agree so the differential passes, but no two outputs ever `diff` clean. Fixing
   it needs `serde_json`'s `preserve_order` plus per-parser key sequences.
@@ -132,12 +132,18 @@ the number to move, and update the CI floor.
 - **Streaming is only live under `-u`.** Without it both jc and jc-rs
   block-buffer stdout when piped; that is jc's behaviour, not an oversight.
   `crates/jc-rs/tests/streaming.rs` covers what the differential structurally
-  cannot — its fixtures are arrays and its input ends immediately, so a parser
+  cannot: its fixtures are arrays and its input ends immediately, so a parser
   that buffers to EOF scores identically to one that streams.
 
 `tasks/todo.md` carries the current milestone list and the per-parser failure
 counts; `tests/differential/report.json` has every failing case with paths and
 diffs.
+
+## Commits
+
+Every commit is authored and committed by `Oleg Sotnikov <os@g1sw.com>`. Never
+add a `Co-Authored-By` trailer or any other attribution line: this is a
+single-owner repository and the contributor list has to say so.
 
 ## Release and publishing
 
@@ -165,7 +171,7 @@ fail on "nothing to commit".
 
 **Package the workspace, never a crate at a time.** `cargo package -p X`
 resolves X's siblings against *crates.io*, so it cannot verify a version that
-is not on the index yet — which is every version between the bump and the
+is not on the index yet, which is every version between the bump and the
 upload. `cargo package --workspace --exclude jc-rs-bench` packages the members
 into a temporary local registry and verifies each against that, so it holds at
 any version. (`jc-rs-bench` is excluded as the one unpublished member: its path
@@ -181,18 +187,18 @@ dependencies carry no version, and packaging refuses that.)
   registry anyway) and neither `NPM_TOKEN` nor `NODE_AUTH_TOKEN` appears in the
   job. Every failure on this path surfaces as `ENEEDAUTH` or a 404 regardless of
   cause, so read that as "check the trusted publisher", not "add a token".
-  It needs npm >= 11.5.1, hence node 24 — node 22 still ships npm 10.9.x.
-- The one credential still outstanding is nothing: `HOMEBREW_TAP_TOKEN` exists
-  because `GITHUB_TOKEN` cannot reach another repository, and that is the only
-  long-lived secret in the release path.
+  It needs npm >= 11.5.1, hence node 24; node 22 still ships npm 10.9.x.
+- Only one long-lived credential remains. `HOMEBREW_TAP_TOKEN` exists because
+  `GITHUB_TOKEN` cannot reach another repository, and it is the only long-lived
+  secret in the release path.
 - Secrets live in GitHub *environments*, never at repository level.
-- Third-party actions are pinned to commit SHAs. Keep it that way — some of these
+- Third-party actions are pinned to commit SHAs. Keep it that way; some of these
   jobs can publish under our name.
 - `CARGO_TERM_COLOR: always` is set in these workflows; never match cargo output
   with an anchored pattern (crate names arrive wrapped in ANSI escapes). The
   re-run guard queries the crates.io API instead.
-- The published binary is `jc-rs`, never `jc` — installing `jc` would shadow the
-  original in `PATH`. The crate name `cj` on crates.io belongs to an unrelated
+- The published binary is `jc-rs`, never `jc`, because installing `jc` would
+  shadow the original in `PATH`. The crate name `cj` on crates.io belongs to an unrelated
   2022 package; never document or publish under it.
 - `LICENSE` keeps two upstream copyright lines. They are the MIT condition for
-  the imported parser code and jc's fixture corpus, not decoration.
+  the imported parser code and jc's fixture corpus, so they stay.

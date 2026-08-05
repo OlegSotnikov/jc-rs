@@ -6,8 +6,8 @@
 # parser, not a flaky test.
 #
 # The rules, enforced by ci/run-tests.sh:
-#   * a failure NOT in this list fails the build — that is a regression
-#   * a test in this list that starts PASSING also fails the build — fix the
+#   * a failure NOT in this list fails the build; that is a regression
+#   * a test in this list that starts PASSING also fails the build; fix the
 #     parser, then delete its line here, in the same commit
 #   * never edit a fixture to make one of these pass; `make check-fixtures`
 #     will catch it and it is the exact mistake that produces a fake 100%

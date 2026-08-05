@@ -25,7 +25,7 @@ jobs:
   publish:
     name: crates.io
     runs-on: ubuntu-latest
-    # Environment, not for an approval gate -- for the two things that cost
+    # Environment, not for an approval gate, but for the two things that cost
     # nothing: it only accepts `v*` tags, and any secret it needs lives here
     # rather than at repository level, so no other workflow can reach it.
     environment: crates-io
@@ -57,7 +57,7 @@ jobs:
             echo "Falling back to CARGO_REGISTRY_TOKEN. Configure Trusted Publishing on crates.io and delete this secret." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "mode=none" >> "$GITHUB_OUTPUT"
-            echo "No crates.io credentials — nothing was published." >> "$GITHUB_STEP_SUMMARY"
+            echo "No crates.io credentials; nothing was published." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       # Publish order is the dependency order and cannot be parallelised: utils
@@ -90,7 +90,7 @@ jobs:
             if curl -sf -A "jc-rs release (github actions)" \
                  "https://crates.io/api/v1/crates/$crate/$version" \
                  | jq -e '.version.num' > /dev/null 2>&1; then
-              echo "$crate $version is already on crates.io — skipping"
+              echo "$crate $version is already on crates.io, skipping"
               continue
             fi
 
@@ -125,7 +125,7 @@ jobs:
           set -euo pipefail
           # `--workspace` verifies the members against each other through a
           # temporary local registry rather than against crates.io, so this
-          # holds for a version that is not on the index -- which is every
+          # holds for a version that is not on the index, which is every
           # version at the moment a release is dry-run. See ci.yml.
           cargo package --workspace --exclude jc-rs-bench
           echo "nothing was uploaded"

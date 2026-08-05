@@ -51,7 +51,7 @@ impl Parser for GitLogSParser {
 
 impl StreamingParser for GitLogSParser {
     /// A commit spans many lines, so records come out one commit behind the
-    /// input -- the session emits the previous commit when the next one starts.
+    /// input: the session emits the previous commit when the next one starts.
     fn session(&self) -> Box<dyn LineParser> {
         Box::new(GitLogSession::default())
     }

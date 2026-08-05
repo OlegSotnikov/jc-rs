@@ -162,7 +162,7 @@ jobs:
             echo "have=true" >> "$GITHUB_OUTPUT"
           else
             echo "have=false" >> "$GITHUB_OUTPUT"
-            echo "DOCKERHUB_TOKEN is not set — skipping the image." >> "$GITHUB_STEP_SUMMARY"
+            echo "DOCKERHUB_TOKEN is not set, skipping the image." >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         if: steps.creds.outputs.have == 'true'
@@ -224,7 +224,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: appmasterio/jc-rs
-          short-description: "Convert CLI output, file formats and strings to JSON — one static binary, 100% jc-compatible"
+          short-description: "Convert CLI output, file formats and strings to JSON from one static binary, 100% jc-compatible"
           readme-filepath: packaging/docker/README.md
 
   homebrew:
@@ -245,7 +245,7 @@ jobs:
             echo "have=true" >> "$GITHUB_OUTPUT"
           else
             echo "have=false" >> "$GITHUB_OUTPUT"
-            echo "HOMEBREW_TAP_TOKEN is not set — skipping the tap update." >> "$GITHUB_STEP_SUMMARY"
+            echo "HOMEBREW_TAP_TOKEN is not set, skipping the tap update." >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         if: steps.creds.outputs.have == 'true'
@@ -294,7 +294,7 @@ jobs:
           # correct: with the formula unchanged, `git commit` exits non-zero
           # on "nothing to commit" and takes the job red for no reason.
           if git diff --cached --quiet; then
-            echo "tap already has this formula — nothing to push"
+            echo "tap already has this formula, nothing to push"
             echo "The Homebrew tap was already up to date." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -306,7 +306,7 @@ jobs:
     needs: [release]
     runs-on: ubuntu-latest
     # Environment: restricts this to `v*` tags. npm knows the environment name
-    # too -- the trusted publisher is registered against workflow `release.yml`
+    # too: the trusted publisher is registered against workflow `release.yml`
     # *and* environment `npm`, so a token minted by any other job is rejected.
     environment: npm
     # id-token is what makes Trusted Publishing work, exactly as in
@@ -329,7 +329,7 @@ jobs:
       # `registry-url` is deliberately NOT set. It makes setup-node write
       # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` into .npmrc
       # unconditionally, and npm treats even an empty token as an attempt to
-      # authenticate rather than falling through to OIDC -- the failure is
+      # authenticate rather than falling through to OIDC. The failure is
       # `ENEEDAUTH ... need auth`, which points at the wrong subsystem
       # entirely. registry.npmjs.org is npm's default, so the line buys us
       # nothing. For the same reason there is no NODE_AUTH_TOKEN and no
@@ -356,7 +356,7 @@ jobs:
           # floor, and the version is cheap to check.
           npm_version=$(npm --version)
           if [ "$(printf '%s\n11.5.1\n' "$npm_version" | sort -V | head -1)" != "11.5.1" ]; then
-            echo "::error::npm $npm_version is below 11.5.1 — Trusted Publishing needs at least that"
+            echo "::error::npm $npm_version is below 11.5.1; Trusted Publishing needs at least that"
             exit 1
           fi
           echo "npm $npm_version, node $(node --version)"
@@ -368,7 +368,7 @@ jobs:
           # permissions problem and is not one.
           if curl -sf "https://registry.npmjs.org/jc-rs-wasm/$version" > /dev/null 2>&1; then
             echo "published=true" >> "$GITHUB_OUTPUT"
-            echo "jc-rs-wasm@$version is already on npm — nothing to publish." >> "$GITHUB_STEP_SUMMARY"
+            echo "jc-rs-wasm@$version is already on npm, nothing to publish." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
@@ -377,7 +377,7 @@ jobs:
         working-directory: crates/jc-rs-wasm/pkg
         # No token: the credential is minted from the OIDC claim above.
         # Provenance is generated automatically on this path, and stating it
-        # keeps the intent visible -- the attestation is what lets anyone tie
+        # keeps the intent visible: the attestation is what lets anyone tie
         # this tarball back to the workflow run that built it.
         run: npm publish --access public --provenance
       - name: what to fix if that failed
@@ -386,7 +386,7 @@ jobs:
           {
             echo "### npm publish failed"
             echo ""
-            echo "There is no npm token by design — publishing uses Trusted Publishing (OIDC)."
+            echo "There is no npm token by design. Publishing uses Trusted Publishing (OIDC)."
             echo "npm reports every failure on this path as \`ENEEDAUTH\` or a 404, which"
             echo "points at authentication regardless of the real cause. Check the trusted"
             echo "publisher at <https://www.npmjs.com/package/jc-rs-wasm/access>:"
@@ -398,6 +398,6 @@ jobs:
             echo "| workflow filename | \`release.yml\` |"
             echo "| environment | \`npm\` |"
             echo ""
-            echo "Adding \`NPM_TOKEN\` back does not fix this — an authToken in the"
+            echo "Adding \`NPM_TOKEN\` back does not fix this. An authToken in the"
             echo "environment stops npm from attempting OIDC at all."
           } >> "$GITHUB_STEP_SUMMARY"

@@ -25,5 +25,5 @@ SOFTWARE.
 Portions of this software originate in two MIT-licensed projects, whose
 permission notices are retained here as that licence requires:
 
-  cj — Copyright (c) 2026 cj contributors
-  jc — Copyright (c) 2020 Kelly Brazil   (fixture corpus under tests/fixtures/)
+  cj: Copyright (c) 2026 cj contributors
+  jc: Copyright (c) 2020 Kelly Brazil   (fixture corpus under tests/fixtures/)

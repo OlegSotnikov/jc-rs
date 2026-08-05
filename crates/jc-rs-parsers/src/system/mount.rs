@@ -209,7 +209,7 @@ fn parse_after_on(rest: &str) -> Option<(String, Option<String>, String)> {
         let fs_type = before_parens[type_pos + 6..].trim().to_string(); // " type " is 6 chars
         Some((mount_point, Some(fs_type), options_str))
     } else {
-        // No type keyword — macOS style
+        // No type keyword: macOS style
         Some((before_parens.to_string(), None, options_str))
     }
 }

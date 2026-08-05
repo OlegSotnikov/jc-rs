@@ -1,8 +1,8 @@
 # jc-rs
 
-Convert the output of command-line tools, file formats and strings to JSON — as
-a single static binary in a `scratch` image. No shell, no libc, no package
-manager: the image is the binary and its licence, nothing else.
+Convert the output of command-line tools, file formats and strings to JSON, from
+a single static binary in a `scratch` image. There is no shell, no libc and no
+package manager in it: the image holds the binary and its licence.
 
 ```console
 $ ps aux | docker run --rm -i appmasterio/jc-rs --ps | jq '.[0]'
@@ -19,7 +19,7 @@ is the Python runtime: ~160 ms of interpreter startup on every invocation, and a
 dependency you cannot put in a `scratch` container. This is that tool as a
 static binary.
 
-**Compatibility with jc is 100%** — 934 of 934 oracle-valid fixture pairs from
+**Compatibility with jc is 100%**: 934 of 934 oracle-valid fixture pairs from
 jc's own corpus, measured on every commit and published whatever it says. CI
 fails below 100%, so it cannot drift quietly. The rule that makes the number
 mean something: a fixture only counts when jc itself reproduces it exactly, and
@@ -27,7 +27,7 @@ everything that does not qualify is reported by category rather than dropped.
 
 ## Speed
 
-Median of 5–11 runs against jc 1.25.7 on Python 3.12, same harness both sides
+Median of 5 to 11 runs against jc 1.25.7 on Python 3.12, same harness both sides
 ([`ci/bench-vs-jc.sh`](https://github.com/OlegSotnikov/jc-rs/blob/master/ci/bench-vs-jc.sh)):
 
 | Scenario | jc | jc-rs |
@@ -42,7 +42,7 @@ and per-host automation rather than at an interactive prompt.
 
 ## Usage
 
-Same interface as jc — 238 parsers, `-p` to pretty-print, `-y` for YAML, `-r`
+Same interface as jc: 238 parsers, `-p` to pretty-print, `-y` for YAML, `-r`
 for raw output, `-M` for metadata.
 
 ```console
@@ -50,8 +50,8 @@ $ docker run --rm appmasterio/jc-rs --help
 $ docker run --rm appmasterio/jc-rs -l          # list parsers
 ```
 
-Streaming parsers emit NDJSON as input arrives — one JSON object per line, not
-one array at the end. Add `-u` to flush per record, which is what a live pipe
+Streaming parsers emit NDJSON as input arrives, one JSON object per line instead
+of one array at the end. Add `-u` to flush per record, which is what a live pipe
 needs:
 
 ```console
@@ -64,10 +64,10 @@ binary.
 
 ## Tags
 
-- `latest` — the most recent release
-- `vX.Y.Z` — a specific release
+- `latest` is the most recent release
+- `vX.Y.Z` is a specific release
 
-2.3 MB compressed. `linux/amd64` and `linux/arm64` in one manifest —
+2.3 MB compressed. `linux/amd64` and `linux/arm64` ship in one manifest, so
 `docker pull` picks the right one.
 
 ## Elsewhere

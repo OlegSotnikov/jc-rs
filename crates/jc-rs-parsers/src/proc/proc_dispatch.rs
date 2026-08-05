@@ -1,4 +1,4 @@
-//! Meta-parser for `/proc` files — dispatches to specific parsers by content detection.
+//! Meta-parser for `/proc` files: dispatches to specific parsers by content detection.
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::{ParserEntry, find_parser};
@@ -28,8 +28,8 @@ static PROC_DISPATCH_PARSER: ProcDispatchParser = ProcDispatchParser;
 
 inventory::submit! { ParserEntry::new(&PROC_DISPATCH_PARSER) }
 
-/// jc's signature table, in jc's order -- the comments there mark pairs where
-/// one pattern would swallow the other, so the order is part of the contract.
+/// jc's signature table, in jc's order. The comments there mark pairs where one
+/// pattern would swallow the other, so the order is part of the contract.
 ///
 /// Python's `$` also matches just before a trailing newline while Rust's does
 /// not, so patterns that jc anchors with `$` carry an explicit `\n?` here.

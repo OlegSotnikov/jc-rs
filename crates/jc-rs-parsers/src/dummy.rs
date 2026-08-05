@@ -1,4 +1,4 @@
-//! Dummy parser — proves the inventory registration system works end-to-end.
+//! Dummy parser: proves the inventory registration system works end to end.
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;

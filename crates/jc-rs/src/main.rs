@@ -1,4 +1,4 @@
-//! jc-rs — jc rewritten in Rust.
+//! jc-rs: jc rewritten in Rust.
 //!
 //! Entry point for the `jc-rs` binary. Handles argument parsing, parser dispatch,
 //! input reading, output formatting, and exit codes.
@@ -465,7 +465,7 @@ fn run_streaming_parser(
 /// Apply a line slice to a stream, lazily when it can be.
 ///
 /// A negative index is only meaningful relative to the end of the input, so it
-/// forces the whole stream into memory -- exactly the trade jc documents in
+/// forces the whole stream into memory, exactly the trade jc documents in
 /// `utils.line_slice`. Positive slices stay lazy and keep streaming live.
 fn slice_lines(
     lines: impl Iterator<Item = Result<String, io::Error>> + 'static,
@@ -682,7 +682,7 @@ fn run() -> i32 {
     // ── Streaming parser path ─────────────────────────────────────────────────
     // Standard mode already took this branch above, before reading stdin. Magic
     // syntax gets here with the command's output already captured, so there is
-    // nothing left to stream -- but it still goes through the streaming runtime
+    // nothing left to stream, but it still goes through the streaming runtime
     // so that the output shape (NDJSON, per-record meta) does not depend on how
     // the parser was selected.
     if let Some(streaming) = parser.as_streaming() {
@@ -759,7 +759,7 @@ fn run() -> i32 {
         ParseOutput::Array(arr) => {
             // Apply slice if we haven't already (slurp case)
             if args.slurp {
-                // Already an array — no further wrapping needed
+                // Already an array: no further wrapping needed
                 Value::Array(arr.into_iter().map(Value::Object).collect())
             } else {
                 // Apply output-level slice (if slice was on the output, not input lines)

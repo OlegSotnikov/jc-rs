@@ -1,4 +1,4 @@
-# jc-rs — current state and remaining work
+# jc-rs: current state and remaining work
 
 Last updated: 2026-08-04
 
@@ -7,7 +7,7 @@ Last updated: 2026-08-04
 **Compatibility: 934/934 = 100%.** The imported codebase measured 80.0%. Run
 `make differential` to regenerate; `tests/differential/REPORT.md` has the
 breakdown. CI fails below 100% (`--fail-under 100`), and
-`ci/known-failures.txt` is empty — every unit test passes.
+`ci/known-failures.txt` is empty: every unit test passes.
 
 What 100% does *and does not* mean: it is 100% of the pairs jc itself can
 reproduce. 149 fixtures remain `unmapped` (the filename resolves to no parser),
@@ -18,10 +18,10 @@ to make visible.
 
 ## Done
 
-- [x] **M0 — codebase in place.** Five-crate workspace, binary `jc-rs`,
+- [x] **M0: codebase in place.** Five-crate workspace, binary `jc-rs`,
       metadata pointing at this repo and jc-rs.com. `cargo build --release`
       green.
-- [x] **M1 — honest harness.** `tests/differential/validate.py`. A pair counts
+- [x] **M1: honest harness.** `tests/differential/validate.py`. A pair counts
       only when jc reproduces its own fixture; everything else is reported by
       category. Two things that make the number trustworthy and were not
       obvious:
@@ -42,7 +42,7 @@ to make visible.
       Linux, completions, `jc` alias, checksums, scratch Docker image),
       `publish-crates.yml` (crates.io in dependency order, Trusted Publishing).
 
-- [x] **M2 — streaming, for real.** Streaming parsers emitted one JSON array at
+- [x] **M2: streaming, for real.** Streaming parsers emitted one JSON array at
       EOF; jc emits NDJSON as input arrives. The blocker was structural: the
       registry holds `&'static dyn Parser` and a trait object cannot be
       downcast, so the CLI could not reach a line-at-a-time API.
@@ -52,7 +52,7 @@ to make visible.
       - `parse_via_session()` drives a session over a whole string, so a
         streaming parser's batch path and its live path are the same code.
       - The CLI reads stdin through `BufReader::lines()`, writes through a
-        `BufWriter`, and flushes per record under `-u` — matching jc's
+        `BufWriter`, and flushes per record under `-u`, matching jc's
         `flush=self.unbuffer` exactly, verified against jc itself.
       - `crates/jc-rs/tests/streaming.rs` asserts records arrive before EOF.
         The differential cannot: its fixtures are arrays and its input ends
@@ -84,14 +84,14 @@ to make visible.
       and one defect each in stat_s, traceroute_s, route, iptables, m3u,
       rsync, iw_scan, route_print, cbt and iwconfig. plist needed a real
       OpenStep parser: the `plist` crate coerces bare tokens to numbers, and
-      that format has none -- `0700` is a string.
-- [x] **M4 — the bulk lint allow-list is gone.** 585 warnings underneath it,
+      that format has none: `0700` is a string.
+- [x] **M4: the bulk lint allow-list is gone.** 585 warnings underneath it,
       including four regexes compiled in loops, fourteen unreachable
       functions and a duplicate `who` parser that was never registered.
 
 ## Next, in order
 
-- [x] **M5 — distribution is wired end to end.** `cargo-binstall` metadata,
+- [x] **M5: distribution is wired end to end.** `cargo-binstall` metadata,
       a Homebrew formula template plus the release job that fills in its
       checksums and pushes to the tap, and `jc-rs-wasm` with an npm publish
       job. Five targets, the scratch image, crates.io via Trusted Publishing,
@@ -100,10 +100,10 @@ to make visible.
       Verified locally, not just wired: `wasm-pack` builds a 3.65 MB bundle
       and `crates/jc-rs-wasm/tests/smoke.mjs` runs it under Node. That test
       exists because the first version built and typed correctly while every
-      record came back as `{}` — serde-wasm-bindgen maps a Rust map to a JS
+      record came back as `{}`: serde-wasm-bindgen maps a Rust map to a JS
       `Map` unless told to serialize maps as objects.
 
-## v0.1.0 shipped 2026-08-05 — what landed and what did not
+## v0.1.0 shipped 2026-08-05: what landed and what did not
 
 Tag `v0.1.0` on `2724bad`. CI green, `make check` green, 934/934.
 
@@ -116,7 +116,7 @@ Did not land, each needing something only a person with the right account can
 do:
 
 - [x] **`jc-rs-wasm` 0.1.0 is on crates.io.** Published by hand, because
-      Trusted Publishing cannot *create* a crate — it 403s with "Trusted
+      Trusted Publishing cannot *create* a crate: it 403s with "Trusted
       Publishing tokens do not support creating new crates". The other four
       were only fine because 0.0.0 had reserved their names.
 
@@ -130,11 +130,11 @@ do:
       multi-arch: one manifest list covering `linux/amd64` and `linux/arm64`.
 - [x] **npm**: `jc-rs-wasm@0.1.0` published, verified by installing it from the
       registry and running it under Node.
-- [x] **Homebrew**: `Formula/jc-rs.rb` is in `OlegSotnikov/homebrew-tap` — the
+- [x] **Homebrew**: `Formula/jc-rs.rb` is in `OlegSotnikov/homebrew-tap`; the
       tap's first formula; everything else in it is a cask. Every URL in it
       returns 200 and the `test do` block was run against the real binary.
 
-- [ ] **Register the npm trusted publisher — one form, then no npm credential
+- [ ] **Register the npm trusted publisher: one form, then no npm credential
       ever.** The job is already converted to OIDC, so `NPM_TOKEN` is not
       wanted: an authToken in the environment stops npm attempting OIDC at all.
       What remains is a setting only the account owner can make, at
@@ -148,7 +148,7 @@ do:
       table above into the run summary so the fix is in front of whoever looks.
 
       npm requires the package to exist before a trusted publisher can be
-      attached, which would have been a chicken-and-egg problem — but
+      attached, which would have been a chicken-and-egg problem, but
       `jc-rs-wasm@0.1.0` was published by hand during the v0.1.0 release, so
       the form is there to fill in.
 
@@ -161,7 +161,7 @@ do:
       `crates-io` and `dockerhub` used to have was removed rather than copied
       across: on a single-owner repository it asks the person who pushed the
       tag to confirm that they pushed the tag. What the environments still buy
-      is free — the tag restriction, and a secret visible to one job instead of
+      is free: the tag restriction, and a secret visible to one job instead of
       every workflow. That second property is why a write-capable token can sit
       in one at all.
 - [x] **Homebrew formula updates automatically.** `HOMEBREW_TAP_TOKEN` is in
@@ -169,14 +169,14 @@ do:
       `https://x-access-token:$TOKEN@...`, pushed a throwaway branch, deleted
       it. The tap is back to `main` alone.
 
-      The token is a fine-grained PAT but broader than the job needs — it
+      The token is a fine-grained PAT but broader than the job needs; it
       reaches all four repositories rather than `homebrew-tap` alone, and has
       **no expiry**. It also passed through a chat transcript, which is enough
       on its own to retire it. When replacing it:
 
       > resource owner `OlegSotnikov` · repository access **only
       > `OlegSotnikov/homebrew-tap`** · repository permissions **Contents: Read
-      > and write** · an expiry date. That is the whole list — the job clones,
+      > and write** · an expiry date. That is the whole list: the job clones,
       > writes one file and pushes. It never touches `.github/workflows/` in
       > the tap, so `Workflows` is not needed.
 
@@ -197,7 +197,7 @@ do:
 - [x] **Packaging check no longer depends on the registry.** One
       `cargo package --workspace --exclude jc-rs-bench` replaces five per-crate
       runs. The per-crate form resolved siblings against crates.io, so it failed
-      for the whole window between a version bump and the upload — i.e. during
+      for the whole window between a version bump and the upload, i.e. during
       every release. Verified by bumping to an unpublished 0.99.0: the old form
       dies on `failed to select a version for jc-rs-core = "^0.99.0"`, the new
       one verifies all five.
@@ -207,29 +207,29 @@ do:
       fixture is unproven either way.
 - [ ] **Key order.** We serialise alphabetically; jc preserves schema order.
       Values agree but no two outputs ever `diff` clean.
-      **`serde_json`'s `preserve_order` feature is not the answer — measured.**
-      It swaps `BTreeMap` for `IndexMap`, and on this corpus that costs 30–40%
+      **Measured: `serde_json`'s `preserve_order` feature is not the answer.**
+      It swaps `BTreeMap` for `IndexMap`, and on this corpus that costs 30-40%
       of throughput (csv 10k rows 29 → 38 ms, pkg-index-deb 88 → 120 ms,
       clf 10k lines 193 → 278 ms) because the hasher is SipHash and cannot be
       swapped through serde_json. Doing this properly means an ordered
       serializer with a per-parser key sequence, not a feature flag.
-- [ ] **149 fixtures are still `unmapped`** — the filename does not resolve to
+- [ ] **149 fixtures are still `unmapped`**: the filename does not resolve to
       a parser name. That is honest reporting, not coverage. Worth reducing.
-- [ ] **M4 — hygiene: three allow entries left.** The bulk list is gone;
+- [ ] **M4 hygiene: three allow entries left.** The bulk list is gone;
       `clippy --workspace --all-targets -- -D warnings` is clean. What remains
       is `manual_strip` (47 sites), `type_complexity` (7) and
       `if_same_then_else` (2), each documented in `Cargo.toml` with its count.
       Removing them is mechanical but wants reading, not a script.
-- [ ] **M5 — distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
-      `jc-rs-wasm` (that crate is not written yet), and a fish completion — the
+- [ ] **M5: distribution.** Homebrew tap, `cargo-binstall` metadata, npm for
+      `jc-rs-wasm` (that crate is not written yet), and a fish completion; the
       generator exists in `crates/jc-rs/src/completions.rs` but no CLI flag
       reaches it.
-- [ ] **M6 — jc-rs.com.** Next.js 16 + Tailwind v4 on webapps-kz behind the
+- [ ] **M6: jc-rs.com.** Next.js 16 + Tailwind v4 on webapps-kz behind the
       Cloudflare tunnel. Zone is already active; DNS, tunnel route and nginx
-      vhost are deliberately **not** created yet — a hostname with no container
+      vhost are deliberately **not** created yet, because a hostname with no container
       behind it returns 502. Content: install, honest comparison table, the live
       compatibility report, a generated page per parser, WASM playground.
-- [ ] **M7 — announce.** Notify Kelly Brazil directly *before*
+- [ ] **M7: announce.** Notify Kelly Brazil directly *before*
       any public post. The headline is the reproducible number and the harness,
       not "rewritten in Rust".
 
@@ -239,14 +239,14 @@ do:
 table comes from it. What the profile says today:
 
 - **Startup dominates the win** (~20x). It is mostly Python interpreter start,
-  which is why the gap narrows to 3–5x on throughput.
+  which is why the gap narrows to 3-5x on throughput.
 - **`[profile.release]` was missing entirely** until 2026-08-04. Adding
   `lto = "fat"`, `codegen-units = 1`, `panic = "abort"` and `strip` cut
   ~25% off throughput and 40% off the binary (8.7 → 5.2 MB).
 - **Format hints matter more than they look.** `parse_timestamp` walks jc's
   34-format table until one parses; without a hint a format near the end costs
   ~30 failed `strptime` attempts *per record*. Every call site now passes the
-  same hint set as the jc parser it mirrors — and because hinted formats are
+  same hint set as the jc parser it mirrors, and because hinted formats are
   tried first, this is a correctness contract, not only a speed one.
 - **The remaining per-record cost is fields, not parsing.** A 22-field `clf`
   record costs ~12 µs against ~3 µs for a 4-field csv row; that is one `String`
@@ -266,7 +266,7 @@ table comes from it. What the profile says today:
 - **Streaming is only live with `-u`.** Without it both jc and jc-rs
   block-buffer stdout when piped. That is jc's behaviour, not an oversight.
 - **A streaming parser's `parse()` and its live path must stay the same code**
-  (`parse_via_session`). If they diverge, the differential — which only
-  exercises the batch path — stops saying anything about what a pipe produces.
+  (`parse_via_session`). If they diverge, the differential, which only
+  exercises the batch path, stops saying anything about what a pipe produces.
 - `cargo install jc-rs` must never be documented as `cargo install jc`: that
   name belongs to an unrelated 2022 crate.

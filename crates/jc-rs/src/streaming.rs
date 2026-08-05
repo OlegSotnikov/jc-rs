@@ -6,8 +6,8 @@
 //! nothing at all: the standard path cannot start until stdin closes, and for
 //! a live pipe it never does.
 //!
-//! Output is NDJSON -- one JSON value per line, as jc emits -- not a single
-//! array. Mirrors `JcCli::streaming_parse_and_print()`.
+//! Output is NDJSON (one JSON value per line, as jc emits) rather than a
+//! single array. Mirrors `JcCli::streaming_parse_and_print()`.
 
 use jc_rs_core::traits::{Parser, StreamingParser};
 use serde_json::{Map, Value};

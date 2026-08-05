@@ -9,7 +9,7 @@ The rule that makes the number meaningful:
     A (fixture, parser) pair enters the denominator ONLY when jc itself
     reproduces that fixture exactly.
 
-Everything else is reported by category -- unmapped, no-input, oracle-reject --
+Everything else is reported by category (unmapped, no-input, oracle-reject)
 and never silently dropped. A harness that quietly skips what it cannot handle
 reports 100% while being blind to 39% of the corpus; that is precisely the
 mistake this file exists to avoid.
@@ -35,7 +35,7 @@ from pathlib import Path
 # jc's fixtures carry `*_epoch` fields computed in local time, and jc's own
 # runtests.sh pins that to PST8PDT. Without this, every fixture with a
 # timestamp fails the oracle check on any other machine and silently leaves
-# the denominator -- which would understate coverage exactly the way cj's
+# the denominator, which would understate coverage exactly the way cj's
 # harness overstated it. Must be set before jc is imported and before the
 # binary is spawned (it inherits the environment).
 os.environ["TZ"] = "PST8PDT"
@@ -160,7 +160,7 @@ def run_bin(parser: str, data: bytes, raw: bool, streaming: bool = False):
     if not out:
         return False, "empty output"
 
-    # Streaming parsers emit NDJSON -- one JSON value per line, as jc does. A
+    # Streaming parsers emit NDJSON, one JSON value per line, as jc does. A
     # single-record stream is therefore a bare object, and decoding the whole
     # output as one document would compare a dict against the fixture's list
     # and report a type mismatch that is not one.
@@ -219,7 +219,7 @@ def main() -> int:
     args = ap.parse_args()
 
     if not BIN.exists():
-        sys.exit(f"{BIN} not found — run: cargo build --release")
+        sys.exit(f"{BIN} not found; run: cargo build --release")
 
     jc = load_jc()
     parsers = set(jc.parser_mod_list(show_hidden=True, show_deprecated=True))

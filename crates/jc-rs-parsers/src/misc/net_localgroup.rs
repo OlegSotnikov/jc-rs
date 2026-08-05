@@ -47,7 +47,7 @@ pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
             continue;
         }
 
-        // "Aliases for \\MACHINE" — list mode
+        // "Aliases for \\MACHINE": list mode
         if trimmed.starts_with("Aliases for ") {
             let origin = trimmed["Aliases for ".len()..].trim();
             account_origin = Some(origin.to_string());
@@ -55,7 +55,7 @@ pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
             continue;
         }
 
-        // "Alias name     GroupName" — detail mode header
+        // "Alias name     GroupName": detail mode header
         if trimmed.starts_with("Alias name") {
             let group_name = trimmed["Alias name".len()..].trim().to_string();
             current_group = Some(group_name);
@@ -64,7 +64,7 @@ pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
             continue;
         }
 
-        // "Comment        ..." — detail mode
+        // "Comment        ...": detail mode
         if in_group_detail && trimmed.starts_with("Comment") {
             let val = trimmed["Comment".len()..].trim();
             comment = if val.is_empty() {
@@ -98,7 +98,7 @@ pub fn parse_net_localgroup(input: &str) -> Map<String, Value> {
             continue;
         }
 
-        // "User accounts for \\MACHINE" or "Group name ..." — alternate formats
+        // "User accounts for \\MACHINE" or "Group name ...": alternate formats
         if trimmed.starts_with("Group name") {
             let group_name = trimmed["Group name".len()..].trim().to_string();
             current_group = Some(group_name);

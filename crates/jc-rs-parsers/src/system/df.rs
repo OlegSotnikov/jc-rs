@@ -55,7 +55,7 @@ fn normalize_df_key(k: &str) -> String {
     }
 }
 
-/// Sparse table parse — a direct Rust port of jc's Python sparse_table_parse.
+/// Sparse table parse: a direct Rust port of jc's Python sparse_table_parse.
 /// Takes a list of lines (first is header, rest are data).
 /// Returns rows as Vec<(column_name, value)>.
 fn df_sparse_parse(lines: &[String]) -> Vec<Vec<(String, Option<String>)>> {

@@ -67,7 +67,7 @@ impl Parser for JwtParser {
         let payload_str = String::from_utf8(payload_bytes).map_err(ParseError::Utf8)?;
         let payload: Value = serde_json::from_str(&payload_str).map_err(ParseError::Json)?;
 
-        // Decode signature — convert to colon-delimited hex
+        // Decode signature: convert to colon-delimited hex
         let sig_bytes = engine.decode(parts[2]).map_err(|e| {
             ParseError::InvalidInput(format!("invalid base64 in JWT signature: {}", e))
         })?;
@@ -122,7 +122,7 @@ mod tests {
     fn test_jwt_invalid_parts() {
         let parser = JwtParser;
         let result = parser.parse("not.a.valid.jwt.token", false);
-        // splitn(3, '.') will handle this — it gives 3 parts max from left
+        // splitn(3, '.') will handle this; it gives 3 parts max from left
         // Actually "not.a.valid.jwt.token" will split into ["not", "a", "valid.jwt.token"]
         // which may fail on base64 decode
         let _ = result; // just ensure no panic

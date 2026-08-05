@@ -1,4 +1,4 @@
-//! String parsers — parse structured string formats.
+//! String parsers for structured string formats.
 
 pub mod datetime_iso;
 pub mod email_address;

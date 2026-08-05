@@ -40,7 +40,7 @@ now_passing="$(comm -13 <(printf '%s\n' "$actual") <(printf '%s\n' "$known") | g
 # "everything passed".
 if ! grep -q '^test result:' "$LOG"; then
   echo
-  echo "the suite did not run — build or link error:"
+  echo "the suite did not run; build or link error:"
   tail -40 "$LOG"
   exit 1
 fi
@@ -53,7 +53,7 @@ status=0
 
 if [ -n "$new_failures" ]; then
   echo
-  echo "NEW failures — these are regressions:"
+  echo "NEW failures (regressions):"
   printf '  %s\n' $new_failures
   status=1
 fi
@@ -68,7 +68,7 @@ fi
 
 if [ "$status" -eq 0 ]; then
   echo
-  echo "no regressions. $(printf '%s\n' "$known" | grep -c .) known failures remain — see $KNOWN_FILE"
+  echo "no regressions. $(printf '%s\n' "$known" | grep -c .) known failures remain; see $KNOWN_FILE"
 fi
 
 exit "$status"

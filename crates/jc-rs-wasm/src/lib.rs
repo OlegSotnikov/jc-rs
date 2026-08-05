@@ -30,7 +30,8 @@ pub fn parse(name: &str, input: &str) -> Result<JsValue, JsError> {
     to_js(&output)
 }
 
-/// Parse without the conversions that shape output to jc's schema -- jc's `-r`.
+/// Parse without the conversions that shape output to jc's schema, which is
+/// jc's `-r`.
 #[wasm_bindgen(js_name = parseRaw)]
 pub fn parse_raw(name: &str, input: &str) -> Result<JsValue, JsError> {
     let parser = jc_rs_parsers::find(name)

@@ -56,7 +56,7 @@ static RE_PROBE_RTT: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 /// One probe under construction. Cloned wholesale when a hop reports several
-/// round-trip times for the same host -- jc deep-copies the previous probe and
+/// round-trip times for the same host: jc deep-copies the previous probe and
 /// swaps in the new time, which is what carries the ASN and name across.
 #[derive(Clone, Default)]
 struct Probe {

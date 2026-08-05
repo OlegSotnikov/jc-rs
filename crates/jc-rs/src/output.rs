@@ -284,7 +284,7 @@ pub fn print_output(
 
     if let Err(e) = write_result {
         if e.kind() == io::ErrorKind::BrokenPipe {
-            // Ignore broken pipe — this is normal when piping to head/less
+            // Ignore broken pipe; it is normal when piping to head/less
         } else {
             eprintln!("jc-rs: error writing output: {}", e);
         }
@@ -305,7 +305,7 @@ pub fn render_output(
     if yaml {
         match serde_yaml::to_string(value) {
             Ok(s) => {
-                // serde_yaml adds a leading "---\n" — strip it to match jc behavior
+                // serde_yaml adds a leading "---\n"; strip it to match jc behavior
                 // Actually keep it: jc uses ruamel which adds "---"
                 s.trim_end().to_string()
             }

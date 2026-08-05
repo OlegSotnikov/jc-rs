@@ -11,7 +11,7 @@
 //! ```
 //!
 //! Parsers register themselves at link time, so depending on this crate is what
-//! populates the registry -- [`parse`] and [`parsers`] exist partly so that you
+//! populates the registry. [`parse`] and [`parsers`] exist partly so that you
 //! never have to know that. Reaching for `jc_rs_core::find_parser` from a crate
 //! that does not otherwise reference this one returns `None`, because the
 //! linker dropped the parsers as unused.
@@ -81,7 +81,7 @@ pub mod misc;
 pub mod package;
 pub mod security;
 
-// Example/test parser — proves registration works
+// Example/test parser: proves registration works
 mod dummy;
 
 #[cfg(test)]

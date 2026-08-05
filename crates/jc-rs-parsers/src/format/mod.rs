@@ -1,4 +1,4 @@
-//! Format parsers — parsers for file and data formats.
+//! Format parsers for file and data formats.
 
 pub mod csv;
 pub mod csv_ih;

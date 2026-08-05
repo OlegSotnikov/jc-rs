@@ -70,8 +70,8 @@ fn parse_extinf(extinf_value: &str) -> Option<(String, String, Vec<(String, Stri
 ///
 /// `#` starts a comment and ends the line, because that is what `shlex` does in
 /// POSIX mode and jc passes it a default `shlex`. It reads as a bug against
-/// channel names like `Bumblebee TV Classics #2 (720p)` -- jc records that name
-/// as `Bumblebee TV Classics` -- but jc is the schema, quirk included.
+/// channel names like `Bumblebee TV Classics #2 (720p)`, which jc records as
+/// `Bumblebee TV Classics`, but jc is the schema, quirk included.
 fn shlex_split(s: &str) -> Option<Vec<String>> {
     let mut tokens = Vec::new();
     let mut current = String::new();

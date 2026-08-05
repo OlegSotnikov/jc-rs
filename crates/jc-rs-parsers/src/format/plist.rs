@@ -66,8 +66,8 @@ fn plist_val_to_json_inner(val: plist::Value) -> JsonValOrDatetime {
         plist::Value::Date(dt) => {
             // A plist date is written as UTC, but Python's plistlib hands jc a
             // *naive* datetime and `.timestamp()` then reads it in the local
-            // zone. So jc's number is the wall clock as written, read as local
-            // -- not the instant the file names. Reproducing that is the whole
+            // zone. So jc's number is the wall clock as written, read as local,
+            // not the instant the file names. Reproducing that is the whole
             // point; computing the true epoch here left every date out by the
             // machine's offset.
             let ts = plist_date_epoch(dt);
@@ -189,7 +189,7 @@ impl Parser for PlistParser {
         }
 
         // The `plist` crate parses old-style plists but coerces bare tokens to
-        // numbers, and that format has no numbers -- `0700` is a string, and jc
+        // numbers, and that format has no numbers: `0700` is a string, and jc
         // (via pbPlist) reports it as one. Check for the format before handing
         // the input over.
         if super::openstep::looks_like_openstep(input) {
@@ -292,7 +292,7 @@ mod tests {
 
     #[test]
     fn test_plist_garageband() {
-        // garageband is a binary plist — read as bytes and parse directly
+        // garageband is a binary plist: read as bytes and parse directly
         let bytes = load_fixture_bytes("plist-garageband-info.plist");
         let mut expected = serde_json::Value::Object(parse_json_obj(&load_fixture_str(
             "plist-garageband-info.json",

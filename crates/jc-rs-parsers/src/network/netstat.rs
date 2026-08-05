@@ -348,7 +348,7 @@ fn linux_parse_socket(
     for (i, h) in headers.iter().enumerate() {
         match tokens.get(i) {
             None => {
-                // Token missing (out of bounds) — don't include key, mirrors Python's zip()
+                // Token missing (out of bounds): don't include key, mirrors Python's zip()
             }
             Some(None) => {
                 // Explicitly inserted None (e.g., state column blank)
@@ -490,7 +490,7 @@ fn linux_post_process(entries: Vec<Map<String, Value>>) -> Vec<Map<String, Value
                 }
             }
 
-            // transport/network protocol — only for network kind
+            // transport/network protocol: only for network kind
             if obj.get("kind").and_then(|v| v.as_str()) == Some("network") {
                 let proto = obj
                     .get("proto")
@@ -600,7 +600,7 @@ fn parse_linux(cleandata: &[&str]) -> Vec<Map<String, Value>> {
             continue;
         }
 
-        // Header lines — do NOT change section flag
+        // Header lines: do NOT change section flag
         if line.starts_with("Proto") {
             header_text = normalize_linux_net_header(line);
             headers = header_text
@@ -714,7 +714,7 @@ fn bsd_parse_item(
             tokens.insert(1, String::new());
             tokens.insert(1, String::new());
         } else if has_state_col && is_udp_first && !has_socket_col {
-            // Standard: state column missing for UDP — insert at position 5
+            // Standard: state column missing for UDP; insert at position 5
             if tokens.len() < headers.len() {
                 tokens.insert(5, String::new());
             }
@@ -733,7 +733,7 @@ fn bsd_parse_item(
 
     let mut obj = Map::new();
     for (i, h) in headers.iter().enumerate() {
-        // Skip missing tokens — mirrors Python's zip() which stops at shortest
+        // Skip missing tokens: mirrors Python's zip() which stops at shortest
         let Some(val_raw) = tokens.get(i) else {
             continue;
         };
@@ -997,7 +997,7 @@ fn parse_freebsd_osx(cleandata: &[&str]) -> Vec<Map<String, Value>> {
             headers.clear();
             continue;
         }
-        // Internet: / Internet6: sub-headers — reset headers for next sub-table
+        // Internet: / Internet6: sub-headers; reset headers for next sub-table
         if routing_table && (line.starts_with("Internet:") || line.starts_with("Internet6:")) {
             headers.clear();
             continue;
