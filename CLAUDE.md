@@ -17,16 +17,17 @@ That premise decides most design arguments:
 - Never exclude an awkward fixture from the count; report it in a category.
 - Publish the number even when it is bad.
 
-Current state: 934/934 = 100% (`tests/differential/REPORT.md`), workspace
-version `0.1.0`, the first real release.
+Current state: 934/934 = 100% (`tests/differential/REPORT.md`). The workspace
+version lives in the root `Cargo.toml`; `./ci/release.sh X.Y.Z` bumps it and
+every internal pin in one step.
 
 ## Commands
 
 ```bash
 make build              # cargo build --release
-make check              # lint + fixture sync + test ratchet + differential; the universal gate
+make check              # lint + fixture sync + tests + differential; the universal gate
 make lint               # cargo clippy --workspace --all-targets -- -D warnings; cargo fmt --check
-make ratchet            # unit tests as a ratchet (./ci/run-tests.sh); the test gate, not `make test`
+make test               # unit + integration tests, pinned to TZ=PST8PDT
 make differential       # full jc corpus; rewrites tests/differential/{REPORT.md,report.json}
 make bench              # criterion, -p jc-rs-bench
 make wasm               # build + Node-test the npm package (needs wasm-pack)
@@ -46,20 +47,14 @@ python3 tests/differential/validate.py --fail-under 100     # the CI floor
 computed in local time and jc's own `runtests.sh` pins that zone. A bare
 `cargo test` produces a pile of meaningless timestamp failures, and a
 differential run in another zone silently drops 146 pairs from the denominator.
-The Makefile and both harnesses set it; hand-run cargo does not.
+The Makefile, the CI test job and the differential harness all set it;
+hand-run cargo does not.
 
-## The two ratchets
+## The compatibility floor
 
-Both fail the build in CI, and both exist because a plain green/red signal would
-be useless while the port is incomplete.
-
-**`ci/known-failures.txt`** is **empty**: every unit test passes. It stays as
-the mechanism: `ci/run-tests.sh` fails on a new failure *and* on a listed test
-that starts passing, so adding a line to it is a deliberate act of deferring a
-regression, not a way to make the build green.
-
-**`--fail-under 100`** in `.github/workflows/ci.yml`. Raise the floor in the
-same commit that raises the number; never lower it silently.
+`--fail-under 100` in `.github/workflows/ci.yml` is what stops the number
+sliding. Raise the floor in the same commit that raises the number; never lower
+it silently.
 
 ## Architecture
 
@@ -135,9 +130,7 @@ the number to move, and update the CI floor.
   cannot: its fixtures are arrays and its input ends immediately, so a parser
   that buffers to EOF scores identically to one that streams.
 
-`tasks/todo.md` carries the current milestone list and the per-parser failure
-counts; `tests/differential/report.json` has every failing case with paths and
-diffs.
+`tests/differential/report.json` has every failing case with paths and diffs.
 
 ## Commits
 

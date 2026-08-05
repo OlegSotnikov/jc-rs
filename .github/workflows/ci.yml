@@ -65,15 +65,16 @@ jobs:
       - run: make check-fixtures
 
   test:
-    name: unit tests (ratchet)
+    name: unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
-      # Fails on NEW failures and on known failures that started passing.
-      # See ci/known-failures.txt for why the suite is not simply green.
-      - run: ./ci/run-tests.sh
+      # TZ matters: jc's fixtures carry *_epoch fields computed in local time
+      # and jc's own runtests.sh pins PST8PDT. Any other zone and a pile of
+      # timestamp tests fail for a reason that has nothing to do with the code.
+      - run: TZ=PST8PDT cargo test --workspace
 
   differential:
     name: differential vs jc corpus
