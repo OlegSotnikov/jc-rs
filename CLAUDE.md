@@ -144,9 +144,18 @@ diffs.
 Cutting a release is a `v*` tag: it fires `release.yml` (five targets, musl
 Linux, bash/zsh/fish completions, a deliberately opt-in `jc` alias, checksums,
 `scratch` Docker image, Homebrew tap, npm) and `publish-crates.yml` (crates.io in
-dependency order) in parallel. Each publishing job sits behind a protected
-environment for human approval, and the environments accept deployments only from
-`v*` tags — a `workflow_dispatch` from `master` is rejected before any step runs.
+dependency order) in parallel. Pushing the tag publishes everything; nothing
+waits for a click. Each publishing job names an environment, which buys two
+things: the environment accepts deployments only from `v*` tags (a
+`workflow_dispatch` from `master` is rejected before any step runs), and its
+secrets are visible to that one job instead of every workflow in the repo.
+
+Deliberately *not* configured: an approval gate. This is a single-owner
+repository, so a required reviewer would only ask the person who just pushed the
+tag to confirm that they pushed the tag. Tagging is the deliberate act; adding a
+second one buys nothing and trains you to click through. Restore it with
+`gh api -X PUT repos/OWNER/REPO/environments/NAME -f 'reviewers[][type]=User'`
+if the repo ever gains a second person with push access.
 
 Every job that needs a credential checks for it first and reports-and-skips
 rather than failing, so a release completes with whatever is configured. Not

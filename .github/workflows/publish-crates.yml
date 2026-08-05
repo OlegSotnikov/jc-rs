@@ -25,9 +25,9 @@ jobs:
   publish:
     name: crates.io
     runs-on: ubuntu-latest
-    # Protected environment: publishing waits for a human, and any secret it
-    # needs lives here rather than at repository level, so no other workflow
-    # can reach it.
+    # Environment, not for an approval gate -- for the two things that cost
+    # nothing: it only accepts `v*` tags, and any secret it needs lives here
+    # rather than at repository level, so no other workflow can reach it.
     environment: crates-io
     steps:
       # Third-party actions are pinned to commit SHAs, not tags. A tag can be
