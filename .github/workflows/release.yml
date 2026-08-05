@@ -191,8 +191,15 @@ jobs:
             appmasterio/jc-rs:latest
       # The Docker Hub overview is the first thing anyone sees; keeping it in
       # the repo means it ships with the image instead of drifting.
+      #
+      # `continue-on-error` because the stored credential is a push/pull PAT:
+      # editing repository metadata needs a wider scope and answers
+      # "access denied: insufficient scope". The image must still publish when
+      # only its description cannot. Give the `dockerhub` environment a PAT
+      # with write access to remove this caveat.
       - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
         if: steps.creds.outputs.have == 'true'
+        continue-on-error: true
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
