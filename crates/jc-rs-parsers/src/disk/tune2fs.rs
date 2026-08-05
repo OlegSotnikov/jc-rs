@@ -86,7 +86,7 @@ fn normalize_key(key: &str) -> String {
 fn parse_date_epoch(s: &str) -> Option<i64> {
     // Try common ctime format
     let s = s.trim();
-    // ctime format: "Mon Apr  6 15:10:37 2020" — normalize double spaces
+    // ctime format: "Mon Apr  6 15:10:37 2020"; normalize double spaces
     let normalized = s.split_whitespace().collect::<Vec<&str>>().join(" ");
     // tune2fs prints local time with no zone; reading it as UTC put every
     // *_epoch out by the machine's offset.

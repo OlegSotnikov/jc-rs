@@ -151,7 +151,7 @@ fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
     raw.into_iter()
         .map(|mut entry| {
             // Process simple split fields (None → [], string → split by spaces)
-            // Skip fields that are in two_space_fields — those will be handled below
+            // Skip fields that are in two_space_fields; those are handled below
             // (matches Python behavior: two_space_fields uses original val and overwrites split_fields)
             for field in &split_fields {
                 if two_space_fields.contains(field) {

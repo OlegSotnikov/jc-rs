@@ -1,7 +1,7 @@
 //! Old-style (NeXTSTEP / OpenStep) property lists.
 //!
-//! The format has no types: `1`, `0700` and `YES` are all just text, and jc --
-//! which reads these with `pbPlist` -- reports them as strings. The `plist`
+//! The format has no types: `1`, `0700` and `YES` are all just text, and jc,
+//! which reads these with `pbPlist`, reports them as strings. The `plist`
 //! crate parses the syntax but coerces bare tokens to numbers, which loses the
 //! leading zero in `0700` and cannot be recovered afterwards. Hence a parser
 //! that keeps the token exactly as written.
@@ -175,7 +175,7 @@ impl Parser<'_> {
         }
     }
 
-    /// `<0a1b 2c3d>` -- reported the way the rest of the plist parser reports
+    /// `<0a1b 2c3d>`, reported the way the rest of the plist parser reports
     /// binary data, as colon-separated hex.
     fn data(&mut self) -> Result<Value, ParseError> {
         self.pos += 1; // '<'
@@ -232,7 +232,7 @@ impl Parser<'_> {
         }
     }
 
-    /// An unquoted token. Kept verbatim -- `0700` must not become `700`.
+    /// An unquoted token. Kept verbatim, because `0700` must not become `700`.
     fn bare_string(&mut self) -> Result<String, ParseError> {
         let start = self.pos;
         while self

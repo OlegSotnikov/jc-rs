@@ -1,4 +1,4 @@
-//! Common Log Format (CLF) parser — parses Apache/Nginx access log files.
+//! Common Log Format (CLF) parser for Apache/Nginx access log files.
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;

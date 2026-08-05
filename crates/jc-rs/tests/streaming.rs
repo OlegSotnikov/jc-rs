@@ -143,7 +143,7 @@ fn streaming_slice_stays_lazy_for_positive_ranges() {
     }
     stdin.flush().expect("flush");
 
-    // Lines 1 and 2 (zero-based, end exclusive) -- line 0 is skipped.
+    // Lines 1 and 2 (zero-based, end exclusive); line 0 is skipped.
     records
         .recv_timeout(Duration::from_secs(5))
         .expect("sliced record before EOF");

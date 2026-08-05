@@ -2,11 +2,11 @@ use crate::error::ParseError;
 use crate::types::{ParseOutput, ParserInfo};
 
 /// One streamed record. A streaming parser emits a JSON object per record, so
-/// this is deliberately narrower than [`ParseOutput`] -- an array cannot be
+/// this is deliberately narrower than [`ParseOutput`]: an array cannot be
 /// produced by a single line and should not be representable here.
 pub type Record = serde_json::Map<String, serde_json::Value>;
 
-/// Core parser trait -- all parsers must implement this.
+/// Core parser trait. Every parser implements this.
 ///
 /// # Contract
 ///
@@ -52,7 +52,7 @@ pub trait Parser: Send + Sync {
     /// This is jc's `-r`: its parsers build a raw structure and then run
     /// `_process()` over it to coerce types, rename keys and add derived
     /// fields. For the many parsers whose `_process` returns its input
-    /// unchanged, raw and processed output are identical -- which is why the
+    /// unchanged, raw and processed output are identical, which is why the
     /// default here forwards to [`Parser::parse`]. A parser whose conversions
     /// do change the shape must override this, or `-r` quietly returns
     /// processed output.
@@ -99,7 +99,7 @@ pub trait StreamingParser: Parser {
 ///   one begins.
 ///
 /// - `finalize()` is called once after the last line and flushes whatever is
-///   still buffered -- a trailing record, a summary block. The default
+///   still buffered, such as a trailing record or a summary block. The default
 ///   returns `Ok(None)`.
 ///
 /// - `quiet` matches [`Parser::parse`]: suppress warnings on stderr, still
@@ -125,8 +125,8 @@ pub trait LineParser {
     }
 }
 
-/// A session for parsers whose lines are independent of one another -- no
-/// header to remember, nothing accumulated across lines. Wraps the per-line
+/// A session for parsers whose lines are independent of one another, with no
+/// header to remember and nothing accumulated across lines. Wraps the per-line
 /// function so such a parser does not have to declare an empty state struct.
 pub struct FnSession<F>(F);
 

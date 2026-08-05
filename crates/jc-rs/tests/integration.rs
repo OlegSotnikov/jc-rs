@@ -221,7 +221,7 @@ fn unknown_parser_exits_nonzero_with_error_message() {
 fn garbage_input_for_df_handles_gracefully() {
     let garbage = b"this is not df output\ngarbage line\n";
     let (code, out, _err) = run(&["--df"], Some(garbage));
-    // Should either return empty JSON array or exit non-zero — not panic
+    // Should either return an empty JSON array or exit non-zero, but never panic
     if code == 0 {
         let _: serde_json::Value = serde_json::from_str(&out)
             .unwrap_or_else(|e| panic!("garbage df output on exit 0 must be valid JSON: {e}"));

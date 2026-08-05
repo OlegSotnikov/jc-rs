@@ -75,7 +75,7 @@ pub fn parse_syslog_bsd_line(line: &str) -> Map<String, Value> {
     let rest = caps.name("rest").map(|m| m.as_str()).unwrap_or("");
 
     // Split hostname from remainder
-    // If the first token ends with ':', it's "hostname:" with no tag — content follows directly
+    // If the first token ends with ':', it's "hostname:" with no tag; content follows directly
     let (hostname, after_host, has_colon_host) = if let Some(sp) = rest.find(' ') {
         let host_token = &rest[..sp];
         let after = &rest[sp + 1..];
@@ -134,7 +134,7 @@ fn parse_tag_content(s: &str) -> (Option<String>, String) {
         .unwrap_or(s.len());
 
     if tag_end == 0 {
-        // Starts with non-word char — no tag
+        // Starts with non-word char: no tag
         return (None, s.to_string());
     }
 
@@ -145,7 +145,7 @@ fn parse_tag_content(s: &str) -> (Option<String>, String) {
     let content = if after_tag.starts_with(": ") {
         after_tag[2..].to_string()
     } else if after_tag.starts_with(':') && after_tag.len() > 1 {
-        // `:content` without space — still strip the colon
+        // `:content` without space; still strip the colon
         after_tag[1..].to_string()
     } else {
         after_tag.to_string()

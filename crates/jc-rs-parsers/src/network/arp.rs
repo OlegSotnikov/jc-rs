@@ -139,7 +139,7 @@ fn parse_bsd_a_style(lines: &[&str]) -> Result<ParseOutput, ParseError> {
 
         // Check for "expires in N seconds" field
         if let Some(exp_idx) = parts.iter().position(|&p| p == "expires") {
-            // "expires in 942 seconds" — number is 2 positions after "expires"
+            // "expires in 942 seconds": the number is 2 positions after "expires"
             if let Some(exp_val) = parts.get(exp_idx + 2)
                 && let Ok(n) = exp_val.parse::<i64>()
             {

@@ -24,8 +24,8 @@ handleMaybe(session.finalize());
 `parseRaw(name, input)` is jc's `-r`: the structure before the conversions that
 shape it to jc's schema.
 
-Everything is text in, structured data out — no I/O, no filesystem, no process
-spawning. That is what makes the whole parser set portable here at all.
+Everything is text in, structured data out. The parsers do no I/O and spawn no
+processes, which is why the whole set ports to WebAssembly unchanged.
 
 Compatibility with [jc](https://github.com/kellyjonbrazil/jc) is **100%** of its
 fixture corpus, measured by `make differential` and published whatever it says.

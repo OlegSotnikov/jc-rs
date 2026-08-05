@@ -79,7 +79,7 @@ pub(crate) fn parse_raw(input: &str) -> Vec<Map<String, Value>> {
             continue;
         }
 
-        // Description : (rpm style — note trailing space)
+        // Description : (rpm style, note the trailing space)
         if line.starts_with("Description :") {
             in_desc = true;
             in_desc_en = false;

@@ -29,7 +29,7 @@ static RSYNC_PARSER: RsyncParser = RsyncParser;
 inventory::submit! { ParserEntry::new(&RSYNC_PARSER) }
 
 /// rsync writes sizes as `8.99K` / `6.88T`, and jc reads those with decimal
-/// multipliers -- 8.99K is 8990 bytes, not 9205.
+/// multipliers: 8.99K is 8990 bytes, not 9205.
 fn parse_size_to_int(s: &str) -> Option<i64> {
     jc_rs_utils::convert_size_to_int(s, false)
 }

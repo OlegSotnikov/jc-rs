@@ -42,7 +42,7 @@ fn strip_curl_prefixes(input: &str) -> String {
     let mut out = String::new();
     for line in input.lines() {
         if line.starts_with("* ") || line.starts_with("{ ") || line.starts_with("} ") {
-            // Informational / timing — skip
+            // Informational / timing: skip
             continue;
         } else if line.starts_with("> ") {
             out.push_str(&line[2..]);

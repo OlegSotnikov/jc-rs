@@ -37,7 +37,7 @@ fn normalize_key(key: &str) -> String {
 }
 
 /// Fields jc renames by moving the unit out of the value and into the key.
-/// `None` means the value is not a fixed suffix -- see the match below.
+/// `None` means the value is not a fixed suffix; see the match below.
 const UNIT_FIELDS: &[(&str, &str, Option<&str>)] = &[
     ("tsf", "tsf_usec", None),
     ("sta_channel_width", "sta_channel_width_mhz", Some(" MHz")),
@@ -97,8 +97,8 @@ fn scan(input: &str) -> Vec<Map<String, Value>> {
             if !section.is_empty() {
                 sections.push(std::mem::take(&mut section));
             }
-            // `BSS 00:11:22:33:44:55(on wlan0)` -- parens become spaces, so the
-            // bssid is field 1 and the interface field 3.
+            // In `BSS 00:11:22:33:44:55(on wlan0)` the parens become spaces, so
+            // the bssid is field 1 and the interface field 3.
             let cleaned = line.replace(['(', ')'], " ");
             let fields: Vec<&str> = cleaned.split_whitespace().collect();
             if let Some(bssid) = fields.get(1) {
@@ -232,7 +232,7 @@ fn post_parse(sections: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
         .collect()
 }
 
-/// int first, then float, else leave it alone -- jc's `_process`, applied to
+/// int first, then float, else leave it alone: jc's `_process`, applied to
 /// scalars and to list members.
 fn numeric(value: Value) -> Value {
     match value {

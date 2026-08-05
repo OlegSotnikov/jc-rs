@@ -185,7 +185,7 @@ pub fn parse_args(argv: &[String]) -> Args {
     }
 
     // -----------------------------------------------------------------------
-    // Phase 2: standard mode — if magic_mode didn't fire
+    // Phase 2, standard mode: if magic_mode didn't fire
     // -----------------------------------------------------------------------
     if !magic_mode {
         option_chars.clear();

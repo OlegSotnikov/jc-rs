@@ -255,7 +255,7 @@ pub fn parse_syslog_line(line: &str) -> Map<String, Value> {
         }
         // If timestamp is Null, don't add epoch fields (matches jc behavior)
     } else {
-        // RFC 5424 didn't match — try RFC 3164 (BSD syslog) format
+        // RFC 5424 didn't match; try RFC 3164 (BSD syslog) format
         let bsd_map = super::syslog_bsd::parse_syslog_bsd_line(line);
         return bsd_map;
     }

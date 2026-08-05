@@ -55,7 +55,7 @@ fn is_commit_hash(s: &str) -> bool {
 /// Split `Name <email>` the way jc does: everything before the last whitespace
 /// is the name, and the final token is the email only when it is bracketed.
 /// A trailing word that is not bracketed is therefore dropped, and `<>` becomes
-/// null rather than an empty string -- both are jc's behaviour, and jc is the
+/// null rather than an empty string. Both are jc's behaviour, and jc is the
 /// schema authority.
 fn parse_name_email(line: &str) -> (Option<String>, Option<String>) {
     let mut name = None;
@@ -115,7 +115,7 @@ pub(crate) struct GitLogSession {
     file_list: Vec<Value>,
     file_stats: Vec<Value>,
     /// jc leaks this between iterations: a file line with no `|` reuses the
-    /// previous line's count. Replicated deliberately -- see `parse_name_email`.
+    /// previous line's count. Replicated deliberately; see `parse_name_email`.
     last_lines_changed: Option<String>,
 }
 

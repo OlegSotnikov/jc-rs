@@ -16,11 +16,11 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 if [ ! -x "$BIN" ]; then
-  echo "no release binary at $BIN -- run: make build" >&2
+  echo "no release binary at $BIN; run: make build" >&2
   exit 1
 fi
 if [ ! -d jc/jc ]; then
-  echo "jc submodule not checked out -- run: make submodule" >&2
+  echo "jc submodule not checked out; run: make submodule" >&2
   exit 1
 fi
 

@@ -38,7 +38,7 @@ inventory::submit! {
 }
 
 // jc's patterns, verbatim. They are applied with `search`, not `match`, so a
-// definition is found anywhere in the line -- which is what lets the same
+// definition is found anywhere in the line, which is what lets the same
 // pattern handle `VAR=x` and `declare -x VAR=x`.
 static VAR_DEF: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)=(?P<val>[^(][^\[].+)$")
@@ -64,7 +64,7 @@ static DECLARE_OPTS: LazyLock<Regex> = LazyLock::new(|| {
 
 /// What `declare -irx` says about a name, plus which of the three shapes it is.
 ///
-/// The flags stay `None` when the line carries no `declare` at all -- plain
+/// The flags stay `None` when the line carries no `declare` at all: plain
 /// `typeset` output says nothing about them, and jc reports that as null rather
 /// than guessing false.
 struct DeclareOptions {
@@ -136,7 +136,7 @@ fn strip_quotes(s: &str) -> &str {
 
 /// Split `[0]="a" [1]="b"` into its items the way `shlex.split` does in POSIX
 /// mode: quotes group and are removed, and a backslash escapes the character
-/// after it -- which is how `declare -p` writes a quote inside a value.
+/// after it, which is how `declare -p` writes a quote inside a value.
 fn shell_split(s: &str) -> Vec<String> {
     let mut items = Vec::new();
     let mut current = String::new();

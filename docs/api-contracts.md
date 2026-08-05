@@ -1,8 +1,8 @@
-# jc-rs API Contracts
+# jc-rs API contracts
 
 This document defines all shared interfaces for the jc-rs project. All crates (jc-rs, jc-rs-utils, jc-rs-parsers) must program against these contracts defined in jc-rs-core.
 
-## 1. Core Types (`jc_rs_core::types`)
+## 1. Core types (`jc_rs_core::types`)
 
 ### ParseOutput
 
@@ -13,8 +13,8 @@ pub enum ParseOutput {
 }
 ```
 
-- **Object**: Used when a parser produces a single record (e.g. `date`, `uname`, `os-release`). The map is a flat or nested JSON object.
-- **Array**: Used when a parser produces multiple records (e.g. `ps`, `ls`, `netstat`). Each element is one record.
+- `Object`: used when a parser produces a single record (e.g. `date`, `uname`, `os-release`). The map is a flat or nested JSON object.
+- `Array`: used when a parser produces multiple records (e.g. `ps`, `ls`, `netstat`). Each element is one record.
 
 Streaming parsers yield one `Record` (a JSON object) per record; the type is
 narrower than `ParseOutput` because a single line cannot produce an array.
@@ -72,11 +72,11 @@ pub struct ParserInfo {
 - The conversion rule: replace `_` with `-` and prepend `--`.
 
 **Helper methods on ParserInfo:**
-- `has_tag(tag: Tag) -> bool` -- check if a tag is present
-- `is_compatible_with(platform: Platform) -> bool` -- checks for `Universal` or exact match
-- `is_slurpable() -> bool` -- shorthand for `has_tag(Tag::Slurpable)`
+- `has_tag(tag: Tag) -> bool`: check if a tag is present
+- `is_compatible_with(platform: Platform) -> bool`: checks for `Universal` or an exact match
+- `is_slurpable() -> bool`: shorthand for `has_tag(Tag::Slurpable)`
 
-## 2. Error Types (`jc_rs_core::error`)
+## 2. Error types (`jc_rs_core::error`)
 
 ### ParseError (parser-level)
 
@@ -118,7 +118,7 @@ pub enum CjError {
 
 **Conversion:** `ParseError` implements `From<ParseError> for CjError`, wrapping it as `ParseFailed { parser: "<unknown>", source }`. The CLI should use `CjError::ParseFailed { parser: name.into(), source: e }` explicitly when it knows the parser name.
 
-## 3. Parser Traits (`jc_rs_core::traits`)
+## 3. Parser traits (`jc_rs_core::traits`)
 
 ### Parser (required for all parsers)
 
@@ -158,7 +158,7 @@ pub trait LineParser {
 ```
 
 The parser itself lives in the registry as a shared `&'static` and cannot hold
-per-run state, so `session()` mints an owned `LineParser` that carries it — the
+per-run state, so `session()` mints an owned `LineParser` that carries it: the
 `PING` banner that decides how later lines are read, the commit being
 accumulated, the column widths taken from a header row.
 
@@ -187,12 +187,12 @@ accumulated, the column widths taken from a header row.
 
 ### Streaming output
 
-The CLI emits **NDJSON** for a streaming parser — one JSON value per line, as
-jc does — not a single array. `-u/--unbuffer` flushes after each record; without
+The CLI emits **NDJSON** for a streaming parser (one JSON value per line, as jc
+does) rather than a single array. `-u/--unbuffer` flushes after each record; without
 it the stream is block-buffered, which is also jc's behaviour
 (`print(..., flush=self.unbuffer)`).
 
-## 4. Parser Registry (`jc_rs_core::registry`)
+## 4. Parser registry (`jc_rs_core::registry`)
 
 ### ParserEntry
 
@@ -249,7 +249,7 @@ inventory::submit! {
 }
 ```
 
-### Lookup Functions
+### Lookup functions
 
 ```rust
 /// Iterate over ALL registered parsers (unordered).
@@ -264,7 +264,7 @@ pub fn find_parser(name: &str) -> Option<&'static dyn Parser>;
 pub fn find_magic_parser(words: &[&str]) -> Option<&'static dyn Parser>;
 ```
 
-## 5. Naming Conventions
+## 5. Naming conventions
 
 | Item | Convention | Example |
 |---|---|---|
@@ -274,9 +274,10 @@ pub fn find_magic_parser(words: &[&str]) -> Option<&'static dyn Parser>;
 | Parser CLI argument | `kebab-case` with `--` | `"--apt-get-sqq"`, `"--git-log"` |
 | jc-rs-utils functions | `snake_case` | `convert_to_int`, `normalize_key` |
 
-## 6. jc-rs-utils Function Contracts
+## 6. jc-rs-utils function contracts
 
-Utility functions in `jc-rs-utils` serve parser implementations. They should follow these patterns:
+Utility functions in `jc-rs-utils` exist for parser implementations. They follow
+these patterns:
 
 | Function | Signature | Returns |
 |---|---|---|
@@ -291,7 +292,7 @@ Utility functions in `jc-rs-utils` serve parser implementations. They should fol
 | `remove_quotes` | `(s: &str) -> &str` | strip matching outer quotes |
 | `line_slice` | `(data: &str, start: Option<i64>, end: Option<i64>) -> Vec<&str>` | Python-style slice of lines |
 
-## 7. How CLI Should Call Parsers
+## 7. How the CLI calls parsers
 
 The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
 
@@ -307,8 +308,9 @@ The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
 
 3. Read input:
    a. Standard parser: read all stdin into a String
-   b. Streaming parser: never read_to_string -- on a live pipe it returns only
-      when the writer closes, which for `tail -f` is never. Read line by line.
+   b. Streaming parser: never read_to_string, because on a live pipe it returns
+      only when the writer closes, which for `tail -f` is never. Read line by
+      line.
 
 4. Execute parser:
    a. Standard: parser.parse(&input, quiet) -> Result<ParseOutput, ParseError>
@@ -331,7 +333,7 @@ The CLI (`jc-rs`) interacts with jc-rs-core through this flow:
    - Other: passthrough from magic command execution
 ```
 
-### Meta Object Structure
+### Meta object structure
 
 When `--meta` is enabled, the CLI wraps output with a `_jc_meta` key:
 
@@ -347,7 +349,7 @@ When `--meta` is enabled, the CLI wraps output with a `_jc_meta` key:
 }
 ```
 
-### Streaming Error Object
+### Streaming error object
 
 When a streaming parser encounters an error with `ignore_exceptions = true`:
 

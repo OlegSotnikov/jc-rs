@@ -1,8 +1,8 @@
 //! Shared machinery for the delimited-text parsers: `csv`, `tsv`, and their
 //! implicit-header and streaming variants.
 //!
-//! jc builds all six on one `csv.DictReader` call with two flags -- a tab
-//! delimiter and an implicit header -- so they share one implementation here
+//! jc builds all six on one `csv.DictReader` call with two flags (a tab
+//! delimiter and an implicit header), so they share one implementation here
 //! too, and a fix to the row splitter lands in all of them at once.
 
 use jc_rs_core::error::ParseError;
@@ -12,9 +12,9 @@ use serde_json::Value;
 
 use super::csv::{detect_delimiter, normalize_csv_line, strip_bom};
 
-/// How much input jc's `csv_s` hands to `csv.Sniffer` -- and, more importantly,
-/// the window it checks for `""` when deciding whether a doubled quote is an
-/// escaped quote or two literal ones.
+/// How much input jc's `csv_s` hands to `csv.Sniffer`. More importantly, it is
+/// also the window it checks for `""` when deciding whether a doubled quote is
+/// an escaped quote or two literal ones.
 const SNIFF_LIMIT: usize = 1024;
 
 /// A delimited-text parse in progress.
@@ -183,7 +183,7 @@ pub(crate) fn parse_delimited(
 ///
 /// With `doublequote` on, `""` inside a quoted field is one literal quote
 /// (RFC 4180). With it off, the first quote simply ends the quoted section and
-/// everything after it is taken literally -- which is what Python's `csv`
+/// everything after it is taken literally, which is what Python's `csv`
 /// module does, and therefore what jc emits.
 fn split_record(text: &str, delimiter: u8, doublequote: bool) -> Vec<String> {
     let delim = delimiter as char;

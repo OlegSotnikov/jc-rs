@@ -124,7 +124,7 @@ jobs:
       # One command, not five. Packaging a crate individually resolves its
       # siblings against crates.io, so every one of these failed for the whole
       # window between bumping the version and the new version reaching the
-      # index -- exactly when a release is being cut. `--workspace` instead
+      # index, exactly when a release is being cut. `--workspace` instead
       # builds a temporary local registry from the crates it has just packaged
       # and verifies against that, so it holds at a version that has never been
       # published. jc-rs-bench is excluded because it is the only member that

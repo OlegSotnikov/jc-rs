@@ -186,13 +186,13 @@ fn parse_iftop(input: &str) -> Vec<Map<String, Value>> {
                 is_previous_line_interface = true;
             }
         } else if line.contains("=>") && !line.contains(':') && is_previous_line_interface {
-            // Send line without port (no-port mode) — skip (matches Python "should not happen" logic)
+            // Send line without port (no-port mode); skip (matches Python "should not happen" logic)
             // Actually check: "=>" and not is_previous and not ':' -> should not happen
             // "=>" and is_previous and not ':' -> also skipped
             // Since is_previous_line_interface=true here, this corresponds to
             // "=>" and is_previous and no ':' -> skipped in Python too
         } else if line.contains("=>") && !line.contains(':') && !is_previous_line_interface {
-            // Send line without port — also skipped (matches Python "should not happen")
+            // Send line without port, also skipped (matches Python "should not happen")
         } else if line.contains("=>") && line.contains(':') && is_previous_line_interface {
             // "=>" and is_previous and ':' -> "should not happen" in Python
         } else if line.contains("<=") && line.contains(':') && is_previous_line_interface {
@@ -233,7 +233,7 @@ fn parse_iftop(input: &str) -> Vec<Map<String, Value>> {
                 is_previous_line_interface = false;
             }
         } else if line.contains("<=") && !line.contains(':') && is_previous_line_interface {
-            // Receive line no port — skipped
+            // Receive line no port: skipped
         } else if line.starts_with("Total send rate:") {
             if let Some(rates) = parse_three_rates(line, "Total send rate:") {
                 let mut obj = Map::new();

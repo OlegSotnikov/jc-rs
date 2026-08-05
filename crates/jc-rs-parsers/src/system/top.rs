@@ -188,8 +188,8 @@ const FLOAT_KEYS: &[&str] = &[
     "used",
 ];
 
-/// `top` repeats a whole sample -- header lines then a process table -- and
-/// opens the next one with `top - `. A sample is complete only when the next
+/// `top` repeats a whole sample (header lines then a process table) and opens
+/// the next one with `top - `. A sample is complete only when the next
 /// one begins, or at end of input.
 #[derive(Default)]
 pub(crate) struct TopSession {

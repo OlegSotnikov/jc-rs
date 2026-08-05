@@ -1,4 +1,4 @@
-//! POSIX path list string parser — parses colon-separated PATH-style lists.
+//! POSIX path list string parser for colon-separated PATH-style lists.
 
 use super::path::parse_path_str;
 use jc_rs_core::error::ParseError;

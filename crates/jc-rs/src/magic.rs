@@ -123,7 +123,7 @@ fn run_proc_magic(words: &[String]) -> Result<MagicResult, String> {
             }
         }
 
-        // Concatenate with a separator — the proc parser will need to handle
+        // Concatenate with a separator; the proc parser will need to handle
         // each chunk. We pass the joined content and the input_list separately.
         // The CLI will handle the multi-proc slurp.
         let joined = contents.join("\n---proc-separator---\n");

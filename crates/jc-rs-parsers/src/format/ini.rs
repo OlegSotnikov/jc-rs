@@ -135,7 +135,7 @@ pub fn ini_to_json(parsed: &ParsedIni) -> serde_json::Map<String, serde_json::Va
         map.insert(k.clone(), serde_json::Value::String(v.clone()));
     }
 
-    // Sections — all sections (including DEFAULT) become nested objects
+    // Sections: all of them (including DEFAULT) become nested objects
     for (section_name, kv) in &parsed.sections {
         let mut section_map = serde_json::Map::new();
         for (k, v) in kv {

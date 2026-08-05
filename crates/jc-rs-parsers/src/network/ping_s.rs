@@ -139,7 +139,7 @@ static ERROR_TYPES_V6: &[(&str, &str)] = &[
     ("Parameter problem:", "parameter_problem"),
 ];
 
-/// A v6 error is refined by a second phrase -- `Destination unreachable: Port
+/// A v6 error is refined by a second phrase, so `Destination unreachable: Port
 /// unreachable` becomes `destination_unreachable_port_unreachable`.
 static ERROR_CODES_V6: &[(&str, &str)] = &[
     ("No route", "no_route"),
@@ -194,7 +194,7 @@ fn parse_linux_line(line: &str, state: &mut PingState) -> Option<Map<String, Val
 
         // Field positions after `(` and `)` become spaces. `ping -I <src>` adds
         // `from <ip>` to the banner, which shifts the byte count but not the
-        // destination -- reading both as shifted put `from` in destination_ip.
+        // destination; reading both as shifted put `from` in destination_ip.
         let (dst_ip_idx, bytes_idx) = if state.ipv4 {
             if state.has_source_ip { (2, 6) } else { (2, 3) }
         } else {
@@ -715,8 +715,8 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
     }
 
     // ICMP error response. BSD reports these as `92 bytes from host (ip):
-    // Destination Host Unreachable`, which also matches the reply branch below
-    // -- so it has to be tested first, and it reports far fewer fields.
+    // Destination Host Unreachable`, which also matches the reply branch below,
+    // so it has to be tested first, and it reports far fewer fields.
     if let Some(kind) = error_type(line, !contains_ipv6(line)) {
         let parts: Vec<&str> = line.split_whitespace().collect();
         let mut obj = Map::with_capacity(4);
@@ -865,7 +865,7 @@ impl StreamingParser for PingStreamParser {
     }
 }
 
-/// A ping reply is one line and goes out immediately -- that is what makes
+/// A ping reply is one line and goes out immediately, which is what makes
 /// `ping host | jc-rs -u --ping-s` usable live. The trailing statistics block
 /// is several lines that accumulate into one record, so it is held until the
 /// end, which is also where jc emits it.

@@ -329,7 +329,7 @@ pub fn parse_cef_line(line: &str) -> Map<String, Value> {
         let type_map: std::collections::HashMap<&str, &str> =
             LABEL_PREFIXES.iter().copied().collect();
 
-        // Handle any key ending in "Label" — generic label renaming.
+        // Handle any key ending in "Label": generic label renaming.
         // Covers cs1-cs6, cn1-cn6, cfp1-cfp4, deviceCustomDate*, flexDate*
         // as well as arbitrary cs7, cs8, cs9, cs11, etc. not in LABEL_PREFIXES.
         for (key, val) in &raw_pairs {
@@ -409,7 +409,7 @@ pub fn parse_cef_line(line: &str) -> Map<String, Value> {
         let s = severity_to_string(n).map(|s| Value::String(s.to_string()));
         (s, Some(Value::Number(n.into())))
     } else {
-        // String severity — only add fields if it's a known severity string
+        // String severity: only add fields if it's a known severity string
         let lower = severity_str.to_lowercase();
         match lower.as_str() {
             "low" | "medium" | "high" | "very-high" => {

@@ -1,6 +1,7 @@
 # jc-rs-utils
 
-Shared helpers for jc-rs parsers: column tables, value coercion, key normalisation and jc-compatible timestamp handling.
+Shared helpers for jc-rs parsers: column tables, value coercion, key
+normalisation and jc-compatible timestamp handling.
 
 Compatibility with [jc](https://github.com/kellyjonbrazil/jc) is **100%** of its
 fixture corpus, measured by `make differential` and published whatever it says.

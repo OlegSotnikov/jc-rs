@@ -1,4 +1,4 @@
-//! URL string parser — parses a URL into its component parts.
+//! URL string parser: splits a URL into its component parts.
 
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;

@@ -89,7 +89,7 @@ fn parse_uname(input: &str) -> Result<Map<String, Value>, ParseError> {
             .cloned()
             .collect();
             if set.len() > 2 {
-                // All 3 are different — no arch fields present, insert "unknown" for processor and hardware_platform
+                // All 3 are different: no arch fields present, insert "unknown" for processor and hardware_platform
                 let os_pos = tokens.len() - 1;
                 tokens.insert(os_pos, "unknown".to_string());
                 tokens.insert(os_pos, "unknown".to_string());

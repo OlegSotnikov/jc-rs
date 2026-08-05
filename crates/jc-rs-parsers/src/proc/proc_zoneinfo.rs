@@ -78,7 +78,7 @@ impl Parser for ProcZoneinfoParser {
                     arr.push(Value::Object(ps));
                 }
 
-                // "Node 0, zone      DMA" — triggers a new node only when zone is "DMA"
+                // "Node 0, zone      DMA": triggers a new node only when zone is "DMA"
                 // Other zone lines reuse the current node
                 let line_no_comma = line.replace(',', "");
                 let parts: Vec<&str> = line_no_comma.split_whitespace().collect();

@@ -91,7 +91,7 @@ fn normalize_key(key: &str) -> String {
 ///
 /// mdadm prints local time with no zone, and jc's `timestamp().naive` reads it
 /// as local. Reading it as UTC instead put every `*_epoch` in this parser out by
-/// the machine's offset -- seven hours under the `TZ=PST8PDT` the corpus is
+/// the machine's offset: seven hours under the `TZ=PST8PDT` the corpus is
 /// pinned to, and a different number of hours everywhere else.
 fn parse_date_epoch(s: &str) -> Option<i64> {
     let normalized = s.split_whitespace().collect::<Vec<&str>>().join(" ");
@@ -641,7 +641,7 @@ fn process_derived_fields(record: &mut Map<String, Value>) {
     }
 
     // name_val: first whitespace-separated token of name
-    // homehost: only if name ends with ')' — take last word without ')'
+    // homehost: only if name ends with ')'; take last word without ')'
     if let Some(Value::String(s)) = record.get("name") {
         let s_clone = s.clone();
         let name_val = s_clone.split_whitespace().next().unwrap_or("").to_string();

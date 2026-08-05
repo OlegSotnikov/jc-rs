@@ -176,7 +176,7 @@ static FORMATS: &[FmtEntry] = &[
 ///
 /// A parser passing the right hint matters for more than speed: hinted formats
 /// are tried *first*, so for a string two formats can both parse, the hint
-/// decides which one wins -- exactly as in jc.
+/// decides which one wins, exactly as in jc.
 pub mod formats {
     pub const F1000: &str = "%a %b %d %H:%M:%S %Y";
     pub const F1100: &str = "%a %b %d %H:%M:%S %Y %z";
@@ -341,11 +341,11 @@ fn try_parse_naive(s: &str, fmt: &str) -> Option<NaiveDateTime> {
 ///
 /// This mirrors Python's `datetime.timestamp()` on a naive datetime, which is
 /// what jc relies on: a command that prints "Jan  5 14:29:24" is printing local
-/// time, so the epoch has to be resolved through `$TZ`. Treating it as UTC —
-/// what this code did before — puts every timestamp-bearing parser out by the
-/// UTC offset (8 h in winter, 7 h in summer for jc's own PST8PDT fixtures) and
-/// silently corrupts `epoch`, `login_epoch`, `modify_time_epoch` and friends
-/// across ~20 parsers.
+/// time, so the epoch has to be resolved through `$TZ`. Treating it as UTC,
+/// which is what this code did before, puts every timestamp-bearing parser out
+/// by the UTC offset (8 h in winter, 7 h in summer for jc's own PST8PDT
+/// fixtures) and silently corrupts `epoch`, `login_epoch`, `modify_time_epoch`
+/// and friends across ~20 parsers.
 ///
 /// DST edge cases follow Python's `fold=0` behaviour: for an ambiguous local
 /// time (the repeated hour when clocks go back) take the earlier instant; for a
@@ -360,7 +360,7 @@ fn naive_local_epoch(dt_naive: &NaiveDateTime) -> i64 {
 }
 
 /// Parse a string whose format carries an offset (`%z`), keeping that offset
-/// rather than normalising to UTC -- the caller needs the wall clock as
+/// rather than normalising to UTC, because the caller needs the wall clock as
 /// written. See [`do_parse`] for why.
 fn try_parse_aware(s: &str, fmt: &str) -> Option<DateTime<FixedOffset>> {
     DateTime::parse_from_str(s, fmt).ok()
@@ -413,8 +413,8 @@ fn do_parse(input: &str, hints: &[&str]) -> TimestampResult {
         if let Some(dt_aware) = try_parse_aware(&normalized, fmt) {
             // jc computes the naive stamp as `dt.replace(tzinfo=None).timestamp()`:
             // the parsed offset is *discarded* and the wall clock as written is
-            // read in the local zone. Converting to UTC instead -- which is the
-            // intuitive reading -- puts every `epoch` field out by the
+            // read in the local zone. Converting to UTC instead, which is the
+            // intuitive reading, puts every `epoch` field out by the
             // difference between the two zones (three hours for `git log`'s
             // -0400 stamps under the corpus's PST8PDT).
             let wall_clock = dt_aware.naive_local();
@@ -466,7 +466,7 @@ mod tests {
         //
         // naive reads 22:14:15 as local time, utc reads it as UTC; the 25200 s
         // gap is PDT's offset. An earlier version of this test asserted the two
-        // were equal, which is what a UTC-everywhere implementation produces —
+        // were equal, which is what a UTC-everywhere implementation produces,
         // and that bug put every *_epoch field in the corpus out by the offset.
         let r = parse_timestamp("2003-10-11T22:14:15.003Z", &[]);
         assert_eq!(r.utc_epoch, Some(1065910455));
@@ -490,7 +490,7 @@ mod tests {
 
     #[test]
     fn test_parse_no_tz() {
-        // No timezone — naive only
+        // No timezone: naive only
         let r = parse_timestamp("2021-03-23 00:14", &[]);
         assert!(r.naive_epoch.is_some());
         assert!(r.utc_epoch.is_none());

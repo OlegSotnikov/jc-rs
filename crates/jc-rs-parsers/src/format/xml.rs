@@ -139,7 +139,7 @@ fn parse_xml_tree(input: &str, attr_prefix: char) -> Result<Vec<XmlNode>, ParseE
                 }
             }
             Ok(Event::Eof) => break,
-            Ok(_) => {} // PI, DocType, etc. — skip
+            Ok(_) => {} // PI, DocType, etc.: skip
             Err(e) => return Err(ParseError::Generic(format!("XML parse error: {e}"))),
         }
     }
@@ -183,7 +183,7 @@ fn node_to_json(node: &XmlNode) -> serde_json::Value {
                 map.insert(k.clone(), serde_json::Value::String(v.clone()));
             }
 
-            // Handle children — group siblings with same tag name into arrays
+            // Handle children: group siblings with the same tag name into arrays
             // First pass: collect all text content and named element children
             let mut text_parts: Vec<String> = Vec::new();
             let mut child_groups: Vec<(String, Vec<serde_json::Value>)> = Vec::new();
@@ -221,7 +221,7 @@ fn node_to_json(node: &XmlNode) -> serde_json::Value {
                 map.insert("#text".to_string(), serde_json::Value::String(combined));
             }
 
-            // Add child elements — single child stays as object, multiple become array
+            // Add child elements: a single child stays an object, multiple become an array
             for (name, values) in child_groups {
                 if values.len() == 1 {
                     map.insert(name, values.into_iter().next().unwrap());

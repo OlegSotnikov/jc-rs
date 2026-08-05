@@ -30,7 +30,7 @@ pub fn slice_lines(lines: Vec<String>, start: Option<i64>, end: Option<i64>) -> 
             iter.collect()
         }
     } else {
-        // Negative indices — materialize all lines
+        // Negative indices: materialize all lines
         let len = lines.len() as i64;
 
         let start_idx = if s < 0 {

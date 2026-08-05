@@ -58,7 +58,7 @@ struct RawCell {
     value: String,
     timestamp_iso: String,
     /// The stamp as cbt printed it (`2000/01/01-01:00:00.000000`). The epoch is
-    /// computed from this, not from the ISO rendering -- jc hints the parse with
+    /// computed from this, not from the ISO rendering: jc hints the parse with
     /// cbt's own format, and the ISO string does not match it.
     timestamp_raw: String,
 }
