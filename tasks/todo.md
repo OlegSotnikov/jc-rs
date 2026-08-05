@@ -136,7 +136,14 @@ do:
 
 - [ ] **`NPM_TOKEN` in the `npm` environment**, so the next release publishes
       the package itself. Without it the job builds and smoke-tests the package
-      and stops there.
+      and stops there. Worth checking npm's Trusted Publishing (OIDC) first —
+      it would remove this credential the way it removed the crates.io one.
+- [x] **`homebrew` and `npm` environments are protected like the other two.**
+      They had been created implicitly by the first release run and carried no
+      rules at all, while `crates-io` and `dockerhub` required a review and
+      accepted deployments only from `v*` tags. All four now match: reviewer
+      `OlegSotnikov`, tag policy `v*`. Worth knowing before putting a
+      write-capable token in one of them.
 - [ ] **Decide how the Homebrew formula gets updated.** It needs a credential
       only because a workflow in `jc-rs` cannot write to `homebrew-tap` —
       `GITHUB_TOKEN` is scoped to its own repository. Three ways out, in
@@ -150,7 +157,19 @@ do:
          exists at all. Costs a lag between release and formula.
       3. **`HOMEBREW_TAP_TOKEN`** in the `homebrew` environment — immediate,
          but it is a long-lived cross-repo credential, and this project has
-         been deliberate about not keeping those.
+         been deliberate about not keeping those. If you go this way, the job
+         needs exactly one permission and nothing else:
+
+         > Fine-grained PAT · resource owner `OlegSotnikov` · repository access
+         > **only `OlegSotnikov/homebrew-tap`** · repository permissions
+         > **Contents: Read and write**. That is the whole list — the job
+         > clones, writes one file and pushes. It never touches
+         > `.github/workflows/` in the tap, so the `Workflows` permission is
+         > not needed, and a classic PAT with `repo` scope would hand out
+         > every repository instead of one.
+
+         Set an expiry. An expired token fails the clone, so the release goes
+         red rather than silently skipping — that is the behaviour you want.
 
       The release job is wired for (3) and reports-and-skips without it. If you
       pick (1) or (2), delete that job rather than leaving it skipping forever.
