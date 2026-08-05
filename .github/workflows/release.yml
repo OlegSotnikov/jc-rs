@@ -148,8 +148,8 @@ jobs:
     name: docker image
     needs: [build]
     runs-on: ubuntu-latest
-    # Protected environment: a human approves before anything is pushed under
-    # the appmasterio namespace, and the credentials are scoped to this job.
+    # Environment: restricts this to `v*` tags and keeps the Docker Hub
+    # credentials scoped to this job rather than the whole repository.
     environment: dockerhub
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -231,8 +231,8 @@ jobs:
     name: homebrew tap
     needs: [release]
     runs-on: ubuntu-latest
-    # Protected environment: pushing to the tap changes what `brew install`
-    # gives people, so a human approves it and the token is scoped to this job.
+    # Environment: restricts this to `v*` tags and keeps the tap token scoped
+    # to this job rather than the whole repository.
     environment: homebrew
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -297,8 +297,8 @@ jobs:
     name: npm package
     needs: [release]
     runs-on: ubuntu-latest
-    # Protected environment: publishing to npm is public and irreversible for
-    # a given version, so a human approves and the token is scoped here.
+    # Environment: restricts this to `v*` tags and keeps the npm token scoped
+    # to this job rather than the whole repository.
     environment: npm
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
