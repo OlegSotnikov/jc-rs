@@ -167,14 +167,28 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         if: steps.creds.outputs.have == 'true'
         with:
-          name: dist-x86_64-unknown-linux-musl
-      - name: unpack the static binary
+          pattern: dist-*-unknown-linux-musl
+          merge-multiple: true
+      - name: lay the binaries out by platform
         if: steps.creds.outputs.have == 'true'
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
-          tar xzf jc-rs-*-x86_64-unknown-linux-musl.tar.gz
-          mv jc-rs-*/jc-rs ./jc-rs
-          chmod +x jc-rs
+          # One directory per Docker architecture name, which is what the
+          # Dockerfile's ${TARGETARCH} selects.
+          while read -r arch target; do
+            mkdir -p "binaries/linux/$arch"
+            tar xzf "jc-rs-${TAG}-${target}.tar.gz"
+            mv "jc-rs-${TAG}-${target}/jc-rs" "binaries/linux/$arch/jc-rs"
+            chmod +x "binaries/linux/$arch/jc-rs"
+            file "binaries/linux/$arch/jc-rs"
+          done <<'ARCHES'
+          amd64 x86_64-unknown-linux-musl
+          arm64 aarch64-unknown-linux-musl
+          ARCHES
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        if: steps.creds.outputs.have == 'true'
       - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         if: steps.creds.outputs.have == 'true'
         with:
@@ -186,6 +200,12 @@ jobs:
           context: .
           file: Dockerfile
           push: true
+          # One tag, both architectures, the daemon picks. Cheap here because
+          # the binaries are prebuilt and the image has no build steps to
+          # emulate.
+          platforms: linux/amd64,linux/arm64
+          sbom: true
+          provenance: true
           tags: |
             appmasterio/jc-rs:${{ github.event.inputs.tag || github.ref_name }}
             appmasterio/jc-rs:latest

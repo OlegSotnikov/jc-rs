@@ -126,7 +126,8 @@ do:
       out with the rest instead of by hand. Until that is set, the release
       workflow will report it as skipped rather than fail.
 
-- [x] **Docker Hub is public**, `appmasterio/jc-rs:v0.1.0` and `:latest`.
+- [x] **Docker Hub is public**, `appmasterio/jc-rs:v0.1.0` and `:latest`,
+      multi-arch: one manifest list covering `linux/amd64` and `linux/arm64`.
 - [x] **npm**: `jc-rs-wasm@0.1.0` published, verified by installing it from the
       registry and running it under Node.
 - [x] **Homebrew**: `Formula/jc-rs.rb` is in `OlegSotnikov/homebrew-tap` — the
