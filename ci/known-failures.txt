@@ -13,5 +13,5 @@
 #     will catch it and it is the exact mistake that produces a fake 100%
 #
 # Progress: this file should only ever get shorter. It is empty as of
-# 2026-08-04 -- the whole corpus matches jc. Keep it that way: a new entry
+# 2026-08-04, and the whole corpus matches jc. Keep it that way: a new entry
 # here is a regression that someone chose not to fix.
