@@ -68,6 +68,10 @@ differential-gate: build submodule ## the release gate: 100% of oracle-valid pai
 bench: ## criterion benchmarks
 	cargo bench -p jc-rs-bench
 
+.PHONY: homebrew-formula
+homebrew-formula: ## regenerate Formula/jc-rs.rb for TAG (default: latest release)
+	@./ci/homebrew-formula.sh
+
 .PHONY: wasm
 wasm: ## build the npm package into crates/jc-rs-wasm/pkg (needs wasm-pack)
 	@command -v wasm-pack >/dev/null || { \
