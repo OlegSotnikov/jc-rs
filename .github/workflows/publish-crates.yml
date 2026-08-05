@@ -91,10 +91,32 @@ jobs:
                  "https://crates.io/api/v1/crates/$crate/$version" \
                  | jq -e '.version.num' > /dev/null 2>&1; then
               echo "$crate $version is already on crates.io — skipping"
-            else
-              cargo publish -p "$crate"
-              echo "published $crate $version"
+              continue
             fi
+
+            # Trusted Publishing can push a new version of an existing crate,
+            # but it cannot *create* one: crates.io answers 403 "Trusted
+            # Publishing tokens do not support creating new crates". The first
+            # publish of a new crate has to be done by a person with an API
+            # token. Failing the whole release over that would block the
+            # crates that CAN go out, so say it plainly and carry on.
+            if ! curl -sf -A "jc-rs release (github actions)" \
+                   "https://crates.io/api/v1/crates/$crate" > /dev/null 2>&1; then
+              echo "::warning::$crate does not exist on crates.io yet."
+              {
+                echo "**$crate was not published.** Trusted Publishing cannot create a new crate."
+                echo ""
+                echo 'Publish it once by hand, then this job takes over:'
+                echo ""
+                echo '```sh'
+                echo "cargo publish -p $crate    # with a personal crates.io token"
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+
+            cargo publish -p "$crate"
+            echo "published $crate $version"
           done
 
       - name: dry run

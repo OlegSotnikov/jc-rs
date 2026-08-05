@@ -118,13 +118,27 @@ do:
 - [ ] **`jc-rs-wasm` is not on crates.io.** Trusted Publishing cannot *create*
       a crate, only publish new versions of one that exists:
       `403 — Trusted Publishing tokens do not support creating new crates.`
-      The other four were fine because 0.0.0 had reserved them. Fix: one manual
-      `cargo publish -p jc-rs-wasm` with a personal crates.io token; every
-      release after that goes through the workflow like the rest.
+      The other four were fine because 0.0.0 had reserved their names. One
+      manual publish fixes it permanently:
+
+      ```sh
+      cargo login                      # a personal crates.io token
+      cargo publish -p jc-rs-wasm      # from a clean checkout of the tag
+      ```
+
+      The workflow no longer fails the whole release over this — it detects a
+      crate that does not exist, writes the command above into the job summary,
+      and publishes everything else.
 - [ ] **The Docker image pushed but is private.** The job ran and both tags
       completed (`appmasterio/jc-rs:v0.1.0`, `:latest`), but an anonymous pull
       gets `repository does not exist` — Docker Hub created the repository
-      private. Flip it to public in the Docker Hub settings.
+      private. Flip it to public in the Docker Hub settings; nothing in the
+      repo can do that.
+
+      The overview text now lives in `packaging/docker/README.md` and the
+      release job pushes it with the image, so it is version-controlled rather
+      than pasted into the web form once. That step runs on the next release,
+      or on a `workflow_dispatch` of `release.yml` against the tag.
 - [ ] **npm: built, not published.** `NPM_TOKEN` is not set in the `npm`
       environment. The package builds and its Node smoke test passes in CI.
 - [ ] **Homebrew: skipped.** `OlegSotnikov/homebrew-tap` does not exist and

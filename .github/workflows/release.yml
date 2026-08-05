@@ -189,6 +189,16 @@ jobs:
           tags: |
             appmasterio/jc-rs:${{ github.event.inputs.tag || github.ref_name }}
             appmasterio/jc-rs:latest
+      # The Docker Hub overview is the first thing anyone sees; keeping it in
+      # the repo means it ships with the image instead of drifting.
+      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        if: steps.creds.outputs.have == 'true'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: appmasterio/jc-rs
+          short-description: "Convert CLI output, file formats and strings to JSON — one static binary, 100% jc-compatible"
+          readme-filepath: packaging/docker/README.md
 
   homebrew:
     name: homebrew tap
