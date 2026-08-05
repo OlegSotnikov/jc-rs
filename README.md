@@ -155,13 +155,35 @@ cargo binstall jc-rs                    # prebuilt binary, no compile
 cargo install jc-rs                     # from source
 brew install OlegSotnikov/tap/jc-rs     # macOS and Linux
 npm install jc-rs-wasm                  # WebAssembly, browser or Node
-docker run --rm -i appmasterio/jc-rs --ps < ps.txt
+docker pull appmasterio/jc-rs           # container, see below
 ```
 
 Or take a static binary straight from the
 [releases](https://github.com/OlegSotnikov/jc-rs/releases): five targets, with
 completions for bash, zsh and fish, a `jc` alias and `SHA256SUMS` in every
 archive.
+
+### Docker
+
+[`appmasterio/jc-rs`](https://hub.docker.com/r/appmasterio/jc-rs) on Docker Hub.
+A `scratch` image, 2.3 MB compressed: the binary and its licence, with no shell,
+no libc and no package manager. `linux/amd64` and `linux/arm64` ship in one
+manifest, so `docker pull` picks the right one.
+
+| Tag | What |
+|---|---|
+| [`latest`](https://hub.docker.com/r/appmasterio/jc-rs/tags?name=latest) | the most recent release |
+| [`vX.Y.Z`](https://hub.docker.com/r/appmasterio/jc-rs/tags) | a specific release |
+
+```console
+$ ps aux | docker run --rm -i appmasterio/jc-rs --ps | jq '.[0]'
+$ docker run --rm -i appmasterio/jc-rs --df < df.txt
+$ tail -f access.log | docker run --rm -i appmasterio/jc-rs -u --clf-s
+```
+
+Magic syntax (`jc-rs df -h`) needs the command inside the container, and this
+image deliberately has nothing else in it. Pipe instead, or use the standalone
+binary.
 
 ## Build from source
 
