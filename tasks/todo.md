@@ -134,12 +134,26 @@ do:
       tap's first formula; everything else in it is a cask. Every URL in it
       returns 200 and the `test do` block was run against the real binary.
 
-- [ ] **Two credentials the release workflow still lacks**, so the next release
-      will report-and-skip rather than do these itself:
-      - `HOMEBREW_TAP_TOKEN` in the `homebrew` environment, for pushing the
-        regenerated formula. A fine-grained PAT scoped to `homebrew-tap` alone
-        is enough — do not reuse the broad account token.
-      - `NPM_TOKEN` in the `npm` environment.
+- [ ] **`NPM_TOKEN` in the `npm` environment**, so the next release publishes
+      the package itself. Without it the job builds and smoke-tests the package
+      and stops there.
+- [ ] **Decide how the Homebrew formula gets updated.** It needs a credential
+      only because a workflow in `jc-rs` cannot write to `homebrew-tap` —
+      `GITHUB_TOKEN` is scoped to its own repository. Three ways out, in
+      increasing order of machinery:
+      1. **By hand**, one command: `make homebrew-formula` writes
+         `Formula/jc-rs.rb` from the published release's own SHA256SUMS, then
+         commit it in the tap. Releases are rare; this is probably enough.
+      2. **A workflow in the tap** on `schedule` + `workflow_dispatch` that
+         reads the latest jc-rs release from the public API and commits the
+         formula with the tap's *own* `GITHUB_TOKEN`. No cross-repo secret
+         exists at all. Costs a lag between release and formula.
+      3. **`HOMEBREW_TAP_TOKEN`** in the `homebrew` environment — immediate,
+         but it is a long-lived cross-repo credential, and this project has
+         been deliberate about not keeping those.
+
+      The release job is wired for (3) and reports-and-skips without it. If you
+      pick (1) or (2), delete that job rather than leaving it skipping forever.
 - [ ] **The Docker Hub description is still empty.** The stored
       `DOCKER_HUB_TOKEN` is a push/pull PAT: editing repository metadata
       answers `access denied: insufficient scope`. The text is ready in
