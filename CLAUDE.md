@@ -158,11 +158,10 @@ second one buys nothing and trains you to click through. Restore it with
 if the repo ever gains a second person with push access.
 
 Every job that needs a credential checks for it first and reports-and-skips
-rather than failing, so a release completes with whatever is configured. All
-four are configured; the only credential still missing is `NPM_TOKEN`, so the
-npm job skips. Re-running a release is safe everywhere: crates already on the
-index are skipped, and an unchanged formula exits before `git commit` can fail
-on "nothing to commit".
+rather than failing, so a release completes with whatever is configured.
+Re-running a release is safe everywhere: crates and npm versions already
+published are skipped, and an unchanged formula exits before `git commit` can
+fail on "nothing to commit".
 
 **Package the workspace, never a crate at a time.** `cargo package -p X`
 resolves X's siblings against *crates.io*, so it cannot verify a version that
@@ -172,9 +171,20 @@ into a temporary local registry and verifies each against that, so it holds at
 any version. (`jc-rs-bench` is excluded as the one unpublished member: its path
 dependencies carry no version, and packaging refuses that.)
 
-- crates.io publishing uses **Trusted Publishing (OIDC)**. There is no long-lived
-  registry credential anywhere. If the workflow ever falls back to
+- crates.io **and npm** publish over **Trusted Publishing (OIDC)**. There is no
+  long-lived registry credential for either. If the workflow ever falls back to
   `CARGO_REGISTRY_TOKEN`, fix the trust config rather than adding the secret back.
+- **Never give the npm job a token.** `actions/setup-node` writes
+  `_authToken=${NODE_AUTH_TOKEN}` into `.npmrc` whenever `registry-url` is set,
+  and npm treats even an *empty* token as an attempt to authenticate instead of
+  falling through to OIDC. So `registry-url` is omitted (npmjs is the default
+  registry anyway) and neither `NPM_TOKEN` nor `NODE_AUTH_TOKEN` appears in the
+  job. Every failure on this path surfaces as `ENEEDAUTH` or a 404 regardless of
+  cause, so read that as "check the trusted publisher", not "add a token".
+  It needs npm >= 11.5.1, hence node 24 — node 22 still ships npm 10.9.x.
+- The one credential still outstanding is nothing: `HOMEBREW_TAP_TOKEN` exists
+  because `GITHUB_TOKEN` cannot reach another repository, and that is the only
+  long-lived secret in the release path.
 - Secrets live in GitHub *environments*, never at repository level.
 - Third-party actions are pinned to commit SHAs. Keep it that way — some of these
   jobs can publish under our name.
