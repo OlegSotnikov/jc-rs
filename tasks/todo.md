@@ -180,11 +180,13 @@ do:
       is `continue-on-error` until the `dockerhub` environment has a PAT with
       write access. Pasting it once in the web UI also works.
 
-- [x] **Packaging check restored to full verification.** All five package and
-      compile against the published 0.1.0 dependencies, `jc-rs-wasm` included.
-      Note for the next release: right after a version bump this breaks again
-      until the new version is on the index — drop the dependent crates to
-      `cargo package --list` for that one commit.
+- [x] **Packaging check no longer depends on the registry.** One
+      `cargo package --workspace --exclude jc-rs-bench` replaces five per-crate
+      runs. The per-crate form resolved siblings against crates.io, so it failed
+      for the whole window between a version bump and the upload — i.e. during
+      every release. Verified by bumping to an unpublished 0.99.0: the old form
+      dies on `failed to select a version for jc-rs-core = "^0.99.0"`, the new
+      one verifies all five.
 - [ ] **`-r/--raw` beyond what the corpus proves.** Seven parsers override
       `parse_raw`; the default forwards to `parse`, which is correct wherever
       jc's `_process` is a no-op. A parser with conversions but no `-raw`

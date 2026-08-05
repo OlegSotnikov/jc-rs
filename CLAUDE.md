@@ -161,11 +161,13 @@ Every job that needs a credential checks for it first and reports-and-skips
 rather than failing, so a release completes with whatever is configured. Not
 configured yet: `HOMEBREW_TAP_TOKEN` (and the tap repo itself) and `NPM_TOKEN`.
 
-**`cargo package` cannot verify any crate with an internal dependency** until
-the version it asks for is on crates.io — it builds the tarball against the
-*registry* copies, not the workspace. Right after a version bump that is every
-crate except `jc-rs-core`, so ci.yml uses `cargo package --list` for the other
-four. Switch them back to the full form once that version is published.
+**Package the workspace, never a crate at a time.** `cargo package -p X`
+resolves X's siblings against *crates.io*, so it cannot verify a version that
+is not on the index yet — which is every version between the bump and the
+upload. `cargo package --workspace --exclude jc-rs-bench` packages the members
+into a temporary local registry and verifies each against that, so it holds at
+any version. (`jc-rs-bench` is excluded as the one unpublished member: its path
+dependencies carry no version, and packaging refuses that.)
 
 - crates.io publishing uses **Trusted Publishing (OIDC)**. There is no long-lived
   registry credential anywhere. If the workflow ever falls back to
