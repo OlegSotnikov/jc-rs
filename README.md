@@ -191,7 +191,7 @@ binary.
 git clone --recurse-submodules https://github.com/OlegSotnikov/jc-rs.git
 cd jc-rs
 make build          # cargo build --release
-make check          # lint + fixture sync + test ratchet + full differential run
+make check          # lint + fixture sync + tests + full differential run
 ```
 
 The differential suite needs the jc submodule and the Python packages jc's own
