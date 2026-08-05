@@ -158,8 +158,11 @@ second one buys nothing and trains you to click through. Restore it with
 if the repo ever gains a second person with push access.
 
 Every job that needs a credential checks for it first and reports-and-skips
-rather than failing, so a release completes with whatever is configured. Not
-configured yet: `HOMEBREW_TAP_TOKEN` (and the tap repo itself) and `NPM_TOKEN`.
+rather than failing, so a release completes with whatever is configured. All
+four are configured; the only credential still missing is `NPM_TOKEN`, so the
+npm job skips. Re-running a release is safe everywhere: crates already on the
+index are skipped, and an unchanged formula exits before `git commit` can fail
+on "nothing to commit".
 
 **Package the workspace, never a crate at a time.** `cargo package -p X`
 resolves X's siblings against *crates.io*, so it cannot verify a version that

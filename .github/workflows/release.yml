@@ -290,6 +290,14 @@ jobs:
           git config user.name "jc-rs release"
           git config user.email "noreply@jc-rs.com"
           git add Formula/jc-rs.rb
+          # Re-running a release must not fail because the tap is already
+          # correct: with the formula unchanged, `git commit` exits non-zero
+          # on "nothing to commit" and takes the job red for no reason.
+          if git diff --cached --quiet; then
+            echo "tap already has this formula — nothing to push"
+            echo "The Homebrew tap was already up to date." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           git commit -m "jc-rs ${TAG}"
           git push
 
