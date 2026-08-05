@@ -103,14 +103,37 @@ to make visible.
       record came back as `{}` — serde-wasm-bindgen maps a Rust map to a JS
       `Map` unless told to serialize maps as objects.
 
-      **Three things need a human before a release can complete them**, each
-      gated so the job reports and skips rather than failing:
-      - the `OlegSotnikov/homebrew-tap` repository does not exist yet, and
-        `HOMEBREW_TAP_TOKEN` is not set in the `homebrew` environment
-      - `NPM_TOKEN` is not set in the `npm` environment
-      - `cargo package` verifies dependent crates against the *registry*, and
-        the 0.0.0 there predates the current traits. ci.yml uses `--list` for
-        those three until v0.1.0 is out; switch them back afterwards.
+## v0.1.0 shipped 2026-08-05 — what landed and what did not
+
+Tag `v0.1.0` on `2724bad`. CI green, `make check` green, 934/934.
+
+Landed:
+- **GitHub Release** with five archives + `SHA256SUMS`
+- **crates.io**: `jc-rs`, `jc-rs-core`, `jc-rs-utils`, `jc-rs-parsers` at 0.1.0,
+  published over Trusted Publishing (no stored credential)
+
+Did not land, each needing something only a person with the right account can
+do:
+
+- [ ] **`jc-rs-wasm` is not on crates.io.** Trusted Publishing cannot *create*
+      a crate, only publish new versions of one that exists:
+      `403 — Trusted Publishing tokens do not support creating new crates.`
+      The other four were fine because 0.0.0 had reserved them. Fix: one manual
+      `cargo publish -p jc-rs-wasm` with a personal crates.io token; every
+      release after that goes through the workflow like the rest.
+- [ ] **The Docker image pushed but is private.** The job ran and both tags
+      completed (`appmasterio/jc-rs:v0.1.0`, `:latest`), but an anonymous pull
+      gets `repository does not exist` — Docker Hub created the repository
+      private. Flip it to public in the Docker Hub settings.
+- [ ] **npm: built, not published.** `NPM_TOKEN` is not set in the `npm`
+      environment. The package builds and its Node smoke test passes in CI.
+- [ ] **Homebrew: skipped.** `OlegSotnikov/homebrew-tap` does not exist and
+      `HOMEBREW_TAP_TOKEN` is not set.
+- [ ] **Switch the packaging check back to full verification.** `cargo package`
+      resolves against the registry, so before 0.1.0 was out only `jc-rs-core`
+      could be verified. Now that four crates are published, ci.yml can drop
+      `--list` for `jc-rs-utils`, `jc-rs-parsers` and `jc-rs` — and for
+      `jc-rs-wasm` once it exists.
 - [ ] **`-r/--raw` beyond what the corpus proves.** Seven parsers override
       `parse_raw`; the default forwards to `parse`, which is correct wherever
       jc's `_process` is a no-op. A parser with conversions but no `-raw`
