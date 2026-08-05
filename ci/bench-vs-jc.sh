@@ -2,10 +2,9 @@
 # Time jc-rs against jc on the same inputs, on this machine, with one harness
 # for both. Prints a markdown table.
 #
-# The speed claims in the README come from here. Anyone can re-run it: a number
-# you cannot reproduce is a number you should not print.
+# The speed claims in the README come from here, and anyone can re-run it.
 #
-# Both sides are invoked the way a user would -- `python3 -m jc` includes the
+# Both sides are invoked the way a user would. `python3 -m jc` includes the
 # interpreter start-up that is most of what this comparison is about, and is
 # what `jc` on your PATH does too.
 set -uo pipefail
