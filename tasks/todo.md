@@ -126,20 +126,26 @@ do:
       out with the rest instead of by hand. Until that is set, the release
       workflow will report it as skipped rather than fail.
 
-- [ ] **The Docker image pushed but is private.** The job ran and both tags
-      completed (`appmasterio/jc-rs:v0.1.0`, `:latest`), but an anonymous pull
-      gets `repository does not exist` — Docker Hub created the repository
-      private. Flip it to public in the Docker Hub settings; nothing in the
-      repo can do that.
+- [x] **Docker Hub is public**, `appmasterio/jc-rs:v0.1.0` and `:latest`.
+- [x] **npm**: `jc-rs-wasm@0.1.0` published, verified by installing it from the
+      registry and running it under Node.
+- [x] **Homebrew**: `Formula/jc-rs.rb` is in `OlegSotnikov/homebrew-tap` — the
+      tap's first formula; everything else in it is a cask. Every URL in it
+      returns 200 and the `test do` block was run against the real binary.
 
-      The overview text now lives in `packaging/docker/README.md` and the
-      release job pushes it with the image, so it is version-controlled rather
-      than pasted into the web form once. That step runs on the next release,
-      or on a `workflow_dispatch` of `release.yml` against the tag.
-- [ ] **npm: built, not published.** `NPM_TOKEN` is not set in the `npm`
-      environment. The package builds and its Node smoke test passes in CI.
-- [ ] **Homebrew: skipped.** `OlegSotnikov/homebrew-tap` does not exist and
-      `HOMEBREW_TAP_TOKEN` is not set.
+- [ ] **Two credentials the release workflow still lacks**, so the next release
+      will report-and-skip rather than do these itself:
+      - `HOMEBREW_TAP_TOKEN` in the `homebrew` environment, for pushing the
+        regenerated formula. A fine-grained PAT scoped to `homebrew-tap` alone
+        is enough — do not reuse the broad account token.
+      - `NPM_TOKEN` in the `npm` environment.
+- [ ] **The Docker Hub description is still empty.** The stored
+      `DOCKER_HUB_TOKEN` is a push/pull PAT: editing repository metadata
+      answers `access denied: insufficient scope`. The text is ready in
+      `packaging/docker/README.md` and the release job pushes it, but that step
+      is `continue-on-error` until the `dockerhub` environment has a PAT with
+      write access. Pasting it once in the web UI also works.
+
 - [x] **Packaging check restored to full verification.** All five package and
       compile against the published 0.1.0 dependencies, `jc-rs-wasm` included.
       Note for the next release: right after a version bump this breaks again

@@ -154,20 +154,17 @@ jc-rs -F > ~/.config/fish/completions/jc-rs.fish
 ## Install
 
 ```sh
-cargo binstall jc-rs    # prebuilt binary, no compile
-cargo install jc-rs     # from source
+cargo binstall jc-rs                    # prebuilt binary, no compile
+cargo install jc-rs                     # from source
+brew install OlegSotnikov/tap/jc-rs     # macOS and Linux
+npm install jc-rs-wasm                  # WebAssembly, browser or Node
+docker run --rm -i appmasterio/jc-rs --ps < ps.txt
 ```
 
 Or take a static binary straight from the
 [releases](https://github.com/OlegSotnikov/jc-rs/releases): five targets, with
 completions for bash, zsh and fish, a `jc` alias and `SHA256SUMS` in every
 archive.
-
-Homebrew, npm and the Docker image are built by the release workflow but are
-not published yet — they need credentials that do not exist. `tasks/todo.md`
-lists exactly what each one is waiting for. They are left out of this list
-until `brew install` and `npm install` actually work, because an install
-instruction that fails is worse than none.
 
 ## Build from source
 
