@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { matchesLiteral, tokenizeJson, tokenizeRaw } from "@/lib/tokens";
 
 /**
@@ -28,6 +28,7 @@ export function Panes({
   busy?: boolean;
 }) {
   const [lit, setLit] = useState<string | null>(null);
+  const highlight = useRef<HTMLPreElement>(null);
 
   const rawTokens = useMemo(() => tokenizeRaw(input), [input]);
   const jsonTokens = useMemo(() => tokenizeJson(output), [output]);
@@ -38,10 +39,23 @@ export function Panes({
     <div className="grid gap-px overflow-hidden rounded-xl border bg-[var(--color-rule)] md:grid-cols-2">
       <section className="flex min-w-0 flex-col bg-[var(--color-surface)]">
         <PaneBar>{inputLabel}</PaneBar>
-        <div className="relative max-h-[26rem] min-h-[12rem] flex-1 overflow-auto focus-within:ring-1 focus-within:ring-[var(--color-key)] focus-within:ring-inset">
+
+        {/* Editable: the textarea is the only thing that scrolls, and the
+            highlighted layer under it is moved to match. Letting both scroll
+            gives the pane two scrollbars that drift apart as you type. */}
+        <div
+          className={`relative max-h-[26rem] min-h-[12rem] flex-1 ${
+            editable
+              ? "overflow-hidden focus-within:ring-1 focus-within:ring-[var(--color-key)] focus-within:ring-inset"
+              : "overflow-auto"
+          }`}
+        >
           <pre
+            ref={highlight}
             aria-hidden={editable}
-            className="pointer-events-none min-h-full px-4 py-3 font-mono text-[12.5px] leading-[1.65] whitespace-pre"
+            className={`px-4 py-3 font-mono text-[12.5px] leading-[1.65] whitespace-pre ${
+              editable ? "pointer-events-none absolute inset-0 overflow-hidden" : ""
+            }`}
           >
             {rawTokens.map((t, i) =>
               t.word ? (
@@ -57,9 +71,17 @@ export function Panes({
             <textarea
               value={input}
               onChange={(e) => onInputChange?.(e.target.value)}
+              onScroll={(e) => {
+                const el = e.currentTarget;
+                if (highlight.current) {
+                  highlight.current.scrollLeft = el.scrollLeft;
+                  highlight.current.scrollTop = el.scrollTop;
+                }
+              }}
               spellCheck={false}
+              wrap="off"
               aria-label="Command output to convert"
-              className="absolute inset-0 h-full w-full resize-none bg-transparent px-4 py-3 font-mono text-[12.5px] leading-[1.65] whitespace-pre text-transparent caret-[var(--color-ink)] outline-none focus-visible:outline-none"
+              className="absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent px-4 py-3 font-mono text-[12.5px] leading-[1.65] whitespace-pre text-transparent caret-[var(--color-ink)] outline-none focus-visible:outline-none"
             />
           )}
         </div>

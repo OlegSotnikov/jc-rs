@@ -3,6 +3,8 @@ export const site = {
   origin: process.env.NEXT_PUBLIC_SITE_ORIGIN ?? "https://jc-rs.com",
   tagline: "Command output to JSON, from one static binary",
   repo: "https://github.com/OlegSotnikov/jc-rs",
+  author: "Oleg Sotnikov",
+  authorUrl: "https://oleg.is",
   jc: "https://github.com/kellyjonbrazil/jc",
   dockerHub: "https://hub.docker.com/r/appmasterio/jc-rs",
   cratesIo: "https://crates.io/crates/jc-rs",
