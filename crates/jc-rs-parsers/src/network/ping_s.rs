@@ -835,8 +835,10 @@ fn parse_bsd_line(line: &str, state: &mut PingState) -> Option<Map<String, Value
 }
 
 fn extract_re(pattern: &str, line: &str) -> Option<String> {
-    Regex::new(pattern)
-        .ok()?
+    // Called from eight sites inside the per-line loop of a streaming parser,
+    // so compiling here meant recompiling the same handful of literals for
+    // every line of input.
+    jc_rs_utils::cached_regex(pattern)?
         .captures(line)?
         .get(1)
         .map(|m| m.as_str().to_string())

@@ -9,6 +9,7 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 
 pub struct IfconfigParser;
 
@@ -97,6 +98,125 @@ fn convert_hex_mask(mask: &str) -> String {
     mask.to_string()
 }
 
+/// Every pattern `ifconfig` parsing needs, compiled once for the process.
+///
+/// These were 31 `Regex::new` calls inside `parse`, so a single invocation on a
+/// 1 KB dump spent nearly all of its time building a pattern set it then used
+/// once. Compilation cannot fail for a literal pattern, so a failure here is a
+/// bug in this file rather than something the caller can act on.
+struct IfconfigRegexes {
+    linux_iface: Regex,
+    linux_ipv4: Regex,
+    linux_ipv6: Regex,
+    linux_state: Regex,
+    linux_rx: Regex,
+    linux_tx: Regex,
+    linux_bytes: Regex,
+    linux_tx_stats: Regex,
+    openbsd_iface: Regex,
+    openbsd_ipv4: Regex,
+    openbsd_ipv6: Regex,
+    openbsd_details: Regex,
+    openbsd_rx: Regex,
+    openbsd_rx_stats: Regex,
+    openbsd_tx: Regex,
+    openbsd_tx_stats: Regex,
+    freebsd_iface: Regex,
+    freebsd_ipv4: Regex,
+    freebsd_ipv4_v2: Regex,
+    freebsd_ipv6: Regex,
+    freebsd_ether: Regex,
+    freebsd_status: Regex,
+    freebsd_nd6: Regex,
+    freebsd_options: Regex,
+    freebsd_media: Regex,
+    freebsd_hwaddr: Regex,
+    freebsd_plugged: Regex,
+    freebsd_vendor: Regex,
+    freebsd_temp_volts: Regex,
+    freebsd_lane: Regex,
+    freebsd_tx_rx_power: Regex,
+}
+
+fn rx(pattern: &str) -> Regex {
+    Regex::new(pattern).expect("ifconfig pattern is valid")
+}
+
+static RE: LazyLock<IfconfigRegexes> = LazyLock::new(|| IfconfigRegexes {
+    linux_iface: rx(
+        r"^(?P<name>[a-zA-Z0-9:._-]+)\s+Link\s+encap:(?P<type>\S+\s?\S+)(?:\s+HWaddr\s+(?P<mac_addr>[0-9A-Fa-f:?]+))?",
+    ),
+    linux_ipv4: rx(
+        r"inet\saddr:(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\s+Bcast:(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?\s+Mask:(?P<mask>(?:[0-9]{1,3}\.){3}[0-9]{1,3})",
+    ),
+    linux_ipv6: rx(r"inet6\s+addr:\s+(?P<address>[^\s/]+)/(?P<mask>[0-9]+)\s+Scope:(?P<scope>\w+)"),
+    linux_state: rx(
+        r"\s+(?P<state>(?:\w+\s)+?)(?:\s+)?MTU:(?P<mtu>[0-9]+)\s+Metric:(?P<metric>[0-9]+)",
+    ),
+    linux_rx: rx(
+        r"RX\spackets:(?P<rx_packets>[0-9]+)\s+errors:(?P<rx_errors>[0-9]+)\s+dropped:(?P<rx_dropped>[0-9]+)\s+overruns:(?P<rx_overruns>[0-9]+)\s+frame:(?P<rx_frame>[0-9]+)",
+    ),
+    linux_tx: rx(
+        r"TX\spackets:(?P<tx_packets>[0-9]+)\s+errors:(?P<tx_errors>[0-9]+)\s+dropped:(?P<tx_dropped>[0-9]+)\s+overruns:(?P<tx_overruns>[0-9]+)\s+carrier:(?P<tx_carrier>[0-9]+)",
+    ),
+    linux_bytes: rx(r"RX\sbytes:(?P<rx_bytes>\d+)\s+\([^)]*\)\s+TX\sbytes:(?P<tx_bytes>\d+)"),
+    linux_tx_stats: rx(r"collisions:(?P<tx_collisions>[0-9]+)\s+txqueuelen:[0-9]+"),
+    openbsd_iface: rx(r"(?x)^(?P<name>[a-zA-Z0-9:._-]+):\s+
+                flags=(?P<flags>[0-9]+)
+                (?:<(?P<state>[^>]*)>)?
+                \s+mtu\s+(?P<mtu>[0-9]+)"),
+    openbsd_ipv4: rx(
+        r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})\s+netmask\s+(?P<mask>(?:[0-9]{1,3}\.){3}[0-9]{1,3}|0x[0-9a-fA-F]+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
+    ),
+    openbsd_ipv6: rx(
+        r"inet6\s+(?P<address>\S+)\s+prefixlen\s+(?P<mask>[0-9]+)\s+scopeid\s+(?P<scope>[0-9a-fA-F]+x[0-9a-fA-F]+)<(?P<type>link|host|global|compat)>",
+    ),
+    openbsd_details: rx(
+        r"\S+\s+(?:(?P<mac_addr>[0-9A-Fa-f:?]+)\s+)?txqueuelen\s+[0-9]+\s+\((?P<type>[^)]+)\)",
+    ),
+    openbsd_rx: rx(r"RX\spackets\s(?P<rx_packets>[0-9]+)\s+bytes\s+(?P<rx_bytes>\d+)"),
+    openbsd_rx_stats: rx(
+        r"RX\serrors\s(?P<rx_errors>[0-9]+)\s+dropped\s+(?P<rx_dropped>[0-9]+)\s+overruns\s+(?P<rx_overruns>[0-9]+)\s+frame\s+(?P<rx_frame>[0-9]+)",
+    ),
+    openbsd_tx: rx(r"TX\spackets\s(?P<tx_packets>[0-9]+)\s+bytes\s+(?P<tx_bytes>\d+)"),
+    openbsd_tx_stats: rx(
+        r"TX\serrors\s(?P<tx_errors>[0-9]+)\s+dropped\s+(?P<tx_dropped>[0-9]+)\s+overruns\s+(?P<tx_overruns>[0-9]+)\s+carrier\s+(?P<tx_carrier>[0-9]+)\s+collisions\s+(?P<tx_collisions>[0-9]+)",
+    ),
+    freebsd_iface: rx(r"(?x)^(?P<name>[a-zA-Z0-9:._-]+):\s+
+                flags=(?P<flags>[0-9]+)
+                (?:<(?P<state>[^>]*)>)?
+                \s+metric\s+(?P<metric>[0-9]+)
+                \s+mtu\s+(?P<mtu>[0-9]+)"),
+    freebsd_ipv4: rx(
+        r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})\s+netmask\s+(?P<mask>0x[0-9a-fA-F]+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
+    ),
+    freebsd_ipv4_v2: rx(
+        r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/(?P<mask>\d+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
+    ),
+    freebsd_ipv6: rx(
+        r"inet6\s(?P<address>[^\s%]+)(?:%(?P<scope_id>\S+))?\s+prefixlen\s+(?P<mask>\d+)(?:[^\n]*\sscopeid\s+(?P<scope>0x\w+))?",
+    ),
+    freebsd_ether: rx(r"ether\s+(?P<mac_addr>[0-9A-Fa-f:]+)"),
+    freebsd_status: rx(r"status:\s+(?P<status>\w+)"),
+    freebsd_nd6: rx(r"nd6\soptions=(?P<nd6_options>\d+)<(?P<nd6_flags>[^>]+)>"),
+    freebsd_options: rx(r"options=(?P<options>[0-9a-fA-F]+)<(?P<options_flags>[^>]+)>"),
+    freebsd_media: rx(r"media:\s+(?P<media>.+?)\s+<(?P<media_flags>[^>]+)>"),
+    freebsd_hwaddr: rx(
+        r"hwaddr\s+(?P<hw_address>[0-9A-Fa-f:]+)(?:\s+media:\s+(?P<media>.+?)\s+<(?P<media_flags>[^>]+)>)?",
+    ),
+    freebsd_plugged: rx(r"plugged:\s+(?P<plugged>.+)"),
+    freebsd_vendor: rx(
+        r"vendor:\s+(?P<vendor>.+?)\s+PN:\s+(?P<vendor_pn>\S+)\s+SN:\s+(?P<vendor_sn>\S+)\s+DATE:\s+(?P<vendor_date>\S+)",
+    ),
+    freebsd_temp_volts: rx(
+        r"(?i)module\s+temperature:\s+(?P<module_temperature>.+?)\s+voltage:\s+(?P<module_voltage>.+)",
+    ),
+    freebsd_lane: rx(
+        r"lane\s+(?P<lane>\d+):\s+RX\s+power:\s+(?P<rx_power_mw>\S+)\s+mW\s+\((?P<rx_power_dbm>\S+)\s+dBm\)\s+TX\s+bias:\s+(?P<tx_bias_ma>\S+)",
+    ),
+    freebsd_tx_rx_power: rx(r"RX:\s+(?P<rx_power>.+)\s+TX:\s+(?P<tx_pwer>.+)"),
+});
+
 impl Parser for IfconfigParser {
     fn info(&self) -> &'static ParserInfo {
         &INFO
@@ -107,161 +227,38 @@ impl Parser for IfconfigParser {
             return Ok(ParseOutput::Array(vec![]));
         }
 
-        // Compile regexes
-        // Old Linux format (ubuntu-16.04 style): "ens33     Link encap:Ethernet  HWaddr 00:..."
-        // Fix: type stops before HWaddr using lookahead simulation by restricting to one word
-        let re_linux_iface = Regex::new(
-            r"^(?P<name>[a-zA-Z0-9:._-]+)\s+Link\s+encap:(?P<type>\S+\s?\S+)(?:\s+HWaddr\s+(?P<mac_addr>[0-9A-Fa-f:?]+))?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_ipv4 = Regex::new(
-            r"inet\saddr:(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})(?:\s+Bcast:(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?\s+Mask:(?P<mask>(?:[0-9]{1,3}\.){3}[0-9]{1,3})",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // Old Linux IPv6: "inet6 addr: fe80::c1ca:3dee:39f7:5937/64 Scope:Link"
-        let re_linux_ipv6 = Regex::new(
-            r"inet6\s+addr:\s+(?P<address>[^\s/]+)/(?P<mask>[0-9]+)\s+Scope:(?P<scope>\w+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_state = Regex::new(
-            r"\s+(?P<state>(?:\w+\s)+?)(?:\s+)?MTU:(?P<mtu>[0-9]+)\s+Metric:(?P<metric>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_rx = Regex::new(
-            r"RX\spackets:(?P<rx_packets>[0-9]+)\s+errors:(?P<rx_errors>[0-9]+)\s+dropped:(?P<rx_dropped>[0-9]+)\s+overruns:(?P<rx_overruns>[0-9]+)\s+frame:(?P<rx_frame>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_tx = Regex::new(
-            r"TX\spackets:(?P<tx_packets>[0-9]+)\s+errors:(?P<tx_errors>[0-9]+)\s+dropped:(?P<tx_dropped>[0-9]+)\s+overruns:(?P<tx_overruns>[0-9]+)\s+carrier:(?P<tx_carrier>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_bytes =
-            Regex::new(r"RX\sbytes:(?P<rx_bytes>\d+)\s+\([^)]*\)\s+TX\sbytes:(?P<tx_bytes>\d+)")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_linux_tx_stats =
-            Regex::new(r"collisions:(?P<tx_collisions>[0-9]+)\s+txqueuelen:[0-9]+")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // OpenBSD/modern Linux flags= style (without metric)
-        let re_openbsd_iface = Regex::new(
-            r"(?x)^(?P<name>[a-zA-Z0-9:._-]+):\s+
-            flags=(?P<flags>[0-9]+)
-            (?:<(?P<state>[^>]*)>)?
-            \s+mtu\s+(?P<mtu>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_ipv4 = Regex::new(
-            r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})\s+netmask\s+(?P<mask>(?:[0-9]{1,3}\.){3}[0-9]{1,3}|0x[0-9a-fA-F]+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // Modern Linux/Ubuntu IPv6: "inet6 ADDR prefixlen MASK scopeid 0x20<link>"
-        // Requires <type> at end to distinguish from FreeBSD format
-        let re_openbsd_ipv6 = Regex::new(
-            r"inet6\s+(?P<address>\S+)\s+prefixlen\s+(?P<mask>[0-9]+)\s+scopeid\s+(?P<scope>[0-9a-fA-F]+x[0-9a-fA-F]+)<(?P<type>link|host|global|compat)>",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_details = Regex::new(
-            r"\S+\s+(?:(?P<mac_addr>[0-9A-Fa-f:?]+)\s+)?txqueuelen\s+[0-9]+\s+\((?P<type>[^)]+)\)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_rx =
-            Regex::new(r"RX\spackets\s(?P<rx_packets>[0-9]+)\s+bytes\s+(?P<rx_bytes>\d+)")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_rx_stats = Regex::new(
-            r"RX\serrors\s(?P<rx_errors>[0-9]+)\s+dropped\s+(?P<rx_dropped>[0-9]+)\s+overruns\s+(?P<rx_overruns>[0-9]+)\s+frame\s+(?P<rx_frame>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_tx =
-            Regex::new(r"TX\spackets\s(?P<tx_packets>[0-9]+)\s+bytes\s+(?P<tx_bytes>\d+)")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_openbsd_tx_stats = Regex::new(
-            r"TX\serrors\s(?P<tx_errors>[0-9]+)\s+dropped\s+(?P<tx_dropped>[0-9]+)\s+overruns\s+(?P<tx_overruns>[0-9]+)\s+carrier\s+(?P<tx_carrier>[0-9]+)\s+collisions\s+(?P<tx_collisions>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // FreeBSD/macOS style (flags= with metric)
-        let re_freebsd_iface = Regex::new(
-            r"(?x)^(?P<name>[a-zA-Z0-9:._-]+):\s+
-            flags=(?P<flags>[0-9]+)
-            (?:<(?P<state>[^>]*)>)?
-            \s+metric\s+(?P<metric>[0-9]+)
-            \s+mtu\s+(?P<mtu>[0-9]+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_ipv4 = Regex::new(
-            r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})\s+netmask\s+(?P<mask>0x[0-9a-fA-F]+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_ipv4_v2 = Regex::new(
-            r"inet\s(?P<address>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/(?P<mask>\d+)(?:\s+broadcast\s+(?P<broadcast>(?:[0-9]{1,3}\.){3}[0-9]{1,3}))?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // FreeBSD/macOS IPv6: "inet6 ADDR%scope_id prefixlen MASK scopeid 0x1"
-        // The address may optionally have %scope_id suffix
-        let re_freebsd_ipv6 = Regex::new(
-            r"inet6\s(?P<address>[^\s%]+)(?:%(?P<scope_id>\S+))?\s+prefixlen\s+(?P<mask>\d+)(?:[^\n]*\sscopeid\s+(?P<scope>0x\w+))?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_ether = Regex::new(r"ether\s+(?P<mac_addr>[0-9A-Fa-f:]+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_status = Regex::new(r"status:\s+(?P<status>\w+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_nd6 = Regex::new(r"nd6\soptions=(?P<nd6_options>\d+)<(?P<nd6_flags>[^>]+)>")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_options =
-            Regex::new(r"options=(?P<options>[0-9a-fA-F]+)<(?P<options_flags>[^>]+)>")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_media = Regex::new(r"media:\s+(?P<media>.+?)\s+<(?P<media_flags>[^>]+)>")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        // FreeBSD extra fields
-        let re_freebsd_hwaddr = Regex::new(
-            r"hwaddr\s+(?P<hw_address>[0-9A-Fa-f:]+)(?:\s+media:\s+(?P<media>.+?)\s+<(?P<media_flags>[^>]+)>)?",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_plugged = Regex::new(r"plugged:\s+(?P<plugged>.+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_vendor = Regex::new(
-            r"vendor:\s+(?P<vendor>.+?)\s+PN:\s+(?P<vendor_pn>\S+)\s+SN:\s+(?P<vendor_sn>\S+)\s+DATE:\s+(?P<vendor_date>\S+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_temp_volts = Regex::new(
-            r"(?i)module\s+temperature:\s+(?P<module_temperature>.+?)\s+voltage:\s+(?P<module_voltage>.+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_lane = Regex::new(
-            r"lane\s+(?P<lane>\d+):\s+RX\s+power:\s+(?P<rx_power_mw>\S+)\s+mW\s+\((?P<rx_power_dbm>\S+)\s+dBm\)\s+TX\s+bias:\s+(?P<tx_bias_ma>\S+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-
-        let re_freebsd_tx_rx_power = Regex::new(r"RX:\s+(?P<rx_power>.+)\s+TX:\s+(?P<tx_pwer>.+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
+        // Bind the process-wide set; see `IfconfigRegexes`.
+        let re_linux_iface = &RE.linux_iface;
+        let re_linux_ipv4 = &RE.linux_ipv4;
+        let re_linux_ipv6 = &RE.linux_ipv6;
+        let re_linux_state = &RE.linux_state;
+        let re_linux_rx = &RE.linux_rx;
+        let re_linux_tx = &RE.linux_tx;
+        let re_linux_bytes = &RE.linux_bytes;
+        let re_linux_tx_stats = &RE.linux_tx_stats;
+        let re_openbsd_iface = &RE.openbsd_iface;
+        let re_openbsd_ipv4 = &RE.openbsd_ipv4;
+        let re_openbsd_ipv6 = &RE.openbsd_ipv6;
+        let re_openbsd_details = &RE.openbsd_details;
+        let re_openbsd_rx = &RE.openbsd_rx;
+        let re_openbsd_rx_stats = &RE.openbsd_rx_stats;
+        let re_openbsd_tx = &RE.openbsd_tx;
+        let re_openbsd_tx_stats = &RE.openbsd_tx_stats;
+        let re_freebsd_iface = &RE.freebsd_iface;
+        let re_freebsd_ipv4 = &RE.freebsd_ipv4;
+        let re_freebsd_ipv4_v2 = &RE.freebsd_ipv4_v2;
+        let re_freebsd_ipv6 = &RE.freebsd_ipv6;
+        let re_freebsd_ether = &RE.freebsd_ether;
+        let re_freebsd_status = &RE.freebsd_status;
+        let re_freebsd_nd6 = &RE.freebsd_nd6;
+        let re_freebsd_options = &RE.freebsd_options;
+        let re_freebsd_media = &RE.freebsd_media;
+        let re_freebsd_hwaddr = &RE.freebsd_hwaddr;
+        let re_freebsd_plugged = &RE.freebsd_plugged;
+        let re_freebsd_vendor = &RE.freebsd_vendor;
+        let re_freebsd_temp_volts = &RE.freebsd_temp_volts;
+        let re_freebsd_lane = &RE.freebsd_lane;
+        let re_freebsd_tx_rx_power = &RE.freebsd_tx_rx_power;
 
         let mut raw_output: Vec<Map<String, Value>> = Vec::new();
         let mut interface_item = null_iface();

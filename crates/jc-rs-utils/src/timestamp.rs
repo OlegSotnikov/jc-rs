@@ -3,10 +3,9 @@
 //! Supports 34+ datetime format strings with LRU caching and timezone normalization.
 
 use chrono::{DateTime, FixedOffset, Local, NaiveDateTime, TimeZone, Utc};
-use lru::LruCache;
+use std::borrow::Cow;
+use std::cell::RefCell;
 use std::collections::HashSet;
-use std::num::NonZeroUsize;
-use std::sync::Mutex;
 
 /// Result of a timestamp parse operation.
 #[derive(Debug, Clone, PartialEq)]
@@ -250,12 +249,41 @@ static OFFSET_SUFFIXES: &[&str] = &[
     "+09:00", "+10:00", "+10:30", "+11:00", "+12:00", "+13:00", "+13:45", "+14:00",
 ];
 
-// LRU cache: key = (input string, optional format hint), value = TimestampResult
-type TimestampCache = Mutex<LruCache<(String, &'static [&'static str]), TimestampResult>>;
-static CACHE: std::sync::OnceLock<TimestampCache> = std::sync::OnceLock::new();
+/// Memo for [`parse_timestamp`], as a direct-mapped table rather than an LRU.
+///
+/// The LRU it replaces had to own its key, so every call — hit or miss — copied
+/// the input into a fresh `String` before it could even ask the question, and
+/// took a process-wide `Mutex` twice to do it. A slot holds its own key, so a
+/// lookup compares against the caller's `&str` and allocates nothing on a hit;
+/// a collision simply evicts, which for the access pattern here (a handful of
+/// distinct stamps repeated across thousands of records) costs nothing an LRU
+/// would have saved. The table is per-thread because the function is pure:
+/// threads agreeing on the answer is all the sharing was ever buying.
+struct CacheSlot {
+    input: String,
+    hints: &'static [&'static str],
+    result: TimestampResult,
+}
 
-fn cache() -> &'static TimestampCache {
-    CACHE.get_or_init(|| Mutex::new(LruCache::new(NonZeroUsize::new(256).unwrap())))
+const CACHE_SLOTS: usize = 512;
+
+// Boxed so the table itself is 512 pointers — 4 KiB, which stays in L1 — and
+// not 512 inline slots, which at ~100 bytes each would evict on every probe.
+thread_local! {
+    static CACHE: RefCell<Vec<Option<Box<CacheSlot>>>> = const { RefCell::new(Vec::new()) };
+}
+
+/// FNV-1a over the input, mixed with the hint list's identity.
+fn cache_slot_for(input: &str, hints: &[&str]) -> usize {
+    let mut h: u64 = 0xcbf2_9ce4_8422_2325 ^ (hints.len() as u64);
+    if let Some(first) = hints.first() {
+        h ^= first.len() as u64;
+    }
+    for &b in input.as_bytes() {
+        h ^= b as u64;
+        h = h.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    (h as usize) % CACHE_SLOTS
 }
 
 /// Static HashSet of non-UTC timezone abbreviations, built once and reused.
@@ -270,6 +298,35 @@ fn subsecond_re() -> &'static regex::Regex {
     RE.get_or_init(|| regex::Regex::new(r"(:\d{2}:\d{2}\.\d{6})\d+").unwrap())
 }
 
+/// True when `s.split_whitespace().collect::<Vec<_>>().join(" ")` would hand
+/// back `s` unchanged: ASCII, no leading or trailing space, no runs, no tabs.
+///
+/// Non-ASCII input answers `false` rather than reason about Unicode
+/// `White_Space`, since a datetime string is never non-ASCII in practice.
+fn is_single_spaced(s: &str) -> bool {
+    if !s.is_ascii() {
+        return false;
+    }
+    let bytes = s.as_bytes();
+    if bytes.first().is_some_and(u8::is_ascii_whitespace)
+        || bytes.last().is_some_and(u8::is_ascii_whitespace)
+    {
+        return false;
+    }
+    let mut prev_space = false;
+    for &c in bytes {
+        if c.is_ascii_whitespace() {
+            if c != b' ' || prev_space {
+                return false;
+            }
+            prev_space = true;
+        } else {
+            prev_space = false;
+        }
+    }
+    true
+}
+
 /// Normalize an input datetime string following jc's algorithm:
 /// - Replace "Coordinated Universal Time" → "UTC"
 /// - Replace "Z" → "UTC" (for ISO-8601 Zulu)
@@ -279,11 +336,20 @@ fn subsecond_re() -> &'static regex::Regex {
 /// - Normalize >6 digit subseconds to 6 digits
 /// - Returns (normalized_string, utc_tz: bool)
 fn normalize_datetime_str(input: &str) -> (String, bool) {
-    let mut data = input.to_string();
+    // Each step rewrites the string only when it has something to rewrite. A
+    // typical stamp matches none of them, and used to pay eight allocations to
+    // discover that.
+    let mut data: Cow<'_, str> = Cow::Borrowed(input);
 
-    data = data.replace("Coordinated Universal Time", "UTC");
-    data = data.replace('Z', "UTC");
-    data = data.replace("GMT", "UTC");
+    if data.contains("Coordinated Universal Time") {
+        data = Cow::Owned(data.replace("Coordinated Universal Time", "UTC"));
+    }
+    if data.contains('Z') {
+        data = Cow::Owned(data.replace('Z', "UTC"));
+    }
+    if data.contains("GMT") {
+        data = Cow::Owned(data.replace("GMT", "UTC"));
+    }
 
     let utc_tz = if data.contains("UTC") {
         if data.contains("UTC+") || data.contains("UTC-") {
@@ -299,35 +365,60 @@ fn normalize_datetime_str(input: &str) -> (String, bool) {
     };
 
     // Fix +00:00 for parsing
-    data = data.replace("+00:00", "+0000");
+    if data.contains("+00:00") {
+        data = Cow::Owned(data.replace("+00:00", "+0000"));
+    }
 
     // Remove parentheses
-    data = data.replace(['(', ')'], "");
+    if data.contains(['(', ')']) {
+        data = Cow::Owned(data.replace(['(', ')'], ""));
+    }
 
     // Strip non-UTC timezone abbreviations from tokens.
     // Use the lazily-initialized static HashSet to avoid re-building it on every call.
     {
         let set = tz_abbr_set();
-        let filtered: Vec<&str> = data
-            .split_whitespace()
-            .filter(|t| !set.contains(*t))
-            .collect();
-        data = filtered.join(" ");
+        // The split/join only has to happen when a token is actually going to
+        // be dropped, or when the whitespace itself needs normalising — which
+        // for a datetime string is neither, nearly always.
+        let needs_rebuild =
+            !is_single_spaced(&data) || data.split_whitespace().any(|t| set.contains(t));
+        if needs_rebuild {
+            let filtered: Vec<&str> = data
+                .split_whitespace()
+                .filter(|t| !set.contains(*t))
+                .collect();
+            data = Cow::Owned(filtered.join(" "));
+        }
     }
 
     // Strip non-UTC offset suffixes from end
     for suffix in OFFSET_SUFFIXES {
         if data.ends_with(suffix) {
-            data = data[..data.len() - suffix.len()].trim_end().to_string();
+            let cut = data.len() - suffix.len();
+            data = Cow::Owned(data[..cut].trim_end().to_string());
             break;
         }
     }
 
     // Normalize subseconds > 6 digits to 6 digits.
     // Use the lazily-initialized static compiled regex to avoid recompiling.
-    data = subsecond_re().replace(&data, "$1").to_string();
+    if let Cow::Owned(replaced) = subsecond_re().replace(&data, "$1") {
+        data = Cow::Owned(replaced);
+    }
 
-    (data.trim().to_string(), utc_tz)
+    match data {
+        // The final `trim` is almost always a no-op, and when the string is
+        // already owned there is no reason to copy it a ninth time.
+        Cow::Owned(mut s) => {
+            let trimmed = s.trim();
+            if trimmed.len() != s.len() {
+                s = trimmed.to_string();
+            }
+            (s, utc_tz)
+        }
+        Cow::Borrowed(s) => (s.trim().to_string(), utc_tz),
+    }
 }
 
 /// Try to parse a naive datetime from a string using the given format.
@@ -370,21 +461,34 @@ fn try_parse_aware(s: &str, fmt: &str) -> Option<DateTime<FixedOffset>> {
 ///
 /// `format_hint`: an optional format string to try first.
 pub fn parse_timestamp(input: &str, hints: &'static [&'static str]) -> TimestampResult {
-    let cache_key = (input.to_string(), hints);
+    let slot = cache_slot_for(input, hints);
 
-    // Check cache
-    if let Ok(mut c) = cache().lock()
-        && let Some(cached) = c.get(&cache_key)
-    {
-        return cached.clone();
+    let hit = CACHE.with(|c| {
+        let mut table = c.borrow_mut();
+        if table.is_empty() {
+            table.resize_with(CACHE_SLOTS, || None);
+        }
+        match &table[slot] {
+            Some(entry) if entry.input == input && entry.hints == hints => {
+                Some(entry.result.clone())
+            }
+            _ => None,
+        }
+    });
+    if let Some(result) = hit {
+        return result;
     }
 
     let result = do_parse(input, hints);
 
-    // Store in cache
-    if let Ok(mut c) = cache().lock() {
-        c.put(cache_key, result.clone());
-    }
+    CACHE.with(|c| {
+        let mut table = c.borrow_mut();
+        table[slot] = Some(Box::new(CacheSlot {
+            input: input.to_string(),
+            hints,
+            result: result.clone(),
+        }));
+    });
 
     result
 }
@@ -395,9 +499,9 @@ fn do_parse(input: &str, hints: &[&str]) -> TimestampResult {
     // Hinted formats first, then the rest in jc's order. Without a hint every
     // parse walks the whole table until something sticks, which for a format
     // near the end of the list is ~30 failed strptime attempts per record.
-    let mut fmt_list: Vec<&str> = Vec::with_capacity(FORMATS.len());
-    fmt_list.extend_from_slice(hints);
-    fmt_list.extend(
+    // Chained lazily: the list was materialised into a `Vec` on every call, and
+    // the first candidate is the right one whenever a hint was given.
+    let fmt_list = hints.iter().copied().chain(
         FORMATS
             .iter()
             .map(|entry| entry.fmt)
@@ -408,7 +512,7 @@ fn do_parse(input: &str, hints: &[&str]) -> TimestampResult {
     let mut utc_epoch: Option<i64> = None;
     let mut iso: Option<String> = None;
 
-    for fmt in &fmt_list {
+    for fmt in fmt_list {
         // Try aware parse first (handles %z, %Z with UTC)
         if let Some(dt_aware) = try_parse_aware(&normalized, fmt) {
             // jc computes the naive stamp as `dt.replace(tzinfo=None).timestamp()`:

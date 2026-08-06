@@ -7,6 +7,13 @@ use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use jc_rs_utils::sparse_table_parse;
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process rather than rebuilt on each invocation.
+static RE_LOGIN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"([A-Z][a-z]{2}\s+\d{1,2}\s+)(\d\d:\d\d|\d{4})(\s?.+)?$")
+        .expect("RE_LOGIN is a valid pattern")
+});
 
 pub struct FingerParser;
 
@@ -80,8 +87,7 @@ impl Parser for FingerParser {
 
         // Regex to extract login time and optional details from second half
         // Pattern: month_abbr whitespace day_num whitespace (HH:MM|YYYY) optional_rest
-        let login_re = Regex::new(r"([A-Z][a-z]{2}\s+\d{1,2}\s+)(\d\d:\d\d|\d{4})(\s?.+)?$")
-            .map_err(|e| ParseError::Generic(e.to_string()))?;
+        let login_re = &*RE_LOGIN;
 
         // Process each data row (skip header row from second_halves)
         let second_halves_data = &second_halves[1..];

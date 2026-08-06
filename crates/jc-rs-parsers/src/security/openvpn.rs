@@ -8,6 +8,13 @@ use regex::Regex;
 use serde_json::{Map, Value};
 use std::sync::LazyLock;
 
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_MAC_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$").expect("RE_MAC_RE is a valid pattern")
+});
+
 pub struct OpenvpnParser;
 
 static INFO: ParserInfo = ParserInfo {
@@ -36,7 +43,7 @@ inventory::submit! {
 /// "22:1d:63:bf:62:38" (MAC), "10.10.10.10" (no port/prefix)
 fn split_addr(addr_str: &str) -> (String, Option<String>, Option<String>) {
     // Check for MAC address pattern
-    let mac_re = Regex::new(r"^(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$").unwrap();
+    let mac_re = &*RE_MAC_RE;
     if mac_re.is_match(addr_str) {
         return (addr_str.to_string(), None, None);
     }

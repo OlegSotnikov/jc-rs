@@ -53,8 +53,17 @@ pub(crate) fn detect_delimiter(input: &str) -> u8 {
 /// Some CSV files have spaces between the delimiter and the quote, so we
 /// normalize those by stripping leading whitespace from unquoted fields only.
 pub(crate) fn normalize_csv_line(line: &str, delimiter: u8) -> String {
-    let delim_char = delimiter as char;
     let mut result = String::with_capacity(line.len());
+    normalize_csv_line_into(line, delimiter, &mut result);
+    result
+}
+
+/// Append the normalized form of `line` to `out`.
+///
+/// Splitting this out lets a whole file be normalized into one buffer instead
+/// of a `String` per line plus a `join` that copies every one of them again.
+fn normalize_csv_line_into(line: &str, delimiter: u8, out: &mut String) {
+    let delim_char = delimiter as char;
     let mut in_quotes = false;
     let mut field_start = true;
 
@@ -62,19 +71,18 @@ pub(crate) fn normalize_csv_line(line: &str, delimiter: u8) -> String {
         if ch == '"' {
             in_quotes = !in_quotes;
             field_start = false;
-            result.push(ch);
+            out.push(ch);
         } else if ch == delim_char && !in_quotes {
-            result.push(ch);
+            out.push(ch);
             field_start = true;
         } else if field_start && ch == ' ' {
             // Skip leading whitespace in unquoted fields
             continue;
         } else {
             field_start = false;
-            result.push(ch);
+            out.push(ch);
         }
     }
-    result
 }
 
 pub fn parse_csv_input(
@@ -88,12 +96,18 @@ pub fn parse_csv_input(
 
     let delimiter = detect_delimiter(input);
 
-    // Normalize lines so quoted fields start immediately after delimiter
-    let normalized: String = input
-        .lines()
-        .map(|line| normalize_csv_line(line, delimiter))
-        .collect::<Vec<_>>()
-        .join("\n");
+    // Normalize lines so quoted fields start immediately after delimiter.
+    // One buffer for the whole file: normalizing into a `Vec<String>` and
+    // joining it allocated twice per line and copied the file a second time.
+    let mut normalized = String::with_capacity(input.len());
+    let mut first_line = true;
+    for line in input.lines() {
+        if !first_line {
+            normalized.push('\n');
+        }
+        first_line = false;
+        normalize_csv_line_into(line, delimiter, &mut normalized);
+    }
 
     let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
@@ -110,8 +124,16 @@ pub fn parse_csv_input(
 
     let mut rows = Vec::new();
 
-    for result in rdr.records() {
-        let record = result.map_err(|e| ParseError::Generic(format!("CSV record error: {e}")))?;
+    // One record buffer, refilled per row. `rdr.records()` hands back a freshly
+    // allocated `StringRecord` every iteration and drops the last one.
+    let mut record = csv::StringRecord::new();
+    loop {
+        let more = rdr
+            .read_record(&mut record)
+            .map_err(|e| ParseError::Generic(format!("CSV record error: {e}")))?;
+        if !more {
+            break;
+        }
         let mut map = serde_json::Map::new();
         for (i, field) in record.iter().enumerate() {
             let key = headers.get(i).cloned().unwrap_or_else(|| format!("col{i}"));

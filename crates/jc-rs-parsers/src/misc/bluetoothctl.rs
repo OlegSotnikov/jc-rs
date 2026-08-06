@@ -6,6 +6,63 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_HEAD_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^Controller (?P<address>([0-9A-F]{2}:){5}[0-9A-F]{2}) (?P<name>.+)$")
+        .expect("RE_HEAD_RE is a valid pattern")
+});
+static RE_LINE_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?x)
+        ^\s*Manufacturer:\s*(?P<manufacturer>.+)
+        |^\s*Version:\s*(?P<version>.+)
+        |^\s*Name:\s*(?P<name>.+)
+        |^\s*Alias:\s*(?P<alias>.+)
+        |^\s*Class:\s*(?P<class>.+)
+        |^\s*Powered:\s*(?P<powered>.+)
+        |^\s*PowerState:\s*(?P<power_state>.+)
+        |^\s*Discoverable:\s*(?P<discoverable>.+)
+        |^\s*DiscoverableTimeout:\s*(?P<discoverable_timeout>.+)
+        |^\s*Pairable:\s*(?P<pairable>.+)
+        |^\s*Modalias:\s*(?P<modalias>.+)
+        |^\s*Discovering:\s*(?P<discovering>.+)
+        |^\s*UUID:\s*(?P<uuid>.+)
+        ",
+    )
+    .expect("RE_LINE_RE is a valid pattern")
+});
+static RE_HEAD_RE2: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^Device (?P<address>([0-9A-F]{2}:){5}[0-9A-F]{2}) (?P<name>.+)$")
+        .expect("RE_HEAD_RE2 is a valid pattern")
+});
+static RE_LINE_RE2: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?x)
+        ^\s*Name:\s*(?P<name>.+)
+        |^\s*Alias:\s*(?P<alias>.+)
+        |^\s*Appearance:\s*(?P<appearance>.+)
+        |^\s*Class:\s*(?P<class>.+)
+        |^\s*Icon:\s*(?P<icon>.+)
+        |^\s*Paired:\s*(?P<paired>.+)
+        |^\s*Bonded:\s*(?P<bonded>.+)
+        |^\s*Trusted:\s*(?P<trusted>.+)
+        |^\s*Blocked:\s*(?P<blocked>.+)
+        |^\s*Connected:\s*(?P<connected>.+)
+        |^\s*LegacyPairing:\s*(?P<legacy_pairing>.+)
+        |^\s*Modalias:\s*(?P<modalias>.+)
+        |^\s*RSSI:\s*(?P<rssi>.+)
+        |^\s*TxPower:\s*(?P<txpower>.+)
+        |^\s*Battery\s+Percentage:\s*0[xX][0-9a-fA-F]*\s*\((?P<battery_percentage>[0-9]+)\)
+        |^\s*UUID:\s*(?P<uuid>.+)
+        |^\s*CablePairing:\s*(?P<cable_pairing>.+)
+        ",
+    )
+    .expect("RE_LINE_RE2 is a valid pattern")
+});
 
 pub struct BluetoothctlParser;
 
@@ -34,8 +91,7 @@ inventory::submit! {
 fn parse_controller(lines: &mut Vec<&str>) -> Option<Map<String, Value>> {
     let first = lines.pop()?;
 
-    let head_re =
-        Regex::new(r"^Controller (?P<address>([0-9A-F]{2}:){5}[0-9A-F]{2}) (?P<name>.+)$").ok()?;
+    let head_re = &*RE_HEAD_RE;
 
     let caps = head_re.captures(first)?;
     let address = caps.name("address").map_or("", |m| m.as_str()).to_string();
@@ -79,24 +135,7 @@ fn parse_controller(lines: &mut Vec<&str>) -> Option<Map<String, Value>> {
     }
     ctrl.insert("name".to_string(), Value::String(name));
 
-    let line_re = Regex::new(
-        r"(?x)
-        ^\s*Manufacturer:\s*(?P<manufacturer>.+)
-        |^\s*Version:\s*(?P<version>.+)
-        |^\s*Name:\s*(?P<name>.+)
-        |^\s*Alias:\s*(?P<alias>.+)
-        |^\s*Class:\s*(?P<class>.+)
-        |^\s*Powered:\s*(?P<powered>.+)
-        |^\s*PowerState:\s*(?P<power_state>.+)
-        |^\s*Discoverable:\s*(?P<discoverable>.+)
-        |^\s*DiscoverableTimeout:\s*(?P<discoverable_timeout>.+)
-        |^\s*Pairable:\s*(?P<pairable>.+)
-        |^\s*Modalias:\s*(?P<modalias>.+)
-        |^\s*Discovering:\s*(?P<discovering>.+)
-        |^\s*UUID:\s*(?P<uuid>.+)
-        ",
-    )
-    .ok()?;
+    let line_re = &*RE_LINE_RE;
 
     while let Some(line) = lines.last() {
         if let Some(caps) = line_re.captures(line) {
@@ -165,8 +204,7 @@ fn parse_controller(lines: &mut Vec<&str>) -> Option<Map<String, Value>> {
 fn parse_device(lines: &mut Vec<&str>, quiet: bool) -> Option<Map<String, Value>> {
     let first = lines.pop()?;
 
-    let head_re =
-        Regex::new(r"^Device (?P<address>([0-9A-F]{2}:){5}[0-9A-F]{2}) (?P<name>.+)$").ok()?;
+    let head_re = &*RE_HEAD_RE2;
 
     let caps = head_re.captures(first)?;
     let address = caps.name("address").map_or("", |m| m.as_str()).to_string();
@@ -207,28 +245,7 @@ fn parse_device(lines: &mut Vec<&str>, quiet: bool) -> Option<Map<String, Value>
     }
     dev.insert("name".to_string(), Value::String(name));
 
-    let line_re = Regex::new(
-        r"(?x)
-        ^\s*Name:\s*(?P<name>.+)
-        |^\s*Alias:\s*(?P<alias>.+)
-        |^\s*Appearance:\s*(?P<appearance>.+)
-        |^\s*Class:\s*(?P<class>.+)
-        |^\s*Icon:\s*(?P<icon>.+)
-        |^\s*Paired:\s*(?P<paired>.+)
-        |^\s*Bonded:\s*(?P<bonded>.+)
-        |^\s*Trusted:\s*(?P<trusted>.+)
-        |^\s*Blocked:\s*(?P<blocked>.+)
-        |^\s*Connected:\s*(?P<connected>.+)
-        |^\s*LegacyPairing:\s*(?P<legacy_pairing>.+)
-        |^\s*Modalias:\s*(?P<modalias>.+)
-        |^\s*RSSI:\s*(?P<rssi>.+)
-        |^\s*TxPower:\s*(?P<txpower>.+)
-        |^\s*Battery\s+Percentage:\s*0[xX][0-9a-fA-F]*\s*\((?P<battery_percentage>[0-9]+)\)
-        |^\s*UUID:\s*(?P<uuid>.+)
-        |^\s*CablePairing:\s*(?P<cable_pairing>.+)
-        ",
-    )
-    .ok()?;
+    let line_re = &*RE_LINE_RE2;
 
     while let Some(line) = lines.last() {
         if let Some(caps) = line_re.captures(line) {

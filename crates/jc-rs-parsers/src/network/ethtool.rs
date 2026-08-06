@@ -4,7 +4,21 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
+use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_DEGREES_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?P<deg_c>.*?) degrees C / (?P<deg_f>.*?) degrees F")
+        .expect("RE_DEGREES_RE is a valid pattern")
+});
+static RE_POWER_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?P<pow_mw>.*?) mW / (?P<pow_dbm>.*?) dBm")
+        .expect("RE_POWER_RE is a valid pattern")
+});
 
 pub struct EthtoolParser;
 
@@ -286,9 +300,8 @@ fn process(obj: &mut Map<String, Value>) {
     }
 
     // Convert unit values (degrees, power, voltage, current)
-    let degrees_re =
-        regex::Regex::new(r"(?P<deg_c>.*?) degrees C / (?P<deg_f>.*?) degrees F").unwrap();
-    let power_re = regex::Regex::new(r"(?P<pow_mw>.*?) mW / (?P<pow_dbm>.*?) dBm").unwrap();
+    let degrees_re = &*RE_DEGREES_RE;
+    let power_re = &*RE_POWER_RE;
 
     let keys: Vec<String> = obj.keys().cloned().collect();
     for key in keys {

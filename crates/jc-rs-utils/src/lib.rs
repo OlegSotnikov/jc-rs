@@ -1,6 +1,7 @@
 pub mod convert;
 pub mod line_slice;
 pub mod normalize;
+pub mod regex_cache;
 pub mod table;
 pub mod timestamp;
 
@@ -10,5 +11,6 @@ pub use convert::{
     has_data, input_type_check, normalize_key, remove_quotes, warning_message,
 };
 pub use line_slice::slice_lines;
+pub use regex_cache::cached_regex;
 pub use table::{simple_table_parse, sparse_table_parse};
 pub use timestamp::{TimestampResult, parse_timestamp};

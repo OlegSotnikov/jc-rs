@@ -6,6 +6,14 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"\("([^"]+)",pid=(\d+),fd=(\d+)\)"#).expect("RE_RE is a valid pattern")
+});
 
 pub struct SsParser;
 
@@ -261,7 +269,7 @@ fn parse_opts(opts_str: &str) -> Map<String, Value> {
 fn parse_users_opts(val: &str) -> Map<String, Value> {
     let mut result = Map::new();
     // Match each ("name",pid=N,fd=M) pattern
-    let re = Regex::new(r#"\("([^"]+)",pid=(\d+),fd=(\d+)\)"#).unwrap();
+    let re = &*RE_RE;
     for cap in re.captures_iter(val) {
         let user = cap.get(1).map(|m| m.as_str()).unwrap_or("");
         let pid = cap.get(2).map(|m| m.as_str()).unwrap_or("");

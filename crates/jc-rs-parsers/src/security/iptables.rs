@@ -6,6 +6,17 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_CHAIN_PKT_BYT_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"\s\(policy\s(?P<policy_name>.+)\s(?P<packets>.+)\spackets,\s(?P<bytes>.+)\sbytes\)",
+    )
+    .expect("RE_CHAIN_PKT_BYT_RE is a valid pattern")
+});
 
 pub struct IptablesParser;
 
@@ -95,10 +106,7 @@ impl Parser for IptablesParser {
         }
 
         // Regex for: " (policy NAME packets, bytes)"
-        let chain_pkt_byt_re = Regex::new(
-            r"\s\(policy\s(?P<policy_name>.+)\s(?P<packets>.+)\spackets,\s(?P<bytes>.+)\sbytes\)",
-        )
-        .unwrap();
+        let chain_pkt_byt_re = &*RE_CHAIN_PKT_BYT_RE;
 
         let mut raw_output: Vec<Map<String, Value>> = Vec::new();
         let mut chain: Option<Map<String, Value>> = None;

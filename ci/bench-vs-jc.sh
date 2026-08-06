@@ -38,29 +38,35 @@ with open(f"{work}/rows.csv", "w") as f:
         f.write(f"{i},{i * 2},value{i},other{i}\n")
 PY
 
-median() {
-  local runs="$1"; shift
-  local times=()
+# Fastest of N runs, not the median. Every run competes with whatever else the
+# machine is doing, so slow runs measure the load and only the fastest measures
+# the program. The median moves with the background; the minimum reproduces.
+fastest() {
+  local runs="$1" input="$2"; shift 2
+  local best='' start end ms
   for _ in $(seq "$runs"); do
-    local start end
     start=$(date +%s%N)
-    "$@" > /dev/null 2>&1
+    if [ -n "$input" ]; then
+      "$@" < "$input" > /dev/null 2>&1
+    else
+      "$@" > /dev/null 2>&1
+    fi
     end=$(date +%s%N)
-    times+=($(( (end - start) / 1000000 )))
+    ms=$(( (end - start) / 1000000 ))
+    if [ -z "$best" ] || [ "$ms" -lt "$best" ]; then best="$ms"; fi
   done
-  printf '%s\n' "${times[@]}" | sort -n | sed -n "$(( runs / 2 + 1 ))p"
+  echo "$best"
 }
 
+# Both sides are invoked identically: same wrapper, same redirection, same
+# number of processes. An earlier version ran the rows that take input through
+# an extra `bash -c` and the cold-start row without one, which charged every
+# other row for a shell it never needed.
 row() {
   local label="$1" runs="$2" args="$3" input="${4:-}"
   local jc_ms rs_ms
-  if [ -n "$input" ]; then
-    jc_ms=$(median "$runs" bash -c "PYTHONPATH=jc python3 -m jc $args < $input")
-    rs_ms=$(median "$runs" bash -c "$BIN $args < $input")
-  else
-    jc_ms=$(median "$runs" env PYTHONPATH=jc python3 -m jc "$args")
-    rs_ms=$(median "$runs" "$BIN" "$args")
-  fi
+  jc_ms=$(fastest "$runs" "$input" env PYTHONPATH=jc python3 -m jc "$args")
+  rs_ms=$(fastest "$runs" "$input" "$BIN" "$args")
   printf '| %-36s | %5s ms | %5s ms | **%sx** |\n' \
     "$label" "$jc_ms" "$rs_ms" \
     "$(python3 -c "print(f'{$jc_ms / max($rs_ms, 1):.1f}')")"
@@ -68,8 +74,13 @@ row() {
 
 echo "| Scenario | jc | jc-rs | Speedup |"
 echo "|---|---|---|---|"
-row 'Cold start (`-v`)'                 11 -v
+row 'Cold start (`-v`)'                 15 -v
 row '`ps aux`, 110 lines'               11 --ps            tests/fixtures/centos-7.7/ps-axu.out
+# Two small inputs whose cost is per-record rather than per-byte: both sides
+# carry a large pattern set here, so the row says something the throughput
+# rows do not.
+row '`traceroute`, 1.5 KB'              11 --traceroute    tests/fixtures/generic/traceroute1.out
+row '`ifconfig`, 1.3 KB'                11 --ifconfig      tests/fixtures/centos-7.7/ifconfig.out
 row '`clf`, 10,000 log lines'            7 --clf           "$WORK/big.clf"
 row '`csv`, 10,000 rows'                 7 --csv           "$WORK/rows.csv"
 row '`pkg-index-deb`, 1.5 MB'            5 --pkg-index-deb tests/fixtures/generic/pkg-index-deb.out

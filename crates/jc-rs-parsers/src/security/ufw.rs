@@ -6,6 +6,25 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_RE_LINE_NUM: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\[[ 0-9]+\]\s").expect("RE_RE_LINE_NUM is a valid pattern"));
+static RE_RE_COMMENT: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"#.+$").expect("RE_RE_COMMENT is a valid pattern"));
+static RE_RE_LOG: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\(log\)").expect("RE_RE_LOG is a valid pattern"));
+static RE_RE_V6: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\(v6\)").expect("RE_RE_V6 is a valid pattern"));
+static RE_TRANSPORT_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"/(tcp|udp|ah|esp|gre|ipv6|igmp)\s*$").expect("RE_TRANSPORT_RE is a valid pattern")
+});
+static RE_ACTION_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(ALLOW IN|ALLOW OUT|ALLOW FWD|DENY IN|DENY OUT|DENY FWD|LIMIT IN|LIMIT OUT|LIMIT FWD|REJECT IN|REJECT OUT|REJECT FWD|ALLOW|DENY|LIMIT|REJECT)").expect("RE_ACTION_RE is a valid pattern")
+});
 
 pub struct UfwParser;
 
@@ -38,7 +57,7 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
 
     // Extract rule index for "to" direction: "[ 1] ..."
     if direction == "to" {
-        let re_line_num = Regex::new(r"\[[ 0-9]+\]\s").unwrap();
+        let re_line_num = &*RE_RE_LINE_NUM;
         if let Some(m) = re_line_num.find(&linedata) {
             let num_str = &linedata[m.start()..m.end()];
             let num = num_str
@@ -56,7 +75,7 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
 
     // Extract comment for "from" direction
     if direction == "from" {
-        let re_comment = Regex::new(r"#.+$").unwrap();
+        let re_comment = &*RE_RE_COMMENT;
         if let Some(m) = re_comment.find(&linedata) {
             let comment = linedata[m.start()..]
                 .trim_start_matches('#')
@@ -72,7 +91,7 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
     // Pull `(log)`. It can appear on either side of the rule and has to come
     // out of the line before the address is read, or it ends up parsed as the
     // service name.
-    let re_log = Regex::new(r"\(log\)").unwrap();
+    let re_log = &*RE_RE_LOG;
     if re_log.is_match(&linedata) {
         rule_obj.insert("log".to_string(), Value::Bool(true));
         linedata = re_log.replace_all(&linedata, "").to_string();
@@ -81,7 +100,7 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
     }
 
     // Detect IPv6
-    let re_v6 = Regex::new(r"\(v6\)").unwrap();
+    let re_v6 = &*RE_RE_V6;
     if re_v6.is_match(&linedata) {
         rule_obj.insert(
             "network_protocol".to_string(),
@@ -138,7 +157,7 @@ fn parse_to_from(linedata: &str, direction: &str, rule_obj: &mut Map<String, Val
     }
 
     // Extract transport: split on '/' at end
-    let transport_re = Regex::new(r"/(tcp|udp|ah|esp|gre|ipv6|igmp)\s*$").unwrap();
+    let transport_re = &*RE_TRANSPORT_RE;
     let transport = if let Some(caps) = transport_re.captures(&linedata) {
         let t = caps[1].to_string();
         linedata = transport_re.replace(&linedata, "").to_string();
@@ -365,9 +384,7 @@ impl Parser for UfwParser {
         let mut rule_lines = false;
 
         // Regex for splitting on action keywords
-        let action_re = Regex::new(
-            r"(ALLOW IN|ALLOW OUT|ALLOW FWD|DENY IN|DENY OUT|DENY FWD|LIMIT IN|LIMIT OUT|LIMIT FWD|REJECT IN|REJECT OUT|REJECT FWD|ALLOW|DENY|LIMIT|REJECT)",
-        ).unwrap();
+        let action_re = &*RE_ACTION_RE;
 
         for line in input.lines() {
             if line.trim().is_empty() {

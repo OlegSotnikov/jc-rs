@@ -129,6 +129,17 @@ the number to move, and update the CI floor.
   `crates/jc-rs/tests/streaming.rs` covers what the differential structurally
   cannot: its fixtures are arrays and its input ends immediately, so a parser
   that buffers to EOF scores identically to one that streams.
+- **`ifconfig` pays 10 ms before it reads anything.** Every pattern a parser
+  needs is now compiled once per process rather than once per call, which is
+  worth 65× to 129× per parse for `ifconfig` and `iwconfig` — but a CLI parses
+  once, so single-shot runs saw none of it. `ifconfig` holds 31 patterns and
+  applies all 23 of the detail ones to every line, so nothing is skippable and
+  a 3-line input costs exactly what a full dump does. Cutting it means
+  detecting the platform from the interface line first and only then touching
+  that family's patterns. Parsers whose patterns were rebuilt *per record*
+  (`traceroute`, `ufw`, `ping`) did gain end-to-end: 2× to 4×.
+  `jc_rs_utils::cached_regex` exists for the case a pattern arrives as an
+  argument and cannot be a `static`.
 
 `tests/differential/report.json` has every failing case with paths and diffs.
 
