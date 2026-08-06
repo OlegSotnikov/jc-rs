@@ -6,6 +6,7 @@ import summary from "@/data/summary.json";
 const NAV = [
   { href: "/parsers", label: "Parsers" },
   { href: "/compatibility", label: "Compatibility" },
+  { href: "/compare", label: "Compare" },
   { href: "/install", label: "Install" },
 ];
 

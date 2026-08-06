@@ -18,8 +18,8 @@ export default function ParsersIndex() {
       </p>
       <h1 className="mt-3 text-4xl">{summary.documented} parsers</h1>
       <p className="mt-4 max-w-2xl text-lg text-[var(--color-muted)]">
-        Grouped the way the crate is: by domain. {summary.withCoverage} of them are covered by
-        jc&apos;s fixture corpus, {summary.streaming} stream line by line, and{" "}
+        Grouped the way the crate is: by domain. {summary.withCoverage} are covered by the
+        reference fixture corpus, {summary.streaming} stream line by line, and{" "}
         {summary.withExample} carry a worked example on their page.
       </p>
 

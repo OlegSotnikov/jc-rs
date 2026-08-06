@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.origin}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${site.origin}/parsers`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${site.origin}/compatibility`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${site.origin}/compare`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.origin}/install`, changeFrequency: "monthly", priority: 0.8 },
   ];
 

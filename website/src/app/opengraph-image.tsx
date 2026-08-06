@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import summary from "@/data/summary.json";
 
-export const alt = `jc-rs — ${summary.matchRate}% compatible with jc ${summary.jcVersion}`;
+export const alt = `jc-rs — ${summary.documented} parsers in one static binary`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -36,14 +36,14 @@ export default function OpengraphImage() {
               {summary.matchRate}%
             </span>
             <span style={{ fontSize: 34, color: "#7aa2f7", paddingBottom: 22 }}>
-              of jc {summary.jcVersion}
+              verified
             </span>
           </div>
           <div style={{ display: "flex", height: 6, marginTop: 34, background: "#212936" }}>
             <div style={{ width: "100%", background: "#6ed3a3" }} />
           </div>
           <span style={{ fontSize: 32, color: "#97a3b6", marginTop: 28 }}>
-            {summary.matched} of {summary.tested} fixture pairs, byte for byte
+            {summary.matched} of {summary.tested} reference fixture pairs, byte for byte
           </span>
         </div>
 

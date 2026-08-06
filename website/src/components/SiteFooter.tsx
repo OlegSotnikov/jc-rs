@@ -8,11 +8,12 @@ const COLUMNS = [
     links: [
       { href: "/parsers", label: `All ${summary.documented} parsers` },
       { href: "/compatibility", label: "How the number is measured" },
+      { href: "/compare", label: "Compared with jc" },
       { href: "/install", label: "Install" },
     ],
   },
   {
-    title: "Packages",
+    title: "Get it",
     links: [
       { href: site.cratesIo, label: "crates.io" },
       { href: site.npm, label: "npm, WebAssembly" },
@@ -21,11 +22,11 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Upstream",
+    title: "Project",
     links: [
-      { href: site.jc, label: "jc, the schema authority" },
-      { href: site.cj, label: "cj, the code this forked" },
       { href: site.repo, label: "Source" },
+      { href: `${site.repo}/issues`, label: "Issues" },
+      { href: `${site.repo}/releases`, label: "Changelog" },
     ],
   },
 ];
@@ -39,8 +40,8 @@ export function SiteFooter() {
             jc<span className="text-[var(--color-key)]">-rs</span>
           </p>
           <p className="mt-2 max-w-56 text-sm text-[var(--color-muted)]">
-            {summary.matchRate}% of jc {summary.jcVersion}&apos;s fixture corpus, measured on
-            every commit.
+            {summary.documented} parsers in one static binary. Verified against the full
+            reference corpus on every commit.
           </p>
         </div>
 
@@ -76,8 +77,11 @@ export function SiteFooter() {
 
       <div className="border-t">
         <p className="mx-auto max-w-6xl px-5 py-5 text-xs text-[var(--color-faint)]">
-          MIT. jc-rs emits the JSON schemas defined by jc (Kelly Brazil).
-          jc-rs invents no schemas: where jc-rs and jc disagree, jc-rs has the bug.
+          MIT. jc-rs emits the JSON schemas defined by{" "}
+          <a href={site.jc} className="underline-offset-4 hover:underline">
+            jc
+          </a>
+          , the original Python tool, so anything already reading that JSON keeps working.
         </p>
       </div>
     </footer>
