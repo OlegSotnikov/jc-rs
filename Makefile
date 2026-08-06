@@ -80,6 +80,21 @@ wasm: ## build the npm package into crates/jc-rs-wasm/pkg (needs wasm-pack)
 bench-vs-jc: build submodule ## time jc-rs against jc on the same inputs
 	./ci/bench-vs-jc.sh
 
+.PHONY: site-wasm
+site-wasm: ## build the wasm bundle the website's converter runs on
+	wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
+	@mkdir -p website/public/wasm
+	@cp crates/jc-rs-wasm/pkg/jc-rs.js crates/jc-rs-wasm/pkg/jc-rs_bg.wasm website/public/wasm/
+	@echo "website/public/wasm updated ($$(du -h website/public/wasm/jc-rs_bg.wasm | cut -f1))"
+
+.PHONY: site-data
+site-data: build ## regenerate the website's parser dataset from this repo
+	TZ=PST8PDT python3 website/scripts/build-data.py
+
+.PHONY: site
+site: site-data site-wasm ## everything the website build needs from this repo
+	@echo "now: cd website && npm ci && npm run build"
+
 .PHONY: check
 check: lint check-fixtures test differential ## universal verification: lint + fixture sync + tests + differential
 	@echo "check complete"

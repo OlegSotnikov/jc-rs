@@ -10,3 +10,13 @@
 
 # wasm-pack output; built by `make wasm`, published by release.yml
 crates/jc-rs-wasm/pkg/
+
+# Website build artefacts. `make site` regenerates both: the wasm bundle is a
+# 4 MB build output that changes every release, and the dataset is derived
+# from the binary, the fixtures and the differential report.
+website/node_modules/
+website/.next/
+website/public/wasm/
+
+# Python bytecode from importing the differential harness in tooling.
+__pycache__/

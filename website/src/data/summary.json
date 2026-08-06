@@ -1,0 +1,16 @@
+{
+ "jcVersion": "1.25.7",
+ "matchRate": 100.0,
+ "tested": 934,
+ "matched": 934,
+ "parserCount": 238,
+ "documented": 237,
+ "withCoverage": 200,
+ "withExample": 123,
+ "streaming": 19,
+ "oracleReject": 9,
+ "unmapped": 149,
+ "noInput": 18,
+ "failures": 0,
+ "version": "0.2.0"
+}
