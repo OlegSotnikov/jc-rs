@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "How the compatibility number is produced",
-  description: `jc-rs measures ${summary.matchRate}% against jc ${summary.jcVersion}. This is the rule that decides what enters the denominator, and what the number deliberately excludes.`,
+  description: `jc-rs measures ${summary.matchRate}% against the full reference corpus. This is the rule that decides what enters the denominator, and what the number deliberately excludes.`,
   alternates: { canonical: "/compatibility" },
 };
 
@@ -26,15 +26,19 @@ export default function Compatibility() {
       <section className="mt-12">
         <h2 className="text-2xl">One rule</h2>
         <blockquote className="mt-4 border-l-2 border-[var(--color-key)] pl-5 text-lg">
-          A fixture pair enters the denominator only when jc itself reproduces that fixture
-          exactly.
+          A fixture pair enters the denominator only when the reference implementation
+          reproduces that fixture exactly.
         </blockquote>
         <p className="mt-4 text-[var(--color-muted)]">
           <code className="font-mono text-sm">tests/differential/validate.py</code> walks every{" "}
-          <code className="font-mono text-sm">.json</code> fixture in the pinned jc submodule,
-          runs jc against the same input, and only then compares jc-rs. If jc cannot reproduce
-          its own expected output on this machine, neither implementation is being tested and
-          the pair is reported instead of counted.
+          <code className="font-mono text-sm">.json</code> fixture in the pinned corpus, runs
+          the reference against the same input, and only then compares jc-rs. If the reference
+          cannot reproduce its own expected output on this machine, neither implementation is
+          being tested and the pair is reported instead of counted. The reference is{" "}
+          <a href={site.jc} className="text-[var(--color-key)] underline-offset-4 hover:underline">
+            jc {summary.jcVersion}
+          </a>
+          , the original Python tool.
         </p>
       </section>
 
@@ -45,7 +49,7 @@ export default function Compatibility() {
             {
               k: "Tested",
               v: summary.tested,
-              d: "jc reproduces the fixture, so the comparison means something.",
+              d: "The reference reproduces the fixture, so the comparison means something.",
             },
             {
               k: "Matching",
@@ -55,7 +59,7 @@ export default function Compatibility() {
             {
               k: "Oracle reject",
               v: summary.oracleReject,
-              d: "jc cannot reproduce its own fixture here. Nothing to measure against.",
+              d: "The reference cannot reproduce its own fixture here. Nothing to measure against.",
             },
             {
               k: "Unmapped",
@@ -81,19 +85,17 @@ export default function Compatibility() {
         <h2 className="text-2xl">Two things that decide whether it means anything</h2>
         <div className="mt-5 space-y-5">
           <Point title="The fixtures are a verbatim mirror">
-            <code className="font-mono text-sm">tests/fixtures/</code> is copied from the jc
-            submodule and <code className="font-mono text-sm">make check-fixtures</code> fails
-            the build if any shared file differs. If the repository could edit its own copy, a
-            failing parser could be made to pass by rewriting the expected output. The
-            codebase this forked reported 100% partly that way: 17 of its vendored fixtures
-            carried its own output rather than jc&apos;s.
+            <code className="font-mono text-sm">tests/fixtures/</code> is copied verbatim from
+            the pinned reference and <code className="font-mono text-sm">make check-fixtures</code>{" "}
+            fails the build if any shared file differs. Without that, a failing parser could be
+            made to pass by rewriting the expected output, and the compatibility number would
+            measure nothing at all.
           </Point>
           <Point title="The run is pinned to TZ=PST8PDT">
-            jc&apos;s fixtures carry <code className="font-mono text-sm">*_epoch</code> fields
-            computed in local time, and jc&apos;s own{" "}
-            <code className="font-mono text-sm">runtests.sh</code> pins that zone. In any other
-            timezone the oracle rejects every timestamp-bearing fixture and 146 pairs quietly
-            leave the denominator, which understates coverage as surely as a silent skip
+            The fixtures carry <code className="font-mono text-sm">*_epoch</code> fields
+            computed in local time, and the reference&apos;s own test runner pins that zone. In
+            any other timezone the oracle rejects every timestamp-bearing fixture and 146 pairs
+            quietly leave the denominator, which understates coverage as surely as a silent skip
             overstates it.
           </Point>
         </div>
@@ -142,8 +144,8 @@ export default function Compatibility() {
       <section className="mt-12 rounded-xl border bg-[var(--color-surface)] p-6">
         <h2 className="text-xl">Check it yourself</h2>
         <p className="mt-3 text-sm text-[var(--color-muted)]">
-          None of this is a claim you have to take on trust. Clone the repository, pull the jc
-          submodule and run the same harness CI runs.
+          None of this is a claim you have to take on trust. Clone the repository, pull the
+          reference submodule and run the same harness CI runs.
         </p>
         <pre className="mt-4 overflow-x-auto rounded-lg bg-[var(--color-sunk)] p-4 font-mono text-xs leading-relaxed">
           {`git clone --recurse-submodules ${site.repo}.git

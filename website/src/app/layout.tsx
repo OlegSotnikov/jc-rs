@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     template: "%s — jc-rs",
   },
   description:
-    `Convert the output of ${summary.parserCount} command-line tools, file formats and strings to JSON. ` +
-    `A Rust implementation of jc's schemas, measured at ${summary.matchRate}% against jc's own fixture corpus.`,
+    `Convert the output of ${summary.documented} command-line tools, file formats and strings to JSON. ` +
+    `One static Rust binary, no runtime to install, ${summary.matchRate}% verified against the full reference corpus on every commit.`,
   applicationName: "jc-rs",
   authors: [{ name: "Oleg Sotnikov" }],
   creator: "Oleg Sotnikov",
@@ -48,12 +48,12 @@ export const metadata: Metadata = {
     siteName: "jc-rs",
     url: site.origin,
     title: `jc-rs — ${site.tagline}`,
-    description: `${summary.matchRate}% compatible with jc ${summary.jcVersion}, measured over ${summary.tested} fixture pairs and published whatever it says.`,
+    description: `${summary.documented} parsers in one static binary. Verified against ${summary.tested} reference fixture pairs on every commit, and the number is published whatever it says.`,
   },
   twitter: {
     card: "summary_large_image",
     title: `jc-rs — ${site.tagline}`,
-    description: `${summary.matchRate}% compatible with jc ${summary.jcVersion}, over ${summary.tested} fixture pairs.`,
+    description: `${summary.documented} parsers in one static binary, verified over ${summary.tested} reference fixture pairs.`,
   },
   alternates: { canonical: "/" },
 };

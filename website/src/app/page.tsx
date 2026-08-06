@@ -34,15 +34,15 @@ export default function Home() {
     <>
       <section className="mx-auto max-w-6xl px-5 pt-14 pb-16 sm:pt-20">
         <p className="font-mono text-xs tracking-wide text-[var(--color-muted)] uppercase">
-          v{summary.version} · {summary.documented} parsers · jc {summary.jcVersion}
+          v{summary.version} · {summary.documented} parsers · one static binary
         </p>
         <h1 className="mt-4 max-w-3xl text-[clamp(2.4rem,6vw,4.1rem)]">
           Pipe anything into <span className="text-[var(--color-key)]">jq</span>.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-[var(--color-muted)]">
           jc-rs turns the output of the commands you already run into JSON. One static
-          binary, no Python runtime. The converter below is the real parser, compiled to
-          WebAssembly and running in your browser.
+          binary, nothing to install alongside it. The converter below is the real parser,
+          compiled to WebAssembly and running in your browser.
         </p>
 
         <div className="mt-9">
@@ -75,9 +75,9 @@ function Evidence() {
               <span style={{ width: `${summary.matchRate}%` }} />
             </div>
             <p className="mt-4 max-w-md text-[var(--color-muted)]">
-              {summary.matched} of {summary.tested} fixture pairs from jc&apos;s own corpus,
-              byte for byte. The code this started from measured 80.0%. CI fails below 100%,
-              so it cannot quietly drift.
+              {summary.matched} of {summary.tested} pairs from the full reference corpus,
+              byte for byte, checked on every commit. CI fails below 100%, so the number
+              cannot quietly drift.
             </p>
           </div>
 
@@ -86,15 +86,15 @@ function Evidence() {
               What the number excludes, and why it says so
             </p>
             <p className="mt-4 text-[var(--color-muted)]">
-              A pair enters the denominator only when jc itself reproduces that fixture
-              exactly. Everything else is reported by category rather than dropped, because a
+              A pair counts only when the reference implementation reproduces its own
+              fixture exactly. Everything else is reported by category rather than dropped: a
               harness that silently skips what it cannot handle is how a project reports 100%
               while being blind to a third of the evidence.
             </p>
             <dl className="mt-6 divide-y border-y">
               {[
-                ["Tested, and matching", summary.matched, "jc reproduces it, so do we"],
-                ["Oracle reject", summary.oracleReject, "jc cannot reproduce its own fixture"],
+                ["Tested, and matching", summary.matched, "the reference reproduces it, so do we"],
+                ["Oracle reject", summary.oracleReject, "the reference cannot reproduce its own fixture"],
                 ["Unmapped", summary.unmapped, "the filename resolves to no parser"],
                 ["No input", summary.noInput, "expected output ships without an input file"],
               ].map(([label, value, note]) => (
@@ -126,10 +126,14 @@ function Speed() {
     <section className="mx-auto max-w-6xl px-5 py-16">
       <h2 className="text-3xl">Startup is where it shows</h2>
       <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-        jc pays ~160 ms of Python interpreter startup on every invocation. That is most of
-        the gap, which is why it matters in loops, git hooks and per-host automation rather
-        than at an interactive prompt. On throughput both end up bound by the same per-field
-        work.
+        A compiled binary starts in single-digit milliseconds. The Python original pays ~160 ms
+        of interpreter startup on every invocation, which is most of the gap and why it matters
+        in loops, git hooks and per-host automation rather than at an interactive prompt. On
+        throughput both are bound by the same per-field work.{" "}
+        <Link href="/compare" className="text-[var(--color-key)] underline-offset-4 hover:underline">
+          Full comparison
+        </Link>
+        .
       </p>
 
       <div className="mt-8 overflow-hidden rounded-xl border bg-[var(--color-surface)]">
@@ -159,8 +163,8 @@ function Speed() {
         ))}
       </div>
       <p className="mt-3 text-sm text-[var(--color-faint)]">
-        Median of 5 to 11 runs, Linux x86-64, jc {summary.jcVersion} on Python 3.12, one
-        harness timing both sides. Re-run it with <code className="font-mono">make bench-vs-jc</code>.
+        Median of 5 to 11 runs, Linux x86-64, Python 3.12, one harness timing both sides.
+        Re-run it with <code className="font-mono">make bench-vs-jc</code>.
       </p>
     </section>
   );

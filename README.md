@@ -203,4 +203,4 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-<sub>inspired by [jc](https://github.com/kellyjonbrazil/jc), mit.</sub>
+<sub>jc-rs implements the JSON schemas defined by [jc](https://github.com/kellyjonbrazil/jc), the original Python tool. MIT.</sub>

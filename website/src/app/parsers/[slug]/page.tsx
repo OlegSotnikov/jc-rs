@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: `${p.name} — ${p.description}`,
     description:
-      `${p.description}. Pipe ${where} into jc-rs ${p.argument} and get JSON matching jc's schema` +
-      (p.coverage ? `, verified against ${p.coverage.tested} of jc's own fixtures.` : "."),
+      `${p.description}. Pipe ${where} into jc-rs ${p.argument} and get structured JSON` +
+      (p.coverage ? `, verified against ${p.coverage.tested} reference fixtures.` : "."),
     alternates: { canonical: `/parsers/${slug}` },
     openGraph: {
       title: `jc-rs ${p.argument}`,
@@ -80,11 +80,11 @@ export default async function ParserPage({ params }: Params) {
         <section className="mt-12">
           <h2 className="text-2xl">A real pair</h2>
           <p className="mt-2 max-w-2xl text-sm text-[var(--color-muted)]">
-            Straight out of jc&apos;s corpus (
-            <code className="font-mono">{p.example.fixture}</code>). The left pane is the
-            input the fixture ships; the right is what jc-rs writes for it, which is compared
-            byte for byte against jc&apos;s expected output on every commit. Hover a value to
-            see where it came from.
+            From the reference corpus (
+            <code className="font-mono">{p.example.fixture}</code>). The left pane is the input
+            the fixture ships; the right is what jc-rs writes for it, compared byte for byte
+            against the expected output on every commit. Hover a value to see where it came
+            from.
           </p>
           <div className="mt-5">
             <Panes
@@ -109,9 +109,9 @@ export default async function ParserPage({ params }: Params) {
         <section className="mt-12 rounded-xl border bg-[var(--color-surface)] p-5">
           <h2 className="text-lg">No worked example here</h2>
           <p className="mt-2 max-w-2xl text-sm text-[var(--color-muted)]">
-            jc&apos;s corpus ships no fixture pair for this parser small enough to read on a
-            page, so rather than invent one this page shows none. Run it against your own
-            output and compare with jc.
+            The reference corpus ships no fixture pair for this parser small enough to read
+            on a page, so rather than invent one this page shows none. Run it against your own
+            output.
           </p>
         </section>
       )}
@@ -124,15 +124,15 @@ export default async function ParserPage({ params }: Params) {
                 {p.coverage.match}/{p.coverage.tested}
               </span>
               <span className="mt-1 block text-sm text-[var(--color-muted)]">
-                oracle-valid pairs from jc&apos;s corpus match byte for byte
+                oracle-valid reference pairs match byte for byte
               </span>
             </>
           ) : (
             <>
               <span className="font-mono text-2xl">none</span>
               <span className="mt-1 block text-sm text-[var(--color-muted)]">
-                jc ships no oracle-valid fixture for this parser, so the differential cannot
-                speak for it. That is reported, not hidden.
+                The reference corpus ships no oracle-valid fixture for this parser, so the
+                differential cannot speak for it. That is reported, not hidden.
               </span>
             </>
           )}
@@ -160,22 +160,23 @@ export default async function ParserPage({ params }: Params) {
       </section>
 
       <p className="mt-10 text-sm text-[var(--color-faint)]">
-        Schema owned by{" "}
-        <a href={site.jc} className="text-[var(--color-key)] underline-offset-4 hover:underline">
-          jc {summary.jcVersion}
-        </a>
-        .{" "}
         {p.source && (
           <>
-            Implementation:{" "}
+            Source:{" "}
             <a
               href={`${site.repo}/blob/master/${p.source}`}
               className="font-mono text-[var(--color-key)] underline-offset-4 hover:underline"
             >
               {p.source}
             </a>
+            .{" "}
           </>
         )}
+        The JSON here is schema-compatible with the original Python tool, so anything already
+        reading it keeps working.{" "}
+        <Link href="/compare" className="text-[var(--color-key)] underline-offset-4 hover:underline">
+          Compare
+        </Link>
       </p>
     </div>
   );
