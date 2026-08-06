@@ -76,13 +76,24 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <p className="mx-auto max-w-6xl px-5 py-5 text-xs text-[var(--color-faint)]">
-          MIT. jc-rs emits the JSON schemas defined by{" "}
-          <a href={site.jc} className="underline-offset-4 hover:underline">
-            jc
-          </a>
-          , the original Python tool, so anything already reading that JSON keeps working.
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-5 text-xs text-[var(--color-faint)]">
+          <p>
+            MIT. jc-rs emits the JSON schemas defined by{" "}
+            <a href={site.jc} className="underline-offset-4 hover:underline">
+              jc
+            </a>
+            , the original Python tool, so anything already reading that JSON keeps working.
+          </p>
+          <p className="shrink-0">
+            Created by{" "}
+            <a
+              href={site.authorUrl}
+              className="text-[var(--color-muted)] underline-offset-4 transition-colors hover:text-[var(--color-ink)] hover:underline"
+            >
+              {site.author}
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
