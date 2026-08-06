@@ -6,6 +6,7 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
 
 pub struct TracerouteParser;
 
@@ -92,16 +93,35 @@ impl Probe {
     }
 }
 
-fn get_probes(hop_string: &str) -> Vec<Probe> {
-    let re_asn = Regex::new(r"\[AS(\d+)\]").unwrap();
-    let re_name_ip =
-        Regex::new(r"(\S+)\s+\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[0-9a-fA-F:]+)\)").unwrap();
-    let re_ip_only = Regex::new(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+[^(]").unwrap();
+/// `get_probes` runs once per hop line, and every one of these was rebuilt from
+/// source each time — five patterns per hop, of which two were then never used.
+/// The two dead ones are gone; the rest are compiled once for the process.
+struct ProbeRegexes {
+    asn: Regex,
+    name_ip: Regex,
+    ip_only: Regex,
+    ipv6: Regex,
+    rtt: Regex,
+}
+
+static PROBE_RE: LazyLock<ProbeRegexes> = LazyLock::new(|| ProbeRegexes {
+    asn: Regex::new(r"\[AS(\d+)\]").expect("asn pattern is valid"),
+    name_ip: Regex::new(r"(\S+)\s+\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[0-9a-fA-F:]+)\)")
+        .expect("name/ip pattern is valid"),
+    ip_only: Regex::new(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+[^(]")
+        .expect("ip pattern is valid"),
     // Handle compressed IPv6 (e.g. 2605:9000:402:6a01::1) - match 2+ colon-separated groups
-    let re_ipv6 =
-        Regex::new(r"(?:^|[\s(])([0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{0,4}){2,7})(?:[\s)]|$)").unwrap();
-    let _re_ipv6_only = Regex::new(r"(([a-f0-9]*:)+[a-f0-9]+)").unwrap();
-    let _re_rtt = Regex::new(r"(?:(\d+(?:\.?\d+)?)\s+ms|(\s+\*\s+))\s*(!\\S*)?").unwrap();
+    ipv6: Regex::new(r"(?:^|[\s(])([0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{0,4}){2,7})(?:[\s)]|$)")
+        .expect("ipv6 pattern is valid"),
+    rtt: Regex::new(r"(?:(\d+(?:[.]\d+)?)\s+ms|(\s+[*]\s+))\s*(![\S]*)?\s*")
+        .expect("rtt pattern is valid"),
+});
+
+fn get_probes(hop_string: &str) -> Vec<Probe> {
+    let re_asn = &PROBE_RE.asn;
+    let re_name_ip = &PROBE_RE.name_ip;
+    let re_ip_only = &PROBE_RE.ip_only;
+    let re_ipv6 = &PROBE_RE.ipv6;
 
     // Collect all match positions
     struct MatchItem {
@@ -180,10 +200,7 @@ fn get_probes(hop_string: &str) -> Vec<Probe> {
     }
 
     // RTT matches
-    for cap in Regex::new(r"(?:(\d+(?:[.]\d+)?)\s+ms|(\s+[*]\s+))\s*(![\S]*)?\s*")
-        .unwrap()
-        .captures_iter(hop_string)
-    {
+    for cap in PROBE_RE.rtt.captures_iter(hop_string) {
         let m = cap.get(0).unwrap();
         matches.push(MatchItem {
             start: m.start(),

@@ -6,6 +6,53 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+/// Every pattern `iwconfig` parsing needs, compiled once for the process
+/// rather than rebuilt on each invocation.
+struct IwconfigRegexes {
+    interface: Regex,
+    mode: Regex,
+    frequency: Regex,
+    access_point: Regex,
+    bit_rate: Regex,
+    tx_power: Regex,
+    retry: Regex,
+    rts: Regex,
+    frag: Regex,
+    power: Regex,
+    link: Regex,
+    signal: Regex,
+    rx_nwid: Regex,
+    rx_crypt: Regex,
+    rx_frag: Regex,
+    tx_retries: Regex,
+    invalid: Regex,
+    missed: Regex,
+}
+
+static RE: LazyLock<IwconfigRegexes> = LazyLock::new(|| {
+    IwconfigRegexes {
+    interface: Regex::new(r#"^(?P<name>[a-zA-Z0-9:._\-]+)\s+(?P<protocol>(?:[a-zA-Z0-9]+\s)*[a-zA-Z0-9.]+)\s+ESSID:"(?P<essid>[^"]+)""#).expect("interface pattern is valid"),
+    mode: Regex::new(r"Mode:(?P<mode>\w+)").expect("mode pattern is valid"),
+    frequency: Regex::new(r"Frequency:(?P<frequency>[0-9.]+)\s(?P<frequency_unit>\w+)").expect("frequency pattern is valid"),
+    access_point: Regex::new(r"Access Point:\s*(?P<access_point>[0-9A-Fa-f:]+)").expect("access_point pattern is valid"),
+    bit_rate: Regex::new(r"Bit Rate=(?P<bit_rate>[0-9.]+)\s(?P<bit_rate_unit>[\w/]+)").expect("bit_rate pattern is valid"),
+    tx_power: Regex::new(r"Tx-Power=(?P<tx_power>[-0-9]+)\s(?P<tx_power_unit>\w+)").expect("tx_power pattern is valid"),
+    retry: Regex::new(r"Retry short limit:(?P<retry_short_limit>[0-9/]+)").expect("retry pattern is valid"),
+    rts: Regex::new(r"RTS thr:(?P<rts_threshold>off|on)").expect("rts pattern is valid"),
+    frag: Regex::new(r"Fragment thr:(?P<fragment_threshold>off|on)").expect("frag pattern is valid"),
+    power: Regex::new(r"Power Management:(?P<power_management>off|on)").expect("power pattern is valid"),
+    link: Regex::new(r"Link Quality=(?P<link_quality>[0-9/]+)").expect("link pattern is valid"),
+    signal: Regex::new(r"Signal level=(?P<signal_level>[-0-9]+)\s(?P<signal_level_unit>\w+)").expect("signal pattern is valid"),
+    rx_nwid: Regex::new(r"Rx invalid nwid:(?P<rx_invalid_nwid>[-0-9]+)").expect("rx_nwid pattern is valid"),
+    rx_crypt: Regex::new(r"Rx invalid crypt:(?P<rx_invalid_crypt>[-0-9]+)").expect("rx_crypt pattern is valid"),
+    rx_frag: Regex::new(r"Rx invalid frag:(?P<rx_invalid_frag>[-0-9]+)").expect("rx_frag pattern is valid"),
+    tx_retries: Regex::new(r"Tx excessive retries:(?P<tx_excessive_retries>[-0-9]+)").expect("tx_retries pattern is valid"),
+    invalid: Regex::new(r"Invalid misc:(?P<invalid_misc>[0-9]+)").expect("invalid pattern is valid"),
+    missed: Regex::new(r"Missed beacon:(?P<missed_beacon>[0-9]+)").expect("missed pattern is valid"),
+}
+});
 
 pub struct IwconfigParser;
 
@@ -90,43 +137,24 @@ fn scan(input: &str) -> Result<Vec<Map<String, Value>>, ParseError> {
         return Ok(Vec::new());
     }
 
-    let re_interface = Regex::new(r#"^(?P<name>[a-zA-Z0-9:._\-]+)\s+(?P<protocol>(?:[a-zA-Z0-9]+\s)*[a-zA-Z0-9.]+)\s+ESSID:"(?P<essid>[^"]+)""#)
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_mode =
-        Regex::new(r"Mode:(?P<mode>\w+)").map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_frequency = Regex::new(r"Frequency:(?P<frequency>[0-9.]+)\s(?P<frequency_unit>\w+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_access_point = Regex::new(r"Access Point:\s*(?P<access_point>[0-9A-Fa-f:]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_bit_rate = Regex::new(r"Bit Rate=(?P<bit_rate>[0-9.]+)\s(?P<bit_rate_unit>[\w/]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_tx_power = Regex::new(r"Tx-Power=(?P<tx_power>[-0-9]+)\s(?P<tx_power_unit>\w+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_retry = Regex::new(r"Retry short limit:(?P<retry_short_limit>[0-9/]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_rts = Regex::new(r"RTS thr:(?P<rts_threshold>off|on)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_frag = Regex::new(r"Fragment thr:(?P<fragment_threshold>off|on)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_power = Regex::new(r"Power Management:(?P<power_management>off|on)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_link = Regex::new(r"Link Quality=(?P<link_quality>[0-9/]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_signal =
-        Regex::new(r"Signal level=(?P<signal_level>[-0-9]+)\s(?P<signal_level_unit>\w+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_rx_nwid = Regex::new(r"Rx invalid nwid:(?P<rx_invalid_nwid>[-0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_rx_crypt = Regex::new(r"Rx invalid crypt:(?P<rx_invalid_crypt>[-0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_rx_frag = Regex::new(r"Rx invalid frag:(?P<rx_invalid_frag>[-0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_tx_retries = Regex::new(r"Tx excessive retries:(?P<tx_excessive_retries>[-0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_invalid = Regex::new(r"Invalid misc:(?P<invalid_misc>[0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-    let re_missed = Regex::new(r"Missed beacon:(?P<missed_beacon>[0-9]+)")
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
+    let re_interface = &RE.interface;
+    let re_mode = &RE.mode;
+    let re_frequency = &RE.frequency;
+    let re_access_point = &RE.access_point;
+    let re_bit_rate = &RE.bit_rate;
+    let re_tx_power = &RE.tx_power;
+    let re_retry = &RE.retry;
+    let re_rts = &RE.rts;
+    let re_frag = &RE.frag;
+    let re_power = &RE.power;
+    let re_link = &RE.link;
+    let re_signal = &RE.signal;
+    let re_rx_nwid = &RE.rx_nwid;
+    let re_rx_crypt = &RE.rx_crypt;
+    let re_rx_frag = &RE.rx_frag;
+    let re_tx_retries = &RE.tx_retries;
+    let re_invalid = &RE.invalid;
+    let re_missed = &RE.missed;
 
     let mut result: Vec<Map<String, Value>> = Vec::new();
     let mut current: Option<Map<String, Value>> = None;

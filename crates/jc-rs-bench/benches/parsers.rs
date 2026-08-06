@@ -19,6 +19,12 @@ static DF_UBUNTU: &str = include_str!("../../../tests/fixtures/ubuntu-18.04/df.o
 static DF_OSX: &str = include_str!("../../../tests/fixtures/osx-10.14.6/df.out");
 static PS_AXU: &str = include_str!("../../../tests/fixtures/centos-7.7/ps-axu.out");
 static PS_EF: &str = include_str!("../../../tests/fixtures/centos-7.7/ps-ef.out");
+static IFCONFIG_CENTOS: &str = include_str!("../../../tests/fixtures/centos-7.7/ifconfig.out");
+static IFCONFIG_UBUNTU: &str = include_str!("../../../tests/fixtures/ubuntu-18.04/ifconfig.out");
+static IWCONFIG: &str = include_str!("../../../tests/fixtures/generic/iwconfig-many.out");
+static PING: &str = include_str!("../../../tests/fixtures/fedora32/ping6-hostname-O-D-p-s.out");
+static UFW: &str = include_str!("../../../tests/fixtures/ubuntu-18.04/ufw-numbered.out");
+static TRACEROUTE: &str = include_str!("../../../tests/fixtures/generic/traceroute1.out");
 
 // ---------------------------------------------------------------------------
 // Helpers that generate synthetic large inputs
@@ -148,6 +154,58 @@ fn bench_ps(c: &mut Criterion) {
             b.iter(|| black_box(parser.parse(black_box(inp.as_str()), false)))
         });
     }
+
+    group.finish();
+}
+
+// ---------------------------------------------------------------------------
+// Benchmark: regex-heavy parsers
+//
+// These two carry the largest pattern sets in the corpus (31 and 18). Their
+// inputs are small, so what these measure is almost entirely per-invocation
+// setup cost rather than throughput — which is the point: a CLI parses one
+// input per process, so setup *is* the runtime.
+// ---------------------------------------------------------------------------
+
+fn bench_regex_heavy(c: &mut Criterion) {
+    let mut group = c.benchmark_group("regex_heavy");
+
+    let ifconfig = find_parser("ifconfig").expect("ifconfig parser not found");
+    group.throughput(Throughput::Bytes(IFCONFIG_CENTOS.len() as u64));
+    group.bench_function("ifconfig_centos", |b| {
+        b.iter(|| black_box(ifconfig.parse(black_box(IFCONFIG_CENTOS), false)))
+    });
+
+    group.throughput(Throughput::Bytes(IFCONFIG_UBUNTU.len() as u64));
+    group.bench_function("ifconfig_ubuntu", |b| {
+        b.iter(|| black_box(ifconfig.parse(black_box(IFCONFIG_UBUNTU), false)))
+    });
+
+    let iwconfig = find_parser("iwconfig").expect("iwconfig parser not found");
+    group.throughput(Throughput::Bytes(IWCONFIG.len() as u64));
+    group.bench_function("iwconfig_many", |b| {
+        b.iter(|| black_box(iwconfig.parse(black_box(IWCONFIG), false)))
+    });
+
+    // These three build their patterns per *line* rather than per invocation,
+    // so they scale the setup cost by the size of the input.
+    let ping = find_parser("ping").expect("ping parser not found");
+    group.throughput(Throughput::Bytes(PING.len() as u64));
+    group.bench_function("ping", |b| {
+        b.iter(|| black_box(ping.parse(black_box(PING), false)))
+    });
+
+    let ufw = find_parser("ufw").expect("ufw parser not found");
+    group.throughput(Throughput::Bytes(UFW.len() as u64));
+    group.bench_function("ufw_numbered", |b| {
+        b.iter(|| black_box(ufw.parse(black_box(UFW), false)))
+    });
+
+    let traceroute = find_parser("traceroute").expect("traceroute parser not found");
+    group.throughput(Throughput::Bytes(TRACEROUTE.len() as u64));
+    group.bench_function("traceroute", |b| {
+        b.iter(|| black_box(traceroute.parse(black_box(TRACEROUTE), false)))
+    });
 
     group.finish();
 }
@@ -297,6 +355,7 @@ criterion_group!(
     benches,
     bench_df,
     bench_ps,
+    bench_regex_heavy,
     bench_csv,
     bench_timestamp,
     bench_table_utils,

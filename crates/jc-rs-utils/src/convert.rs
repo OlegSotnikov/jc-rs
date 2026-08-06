@@ -1,11 +1,39 @@
 //! Conversion utilities ported from jc's utils.py.
 
 use regex::Regex;
+use std::borrow::Cow;
 use std::sync::OnceLock;
 
-fn non_numeric_re() -> &'static Regex {
+fn size_token_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"[^0-9\-\.]").unwrap())
+    RE.get_or_init(|| Regex::new(r"(\d+(?:\.\d+)?)").expect("valid size token pattern"))
+}
+
+/// True for the characters jc's `[^0-9\-\.]` regex *keeps*.
+#[inline]
+const fn is_numeric_byte(b: u8) -> bool {
+    b.is_ascii_digit() || b == b'-' || b == b'.'
+}
+
+/// Drop every character jc's `[^0-9\-\.]` would strip.
+///
+/// This runs on every numeric field of every record — 89 call sites feed it —
+/// and the overwhelmingly common input is already clean, so the clean case
+/// borrows instead of allocating. The discarded set is a superset of the
+/// non-ASCII range, so filtering bytes and rebuilding is exact: every byte kept
+/// is ASCII, and every continuation byte of a multi-byte char is >= 0x80 and so
+/// dropped, which is what the Unicode-aware regex did too.
+fn strip_non_numeric(value: &str) -> Cow<'_, str> {
+    if value.bytes().all(is_numeric_byte) {
+        return Cow::Borrowed(value);
+    }
+    let mut out = String::with_capacity(value.len());
+    for b in value.bytes() {
+        if is_numeric_byte(b) {
+            out.push(b as char);
+        }
+    }
+    Cow::Owned(out)
 }
 
 /// Convert a string to i64 by stripping non-numeric characters.
@@ -13,7 +41,7 @@ fn non_numeric_re() -> &'static Regex {
 /// Matches jc's `convert_to_int`: strips everything except digits, `-`, `.`,
 /// tries int parse first, then float-to-int.
 pub fn convert_to_int(value: &str) -> Option<i64> {
-    let cleaned = non_numeric_re().replace_all(value, "");
+    let cleaned = strip_non_numeric(value);
     let s = cleaned.as_ref();
     if s.is_empty() {
         return None;
@@ -31,7 +59,7 @@ pub fn convert_to_int(value: &str) -> Option<i64> {
 ///
 /// Matches jc's `convert_to_float`.
 pub fn convert_to_float(value: &str) -> Option<f64> {
-    let cleaned = non_numeric_re().replace_all(value, "");
+    let cleaned = strip_non_numeric(value);
     let s = cleaned.as_ref();
     if s.is_empty() {
         return None;
@@ -49,16 +77,25 @@ pub fn convert_to_bool(value: &str) -> Option<bool> {
     if let Some(f) = convert_to_float(value) {
         return Some(f != 0.0);
     }
-    // Non-numeric string
+    // Non-numeric string. The candidates are all ASCII, so a case-insensitive
+    // ASCII compare answers the same question as lowercasing the input first,
+    // without the allocation.
     if value.is_empty() {
         return Some(false);
     }
-    let lower = value.to_lowercase();
-    match lower.as_str() {
-        "y" | "yes" | "true" | "*" => Some(true),
-        "n" | "no" | "false" | "0" => Some(false),
-        _ => None,
+    if ["y", "yes", "true", "*"]
+        .iter()
+        .any(|t| value.eq_ignore_ascii_case(t))
+    {
+        return Some(true);
     }
+    if ["n", "no", "false", "0"]
+        .iter()
+        .any(|t| value.eq_ignore_ascii_case(t))
+    {
+        return Some(false);
+    }
+    None
 }
 
 /// Parse a human-readable size string like "10KB", "5.2 MiB" into bytes.
@@ -68,24 +105,29 @@ pub fn convert_to_bool(value: &str) -> Option<bool> {
 /// Mirrors jc's `convert_size_to_int` with `binary` parameter.
 pub fn convert_size_to_int(size: &str, binary_mode: bool) -> Option<i64> {
     // Remove commas
-    let size = size.replace(',', "");
+    let size: Cow<'_, str> = if size.contains(',') {
+        Cow::Owned(size.replace(',', ""))
+    } else {
+        Cow::Borrowed(size)
+    };
     let size = size.trim();
 
-    // Tokenize: split on digit sequences
-    let token_re = Regex::new(r"(\d+(?:\.\d+)?)").ok()?;
-    let mut tokens: Vec<String> = Vec::new();
+    // Tokenize: split on digit sequences. The pattern is compiled once for the
+    // process; building it per call cost more than the rest of this function by
+    // three orders of magnitude, on all 20 call sites.
+    let mut tokens: Vec<&str> = Vec::new();
     let mut last_end = 0;
-    for m in token_re.find_iter(size) {
+    for m in size_token_re().find_iter(size) {
         let before = size[last_end..m.start()].trim();
         if !before.is_empty() {
-            tokens.push(before.to_string());
+            tokens.push(before);
         }
-        tokens.push(m.as_str().to_string());
+        tokens.push(m.as_str());
         last_end = m.end();
     }
     let remainder = size[last_end..].trim();
     if !remainder.is_empty() {
-        tokens.push(remainder.to_string());
+        tokens.push(remainder);
     }
 
     if tokens.is_empty() {
@@ -93,8 +135,7 @@ pub fn convert_size_to_int(size: &str, binary_mode: bool) -> Option<i64> {
     }
 
     // First token must be a number
-    let num_str = &tokens[0];
-    let num: f64 = num_str.parse().ok()?;
+    let num: f64 = tokens[0].parse().ok()?;
 
     // Get unit token if present
     let unit = if tokens.len() >= 2 {
@@ -230,26 +271,101 @@ pub fn remove_quotes(s: &str) -> String {
 /// Matches jc's `normalize_key` exactly. Special chars include:
 /// `!"#$%&'()*+,-./:;<=>?@[\]^{|}~ ` (and space).
 pub fn normalize_key(key: &str) -> String {
-    // Same set as jc: !"#$%&'()*+,-./:;<=>?@[\]^`{|}~ and space
-    const SPECIAL: &str = "!\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~ ";
-    let mut data = key.trim().to_lowercase();
+    let trimmed = key.trim();
+    if trimmed.is_ascii() {
+        squash_key(trimmed)
+    } else {
+        // Only the Unicode path needs `to_lowercase`; `squash_key` then has
+        // nothing left to fold. None of jc's special characters can be produced
+        // by a lowercase mapping, so folding first is equivalent to folding
+        // after the replacement, which is the order jc uses.
+        squash_key(&trimmed.to_lowercase())
+    }
+}
 
-    for ch in SPECIAL.chars() {
-        data = data.replace(ch, "_");
+/// jc's special set: `!"#$%&'()*+,-./:;<=>?@[\]^`{|}~` and space.
+static SPECIAL_KEY_BYTE: [bool; 128] = {
+    let mut t = [false; 128];
+    let mut i = 0;
+    while i < 128 {
+        let b = i as u8;
+        t[i] = matches!(
+            b,
+            b'!' | b'"'
+                | b'#'
+                | b'$'
+                | b'%'
+                | b'&'
+                | b'\''
+                | b'('
+                | b')'
+                | b'*'
+                | b'+'
+                | b','
+                | b'-'
+                | b'.'
+                | b'/'
+                | b':'
+                | b';'
+                | b'<'
+                | b'='
+                | b'>'
+                | b'?'
+                | b'@'
+                | b'['
+                | b'\\'
+                | b']'
+                | b'^'
+                | b'`'
+                | b'{'
+                | b'|'
+                | b'}'
+                | b'~'
+                | b' '
+        );
+        i += 1;
+    }
+    t
+};
+
+#[inline]
+fn is_special_key_char(ch: char) -> bool {
+    (ch as u32) < 128 && SPECIAL_KEY_BYTE[ch as usize]
+}
+
+/// Map the special set to `_`, lowercase, collapse runs of `_`, drop them from
+/// both ends but keep a single leading one — in a single pass and a single
+/// allocation.
+///
+/// The previous form ran 31 `String::replace` passes per key and then split and
+/// rejoined, so it allocated 34 strings to produce one. Parsers call this once
+/// per column *per row*.
+fn squash_key(data: &str) -> String {
+    let mut out = String::with_capacity(data.len());
+    let mut first = true;
+    // An underscore run is only written once something follows it.
+    let mut pending = false;
+    let mut wrote_any = false;
+
+    for ch in data.chars() {
+        if ch == '_' || is_special_key_char(ch) {
+            if first {
+                // jc keeps exactly one leading underscore ("%CPU" -> "_cpu").
+                out.push('_');
+            }
+            pending = true;
+        } else {
+            if pending && wrote_any {
+                out.push('_');
+            }
+            pending = false;
+            out.push(ch.to_ascii_lowercase());
+            wrote_any = true;
+        }
+        first = false;
     }
 
-    let initial_underscore = data.starts_with('_');
-
-    // Strip leading/trailing underscores, split on underscore (compresses multiples), rejoin
-    let stripped = data.trim_matches('_');
-    let parts: Vec<&str> = stripped.split('_').filter(|s| !s.is_empty()).collect();
-    let mut result = parts.join("_");
-
-    if initial_underscore {
-        result = format!("_{}", result);
-    }
-
-    result
+    out
 }
 
 /// Print a warning message to stderr. Respects `quiet` flag.

@@ -6,6 +6,14 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_MAP_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^([0-9a-f]{8,16})-([0-9a-f]{8,16})\s([rwxsp\-]{4})\s([0-9a-f]{8,9})\s([0-9a-f]{2}):([0-9a-f]{2})\s(\d+)\s+(.*)").expect("RE_MAP_RE is a valid pattern")
+});
 
 pub struct ProcPidSmapsParser;
 
@@ -84,9 +92,7 @@ impl Parser for ProcPidSmapsParser {
             return Ok(ParseOutput::Array(vec![]));
         }
 
-        let map_re = Regex::new(
-            r"^([0-9a-f]{8,16})-([0-9a-f]{8,16})\s([rwxsp\-]{4})\s([0-9a-f]{8,9})\s([0-9a-f]{2}):([0-9a-f]{2})\s(\d+)\s+(.*)"
-        ).unwrap();
+        let map_re = &*RE_MAP_RE;
 
         let reserved_keys = [
             "start", "end", "perms", "offset", "maj", "min", "pathname", "VmFlags",

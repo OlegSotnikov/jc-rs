@@ -6,6 +6,23 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?x)
+            Linux\s+version\s+(?P<version>\S+)\s
+            \((?P<email>\S+?)\)\s
+            \((?P<gcc>gcc.+)\)\s
+            (?P<build>\#\d+\S*)\s
+            (?P<flags>.*?)
+            (?P<date>(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat).+)",
+    )
+    .expect("RE_RE is a valid pattern")
+});
 
 pub struct ProcVersionParser;
 
@@ -39,16 +56,7 @@ impl Parser for ProcVersionParser {
             return Ok(ParseOutput::Object(Map::new()));
         }
 
-        let re = Regex::new(
-            r"(?x)
-            Linux\s+version\s+(?P<version>\S+)\s
-            \((?P<email>\S+?)\)\s
-            \((?P<gcc>gcc.+)\)\s
-            (?P<build>\#\d+\S*)\s
-            (?P<flags>.*?)
-            (?P<date>(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat).+)",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
+        let re = &*RE_RE;
 
         let mut out = Map::new();
 

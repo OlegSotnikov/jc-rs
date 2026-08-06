@@ -63,14 +63,12 @@ fn df_sparse_parse(lines: &[String]) -> Vec<Vec<(String, Option<String>)>> {
         return Vec::new();
     }
 
-    // Find max line length and pad all lines
+    // Find max line length. Only the header still gets a materialised padded
+    // copy, because the column offsets are read out of it; the data rows are
+    // padded in a buffer that is reused for the whole table.
     let max_len = lines.iter().map(|l| l.len()).max().unwrap_or(0);
-    let padded: Vec<String> = lines
-        .iter()
-        .map(|l| format!("{:<width$}", l, width = max_len))
-        .collect();
 
-    let header_text = format!("{} ", padded[0]);
+    let header_text = format!("{:<width$} ", lines[0], width = max_len);
     let header_list: Vec<&str> = header_text.split_whitespace().collect();
     let n = header_list.len();
 
@@ -78,61 +76,76 @@ fn df_sparse_parse(lines: &[String]) -> Vec<Vec<(String, Option<String>)>> {
         return Vec::new();
     }
 
-    // Build header_search: [header_list[0], " h1 ", " h2 ", ...]
-    let header_search: Vec<String> = {
-        let mut v = vec![header_list[0].to_string()];
-        for h in &header_list[1..] {
-            v.push(format!(" {} ", h));
-        }
-        v
-    };
-
     // Find end position for each column (all except the last)
-    let mut col_ends: Vec<usize> = Vec::new();
-    for i in 0..n - 1 {
-        let end = header_text
-            .find(&header_search[i + 1])
-            .unwrap_or(header_text.len());
-        col_ends.push(end);
+    let mut col_ends: Vec<usize> = Vec::with_capacity(n.saturating_sub(1));
+    let mut search = String::new();
+    for h in &header_list[1..] {
+        search.clear();
+        search.push(' ');
+        search.push_str(h);
+        search.push(' ');
+        col_ends.push(header_text.find(&search).unwrap_or(header_text.len()));
     }
 
     const DELIM: char = '\u{2063}';
-    let mut output = Vec::new();
+    let mut output = Vec::with_capacity(lines.len().saturating_sub(1));
 
-    for line in &padded[1..] {
+    let mut entry: Vec<char> = Vec::with_capacity(max_len);
+    let mut field = String::with_capacity(max_len);
+
+    for line in &lines[1..] {
         if line.trim().is_empty() {
             continue;
         }
 
-        let mut entry: Vec<char> = line.chars().collect();
+        entry.clear();
+        entry.extend(line.chars());
+        if entry.len() < max_len {
+            entry.resize(max_len, ' ');
+        }
+        let entry_len = entry.len();
 
         // Insert delimiters at column boundaries (process in reverse)
         for &h_end in col_ends.iter().rev() {
             let mut pos = h_end;
             // Walk left until whitespace found
-            while pos > 0 && pos < entry.len() && !entry[pos].is_whitespace() {
+            while pos > 0 && pos < entry_len && !entry[pos].is_whitespace() {
                 pos -= 1;
             }
-            if pos < entry.len() {
+            if pos < entry_len {
                 entry[pos] = DELIM;
             }
         }
 
-        let entry_str: String = entry.into_iter().collect();
-        let parts: Vec<&str> = entry_str.splitn(n, DELIM).collect();
-
-        let row: Vec<(String, Option<String>)> = header_list
-            .iter()
-            .enumerate()
-            .map(|(i, &h)| {
-                let val = parts.get(i).copied().unwrap_or("").trim();
-                if val.is_empty() {
-                    (h.to_string(), None)
-                } else {
-                    (h.to_string(), Some(val.to_string()))
-                }
-            })
-            .collect();
+        // Walk the delimited row in place rather than rebuilding it as a
+        // `String` only to split that back into slices. `splitn` semantics: the
+        // last column keeps any further delimiters.
+        let mut row: Vec<(String, Option<String>)> = Vec::with_capacity(n);
+        let mut start = 0;
+        for pos in 0..=entry_len {
+            let last_col = row.len() + 1 == n;
+            let at_end = pos == entry_len;
+            if !at_end && (last_col || entry[pos] != DELIM) {
+                continue;
+            }
+            field.clear();
+            field.extend(&entry[start..pos]);
+            let val = field.trim();
+            let cell = if val.is_empty() {
+                None
+            } else {
+                Some(val.to_string())
+            };
+            row.push((header_list[row.len()].to_string(), cell));
+            start = pos + 1;
+            if at_end {
+                break;
+            }
+        }
+        // Columns the row ran out of characters for.
+        while row.len() < n {
+            row.push((header_list[row.len()].to_string(), None));
+        }
 
         output.push(row);
     }

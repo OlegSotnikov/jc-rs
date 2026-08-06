@@ -62,8 +62,29 @@ pub fn all_parsers() -> impl Iterator<Item = &'static dyn Parser> {
 /// form (`"apt-get-sqq"`) for convenience. The lookup normalises dashes to
 /// underscores before comparing.
 pub fn find_parser(name: &str) -> Option<&'static dyn Parser> {
-    let normalised = name.trim_start_matches('-').replace('-', "_");
-    all_parsers().find(|p| p.info().name == normalised)
+    let query = name.trim_start_matches('-');
+    // Registered names are snake_case, so a query without a dash needs no
+    // translation and can be compared whole rather than byte by byte.
+    if query.contains('-') {
+        all_parsers().find(|p| name_matches(p.info().name, query))
+    } else {
+        all_parsers().find(|p| p.info().name == query)
+    }
+}
+
+/// Compare a registered parser name against a query in which `-` stands in for
+/// `_`.
+///
+/// This is what `query.replace('-', "_")` computed, minus the allocation: the
+/// two are equal exactly when they are the same length and differ only where
+/// the query has `-` against the name's `_`. Registered names are snake_case
+/// and never contain `-`, so nothing else can collide.
+fn name_matches(registered: &str, query: &str) -> bool {
+    registered.len() == query.len()
+        && registered
+            .bytes()
+            .zip(query.bytes())
+            .all(|(r, q)| r == q || (r == b'_' && q == b'-'))
 }
 
 /// Find a parser whose `magic_commands` list contains a matching command.

@@ -673,8 +673,9 @@ fn parse_bsd(input: &str) -> Map<String, Value> {
 }
 
 fn extract_re(pattern: &str, line: &str) -> Option<String> {
-    Regex::new(pattern)
-        .ok()?
+    // Seven call sites, all inside the loop over input lines; each was
+    // recompiling its literal on every line.
+    jc_rs_utils::cached_regex(pattern)?
         .captures(line)?
         .get(1)
         .map(|m| m.as_str().to_string())

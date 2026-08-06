@@ -29,7 +29,9 @@ pub fn simple_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
     }
 
     let ncols = headers.len();
-    let mut output = Vec::new();
+    let mut output = Vec::with_capacity(count_lines(data).saturating_sub(1));
+    // One splitting buffer for the whole table rather than one per row.
+    let mut parts: Vec<&str> = Vec::with_capacity(ncols);
 
     for line in lines {
         let line = line.trim();
@@ -37,9 +39,9 @@ pub fn simple_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
             continue;
         }
 
-        let parts = split_whitespace_n(line, ncols);
+        split_whitespace_n_into(line, ncols, &mut parts);
 
-        let mut record = HashMap::new();
+        let mut record = HashMap::with_capacity(ncols);
         for (i, header) in headers.iter().enumerate() {
             let value = parts.get(i).copied().unwrap_or("").trim().to_string();
             record.insert(header.clone(), Value::String(value));
@@ -50,12 +52,26 @@ pub fn simple_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
     output
 }
 
-/// Split on whitespace up to `n` parts (last part captures the remainder including spaces).
-fn split_whitespace_n(s: &str, n: usize) -> Vec<&str> {
-    if n == 0 {
-        return Vec::new();
+/// Number of lines `str::lines` will yield, without materialising any of them.
+fn count_lines(data: &str) -> usize {
+    if data.is_empty() {
+        return 0;
     }
-    let mut parts = Vec::new();
+    let newlines = data.as_bytes().iter().filter(|&&b| b == b'\n').count();
+    if data.ends_with('\n') {
+        newlines
+    } else {
+        newlines + 1
+    }
+}
+
+/// Split on whitespace up to `n` parts (last part captures the remainder including spaces),
+/// reusing `parts` as scratch so a table costs one allocation rather than one per row.
+fn split_whitespace_n_into<'a>(s: &'a str, n: usize, parts: &mut Vec<&'a str>) {
+    parts.clear();
+    if n == 0 {
+        return;
+    }
     let mut remaining = s.trim_start();
 
     for i in 0..n {
@@ -74,8 +90,6 @@ fn split_whitespace_n(s: &str, n: usize) -> Vec<&str> {
         parts.push(&remaining[..token_end]);
         remaining = remaining[token_end..].trim_start();
     }
-
-    parts
 }
 
 /// Parse a sparse table where column positions are determined by header positions.
@@ -85,19 +99,20 @@ fn split_whitespace_n(s: &str, n: usize) -> Vec<&str> {
 ///
 /// Mirrors jc's `sparse_table_parse`.
 pub fn sparse_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
-    let raw_lines: Vec<&str> = data.lines().collect();
-    if raw_lines.is_empty() {
+    let mut raw_lines = data.lines();
+    let Some(header_line) = raw_lines.next() else {
         return Vec::new();
-    }
+    };
 
-    // Pad all lines to the length of the longest line
-    let max_len = raw_lines.iter().map(|l| l.len()).max().unwrap_or(0);
-    let padded: Vec<String> = raw_lines
-        .iter()
-        .map(|l| format!("{:<width$}", l, width = max_len))
-        .collect();
+    // Every line is padded to the longest one. Padding the *header* cannot move
+    // any column boundary — the positions searched for all lie inside the real
+    // text — so only the data rows need it, and only conceptually: a position
+    // past the end of a short line is a space, which the scan below knows.
+    let max_len = data.lines().map(|l| l.len()).max().unwrap_or(0);
 
-    let header_text = format!("{} ", padded[0]);
+    // The one line that still gets a materialised padded copy, so the column
+    // offsets below are byte-for-byte what the padded form produced.
+    let header_text = format!("{:<width$} ", header_line, width = max_len);
     let header_list: Vec<&str> = header_text.split_whitespace().collect();
 
     if header_list.is_empty() {
@@ -105,26 +120,40 @@ pub fn sparse_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
     }
 
     // Build header specs: name → end position (where next column starts)
-    let mut header_spec_list: Vec<(&str, usize)> = Vec::new();
+    let mut header_spec_list: Vec<(&str, usize)> = Vec::with_capacity(header_list.len());
 
+    let mut search = String::new();
     for i in 0..header_list.len().saturating_sub(1) {
         let next_header = header_list[i + 1];
         // Find position of " <next_header> " in header_text
-        let search = format!(" {} ", next_header);
+        search.clear();
+        search.push(' ');
+        search.push_str(next_header);
+        search.push(' ');
         let end_pos = header_text.find(&search).unwrap_or(header_text.len());
         header_spec_list.push((header_list[i], end_pos));
     }
 
-    let data_lines = &padded[1..];
-    let mut output = Vec::new();
+    let ncols = header_list.len();
+    let mut output = Vec::with_capacity(count_lines(data).saturating_sub(1));
 
     // Use the invisible separator technique (U+2063)
     const DELIM: char = '\u{2063}';
 
-    for line in data_lines {
-        // Convert to a char vec once per row, do all delimiter insertions in-place,
-        // then convert back. This avoids O(n²) re-scanning from chars().nth().
-        let mut chars: Vec<char> = line.chars().collect();
+    // Scratch reused for every row: the padded row, and the field being trimmed.
+    let mut chars: Vec<char> = Vec::with_capacity(max_len);
+    let mut field = String::with_capacity(max_len);
+
+    for line in raw_lines {
+        chars.clear();
+        chars.extend(line.chars());
+        // The padding the old code produced with `format!` — as spaces in the
+        // buffer we already own. Every line has the same length in chars
+        // afterwards, because `max_len` counts bytes and so bounds every line's
+        // character count.
+        if chars.len() < max_len {
+            chars.resize(max_len, ' ');
+        }
         let char_len = chars.len();
 
         // Process columns in reverse, insert delimiter at column boundaries
@@ -139,22 +168,44 @@ pub fn sparse_table_parse(data: &str) -> Vec<HashMap<String, Value>> {
             }
         }
 
-        let entry: String = chars.into_iter().collect();
-        let parts: Vec<&str> = entry.splitn(header_list.len(), DELIM).collect();
-
-        let mut record = HashMap::new();
-        for (i, header) in header_list.iter().enumerate() {
-            let val = parts.get(i).copied().unwrap_or("").trim();
-            if val.is_empty() {
-                record.insert(header.to_string(), Value::Null);
-            } else {
-                record.insert(header.to_string(), Value::String(val.to_string()));
+        // Walk the delimited row directly instead of rebuilding it as a String
+        // and re-splitting that. `splitn` semantics: the last field keeps any
+        // further delimiters.
+        let mut record = HashMap::with_capacity(ncols);
+        let mut start = 0;
+        let mut col = 0;
+        for pos in 0..=char_len {
+            let last_field = col + 1 == ncols;
+            let at_end = pos == char_len;
+            if !at_end && (last_field || chars[pos] != DELIM) {
+                continue;
             }
+            field.clear();
+            field.extend(&chars[start..pos]);
+            insert_sparse_cell(&mut record, header_list[col], field.trim());
+            start = pos + 1;
+            col += 1;
+            if at_end {
+                break;
+            }
+        }
+        // Columns the row ran out of characters for.
+        for header in &header_list[col.min(ncols)..] {
+            record.insert((*header).to_string(), Value::Null);
         }
         output.push(record);
     }
 
     output
+}
+
+fn insert_sparse_cell(record: &mut HashMap<String, Value>, header: &str, val: &str) {
+    let cell = if val.is_empty() {
+        Value::Null
+    } else {
+        Value::String(val.to_string())
+    };
+    record.insert(header.to_string(), cell);
 }
 
 #[cfg(test)]

@@ -67,21 +67,36 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 ## Speed
 
 Measured by [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), which times both sides with
-one harness on the same inputs: median of 5 to 11 runs, Linux x86-64, jc 1.25.7
+one harness on the same inputs: fastest of 5 to 15 runs, Linux x86-64, jc 1.25.7
 on Python 3.12. Re-run it yourself with `make bench-vs-jc`.
 
 | Scenario | jc | jc-rs | Speedup |
 |---|---|---|---|
-| Cold start (`-v`) | 138 ms | 7 ms | **19.7×** |
-| `ps aux`, 110 lines | 156 ms | 12 ms | **13.0×** |
-| `csv`, 10,000 rows | 200 ms | 41 ms | **4.9×** |
-| `pkg-index-deb`, 1.5 MB | 309 ms | 88 ms | **3.5×** |
-| `clf`, 10,000 log lines | 604 ms | 208 ms | **2.9×** |
+| Cold start (`-v`) | 106 ms | 5 ms | **21.2×** |
+| `ps aux`, 110 lines | 111 ms | 6 ms | **18.5×** |
+| `traceroute`, 1.5 KB | 122 ms | 10 ms | **12.2×** |
+| `ifconfig`, 1.3 KB | 125 ms | 16 ms | **7.8×** |
+| `pkg-index-deb`, 1.5 MB | 234 ms | 36 ms | **6.5×** |
+| `csv`, 10,000 rows | 160 ms | 31 ms | **5.2×** |
+| `clf`, 10,000 log lines | 495 ms | 174 ms | **2.8×** |
 
 The gap is largest at startup, which is why it matters most in loops, git hooks
 and per-host automation rather than at an interactive prompt. On throughput it
-narrows to 3× to 5×: both implementations end up bound by the same per-field
+narrows to 3× to 6×: both implementations end up bound by the same per-field
 work, and `clf`, at 22 fields and a timestamp per line, is the worst case.
+
+`ifconfig` is the row to read if you want the least flattering number. Its 16 ms
+is almost entirely fixed cost: the parser holds 31 patterns and tries each of
+them against every line, so a 1.3 KB input costs the same as a 3-line one. That
+is a property of how the parser is written, not of the input, and it is the
+clearest remaining thing to fix.
+
+These numbers are end-to-end, one process per run, which is how the CLI is
+actually used. Code that parses repeatedly in one process — the
+[`jc-rs-wasm`](crates/jc-rs-wasm) converter on the site, library callers,
+`--slurp` — sees much larger factors, because it pays that fixed pattern cost
+once instead of once per invocation. `make bench` reports that side:
+`ifconfig` is 65× faster per parse than it was, `iwconfig` 129×, and `ps` 3.4×.
 
 ## Usage
 

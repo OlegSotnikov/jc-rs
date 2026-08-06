@@ -71,33 +71,36 @@ fn parse_raw(input: &str) -> Result<Vec<Map<String, Value>>, ParseError> {
 fn process(raw: Vec<Map<String, Value>>) -> Vec<Map<String, Value>> {
     raw.into_iter()
         .map(|mut row| {
+            // Each field is rewritten in place. Reading it through `get` forced
+            // a clone of the string just to release the borrow, and then a
+            // second allocation for the key `insert` needed — two per field per
+            // row, for a value that was already sitting in the map.
             // Integer fields
-            for field in &["pid", "ppid", "c", "vsz", "rss"] {
-                if let Some(Value::String(s)) = row.get(*field) {
-                    let s = s.clone();
-                    if let Ok(n) = s.trim().parse::<i64>() {
-                        row.insert(field.to_string(), Value::Number(n.into()));
-                    }
+            for field in ["pid", "ppid", "c", "vsz", "rss"] {
+                if let Some(slot) = row.get_mut(field)
+                    && let Value::String(s) = slot
+                    && let Ok(n) = s.trim().parse::<i64>()
+                {
+                    *slot = Value::Number(n.into());
                 }
             }
             // Float fields
-            for field in &["%cpu", "%mem", "cpu_percent", "mem_percent"] {
-                if let Some(Value::String(s)) = row.get(*field) {
-                    let s = s.clone();
-                    if let Ok(f) = s.trim().parse::<f64>()
-                        && let Some(n) = serde_json::Number::from_f64(f)
-                    {
-                        row.insert(field.to_string(), Value::Number(n));
-                    }
+            for field in ["%cpu", "%mem", "cpu_percent", "mem_percent"] {
+                if let Some(slot) = row.get_mut(field)
+                    && let Value::String(s) = slot
+                    && let Ok(f) = s.trim().parse::<f64>()
+                    && let Some(n) = serde_json::Number::from_f64(f)
+                {
+                    *slot = Value::Number(n);
                 }
             }
             // Null TTY fields
-            for field in &["tty", "tt"] {
-                if let Some(Value::String(s)) = row.get(*field) {
-                    let s = s.clone();
-                    if s == "?" || s == "??" {
-                        row.insert(field.to_string(), Value::Null);
-                    }
+            for field in ["tty", "tt"] {
+                if let Some(slot) = row.get_mut(field)
+                    && let Value::String(s) = slot
+                    && (s == "?" || s == "??")
+                {
+                    *slot = Value::Null;
                 }
             }
             row

@@ -7,6 +7,41 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+/// Every pattern `rsync` parsing needs, compiled once for the process
+/// rather than rebuilt on each invocation.
+struct RsyncRegexes {
+    file_line: Regex,
+    file_line_mac: Regex,
+    file_line_log: Regex,
+    file_line_log_mac: Regex,
+    stat1: Regex,
+    stat2: Regex,
+    stat1_simple: Regex,
+    stat2_simple: Regex,
+    stat_log: Regex,
+    stat1_log_v: Regex,
+    stat2_log_v: Regex,
+    stat3_log_v: Regex,
+}
+
+static RE: LazyLock<RsyncRegexes> = LazyLock::new(|| {
+    RsyncRegexes {
+    file_line: Regex::new(r"^([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][u.+ ?][a.+ ?][x.+ ?]) (.+)$").expect("file_line pattern is valid"),
+    file_line_mac: Regex::new(r"^([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][x.+ ?]) (.+)$").expect("file_line_mac pattern is valid"),
+    file_line_log: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] ([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][u.+ ?][a.+ ?][x.+ ?]) (.+)$").expect("file_line_log pattern is valid"),
+    file_line_log_mac: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] ([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][x.+ ?]) (.+)$").expect("file_line_log_mac pattern is valid"),
+    stat1: Regex::new(r"sent\s+([0-9,]+)\s+bytes\s+received\s+([0-9,]+)\s+bytes\s+([0-9,.]+)\s+bytes/sec").expect("stat1 pattern is valid"),
+    stat2: Regex::new(r"total size is\s+([0-9,]+)\s+speedup is\s+([0-9,.]+)").expect("stat2 pattern is valid"),
+    stat1_simple: Regex::new(r"sent\s+([0-9,.TGMK]+)\s+bytes\s+received\s+([0-9,.TGMK]+)\s+bytes\s+([0-9,.TGMK]+)\s+bytes/sec").expect("stat1_simple pattern is valid"),
+    stat2_simple: Regex::new(r"total\s+size\s+is\s+([0-9,.TGMK]+)\s+speedup\s+is\s+([0-9,.TGMK]+)").expect("stat2_simple pattern is valid"),
+    stat_log: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] sent\s+([\d,]+)\s+bytes\s+received\s+([\d,]+)\s+bytes\s+total\s+size\s+([\d,]+)").expect("stat_log pattern is valid"),
+    stat1_log_v: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] total:\s+matches=([\d,]+)\s+hash_hits=([\d,]+)\s+false_alarms=([\d,]+)\s+data=([\d,]+)").expect("stat1_log_v pattern is valid"),
+    stat2_log_v: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] sent\s+([\d,]+)\s+bytes\s+received\s+([\d,]+)\s+bytes\s+([\d,.]+)\s+bytes/sec").expect("stat2_log_v pattern is valid"),
+    stat3_log_v: Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] total\s+size\s+is\s+([\d,]+)\s+speedup\s+is\s+([\d,.]+)").expect("stat3_log_v pattern is valid"),
+}
+});
 
 pub struct RsyncParser;
 
@@ -155,36 +190,19 @@ impl Parser for RsyncParser {
         }
 
         // Regexes for file lines and summary
-        let file_line_re = Regex::new(r"^([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][u.+ ?][a.+ ?][x.+ ?]) (.+)$")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let file_line_mac_re = Regex::new(
-            r"^([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][x.+ ?]) (.+)$",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let file_line_log_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] ([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][u.+ ?][a.+ ?][x.+ ?]) (.+)$")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let file_line_log_mac_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] ([<>ch.*][fdlDS][c.+ ?][s.+ ?][t.+ ?][p.+ ?][o.+ ?][g.+ ?][x.+ ?]) (.+)$")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
+        let file_line_re = &RE.file_line;
+        let file_line_mac_re = &RE.file_line_mac;
+        let file_line_log_re = &RE.file_line_log;
+        let file_line_log_mac_re = &RE.file_line_log_mac;
 
-        let stat1_re = Regex::new(
-            r"sent\s+([0-9,]+)\s+bytes\s+received\s+([0-9,]+)\s+bytes\s+([0-9,.]+)\s+bytes/sec",
-        )
-        .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat2_re = Regex::new(r"total size is\s+([0-9,]+)\s+speedup is\s+([0-9,.]+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat1_simple_re = Regex::new(r"sent\s+([0-9,.TGMK]+)\s+bytes\s+received\s+([0-9,.TGMK]+)\s+bytes\s+([0-9,.TGMK]+)\s+bytes/sec")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat2_simple_re =
-            Regex::new(r"total\s+size\s+is\s+([0-9,.TGMK]+)\s+speedup\s+is\s+([0-9,.TGMK]+)")
-                .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat_log_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] sent\s+([\d,]+)\s+bytes\s+received\s+([\d,]+)\s+bytes\s+total\s+size\s+([\d,]+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat1_log_v_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] total:\s+matches=([\d,]+)\s+hash_hits=([\d,]+)\s+false_alarms=([\d,]+)\s+data=([\d,]+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat2_log_v_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] sent\s+([\d,]+)\s+bytes\s+received\s+([\d,]+)\s+bytes\s+([\d,.]+)\s+bytes/sec")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let stat3_log_v_re = Regex::new(r"^(\d{4}/\d{2}/\d{2}) (\d{2}:\d{2}:\d{2}) \[(\d+)\] total\s+size\s+is\s+([\d,]+)\s+speedup\s+is\s+([\d,.]+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
+        let stat1_re = &RE.stat1;
+        let stat2_re = &RE.stat2;
+        let stat1_simple_re = &RE.stat1_simple;
+        let stat2_simple_re = &RE.stat2_simple;
+        let stat_log_re = &RE.stat_log;
+        let stat1_log_v_re = &RE.stat1_log_v;
+        let stat2_log_v_re = &RE.stat2_log_v;
+        let stat3_log_v_re = &RE.stat3_log_v;
 
         // Group by process ID for log format
         let mut groups: Vec<(String, Vec<Map<String, Value>>, Map<String, Value>)> = Vec::new(); // (process_id, files, summary)

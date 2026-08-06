@@ -6,6 +6,26 @@ use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
 use regex::Regex;
 use serde_json::{Map, Value};
+use std::sync::LazyLock;
+
+// Compiled once for the process. Each of these sat inside a function the
+// parser calls per line or per record, so the pattern was rebuilt from
+// source for every one of them.
+static RE_RE_TTL_HOST: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\s?(\d+)(\??): +(no reply|\S+)").expect("RE_RE_TTL_HOST is a valid pattern")
+});
+static RE_RE_PMTU: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r" pmtu (\d+)").expect("RE_RE_PMTU is a valid pattern"));
+static RE_RE_REPLY_MS: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r" (\d+\.\d+)ms").expect("RE_RE_REPLY_MS is a valid pattern"));
+static RE_RE_ASYMM: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r" asymm +(\d+)").expect("RE_RE_ASYMM is a valid pattern"));
+static RE_RE_REACHED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r" reached").expect("RE_RE_REACHED is a valid pattern"));
+static RE_RE_SUMMARY: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\s+Resume: pmtu (\d+)(?:\s+hops (\d+))?(?:\s+back (\d+))?")
+        .expect("RE_RE_SUMMARY is a valid pattern")
+});
 
 pub struct TracepathParser;
 
@@ -47,16 +67,12 @@ impl Parser for TracepathParser {
 
         // Alternation order matters: `\S+` first would match just "no" in
         // "no reply" and report it as a hostname.
-        let re_ttl_host = Regex::new(r"^\s?(\d+)(\??): +(no reply|\S+)")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_pmtu = Regex::new(r" pmtu (\d+)").map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_reply_ms =
-            Regex::new(r" (\d+\.\d+)ms").map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_asymm =
-            Regex::new(r" asymm +(\d+)").map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_reached = Regex::new(r" reached").map_err(|e| ParseError::Regex(e.to_string()))?;
-        let re_summary = Regex::new(r"\s+Resume: pmtu (\d+)(?:\s+hops (\d+))?(?:\s+back (\d+))?")
-            .map_err(|e| ParseError::Regex(e.to_string()))?;
+        let re_ttl_host = &*RE_RE_TTL_HOST;
+        let re_pmtu = &*RE_RE_PMTU;
+        let re_reply_ms = &*RE_RE_REPLY_MS;
+        let re_asymm = &*RE_RE_ASYMM;
+        let re_reached = &*RE_RE_REACHED;
+        let re_summary = &*RE_RE_SUMMARY;
 
         let mut hops: Vec<Value> = Vec::new();
         let mut top_pmtu: Option<i64> = None;
