@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Palette
+   The four accents are the colours a developer already reads in a JSON blob:
+   key, string, number, punctuation. Using them as the site's palette means the
+   interface and the code samples speak one language instead of two.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --color-paper: #f4f6f8;
+  --color-surface: #ffffff;
+  --color-sunk: #eceff3;
+  --color-ink: #0f1319;
+  --color-muted: #5a6474;
+  --color-faint: #8996a8;
+  --color-rule: #dfe4ea;
+
+  --color-key: #2d5bd0;
+  --color-str: #12805a;
+  --color-num: #bd5400;
+  --color-punct: #94a0b2;
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #0b0e13;
+  --color-surface: #131922;
+  --color-sunk: #0f141b;
+  --color-ink: #e7ecf3;
+  --color-muted: #97a3b6;
+  --color-faint: #6d7b90;
+  --color-rule: #212936;
+
+  --color-key: #7aa2f7;
+  --color-str: #6ed3a3;
+  --color-num: #f0a868;
+  --color-punct: #6d7b90;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-paper: #0b0e13;
+    --color-surface: #131922;
+    --color-sunk: #0f141b;
+    --color-ink: #e7ecf3;
+    --color-muted: #97a3b6;
+    --color-faint: #6d7b90;
+    --color-rule: #212936;
+
+    --color-key: #7aa2f7;
+    --color-str: #6ed3a3;
+    --color-num: #f0a868;
+    --color-punct: #6d7b90;
+  }
+}
+
+* {
+  border-color: var(--color-rule);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-key) 26%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-key);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.08;
+}
+
+/* --- The measurement rule -------------------------------------------------
+   A hairline with a tick at the 100% mark. It reads as a ruler rather than a
+   progress bar, which is the honest metaphor: this is a measurement, not a
+   loading state. */
+
+.ruler {
+  position: relative;
+  height: 3px;
+  background: var(--color-sunk);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ruler > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--color-key), var(--color-str));
+  border-radius: 999px;
+  transform-origin: left center;
+  animation: ruler-fill 1.1s var(--ease-out-quint) both;
+}
+
+@keyframes ruler-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* --- Token linking --------------------------------------------------------
+   The signature interaction: hovering a JSON key lights the span of raw
+   command output it was read from. */
+
+.tok {
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.tok[data-lit="true"] {
+  background: color-mix(in oklab, var(--color-key) 22%, transparent);
+  color: var(--color-ink);
+}
+
+.jkey {
+  color: var(--color-key);
+  cursor: default;
+  border-radius: 3px;
+  transition: background-color 140ms ease;
+}
+
+.jkey[data-lit="true"] {
+  background: color-mix(in oklab, var(--color-key) 22%, transparent);
+}
+
+.jstr {
+  color: var(--color-str);
+}
+.jnum {
+  color: var(--color-num);
+}
+.jpunct {
+  color: var(--color-punct);
+}
+
+/* --- Entrance -------------------------------------------------------------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.rise {
+  animation: rise 620ms var(--ease-out-quint) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
