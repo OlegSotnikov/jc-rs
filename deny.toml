@@ -1,0 +1,21 @@
+# What `cargo deny check advisories` reads. CI runs it on every push, so an
+# advisory published against anything jc-rs ships fails the build the same way
+# a test does.
+#
+# Until this file existed the check ran on defaults and only by hand, which is
+# how a binary went out depending on `atty` — unmaintained since 2024 — and on
+# a quick-xml with two denial-of-service advisories against it.
+
+[graph]
+# jc-rs-bench is `publish = false`; it exists to run criterion locally and
+# nothing it pulls in reaches a user. An advisory against criterion's tree is
+# worth knowing about, but it is not a finding about what jc-rs ships, and
+# leaving it in the graph means the check is red for a reason nobody can act on.
+exclude = ["jc-rs-bench"]
+all-features = true
+
+[advisories]
+version = 2
+# No ignore list. Adding an entry here should take the same argument as
+# shipping the vulnerability, because that is what it does.
+yanked = "deny"

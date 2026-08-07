@@ -19,7 +19,7 @@ thiserror = { workspace = true }
 regex = "1"
 csv = "1"
 serde_yaml = "0.9"
-quick-xml = { version = "0.37", features = ["serialize"] }
+quick-xml = { version = "0.41", features = ["serialize"] }
 toml = "0.8"
 inventory = "0.3"
 ini = "1"

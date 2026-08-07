@@ -1,0 +1,43 @@
+# Keeps the three dependency sets current without anyone remembering to look.
+#
+# The CI `advisories` and `website` jobs tell you when something is already
+# wrong; this is what stops it getting wrong. Both are needed: an advisory
+# check finds the vulnerability you have, Dependabot removes the year of drift
+# that made it likely.
+#
+# Grouped so a week produces a handful of reviewable pull requests instead of
+# forty. Majors stay separate, because those are the ones that need a person:
+# TypeScript 7 and ESLint 10 are both released and both currently break
+# `typescript-eslint`, which is exactly the call an automated merge should not
+# be making.
+version: 2
+
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      cargo-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  # The workflows pin third-party actions to commit SHAs, which is what keeps a
+  # compromised tag from publishing under our name — and also what makes them
+  # invisible to every other update mechanism.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

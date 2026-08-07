@@ -5,7 +5,7 @@
 
 use colored::Colorize;
 use serde_json::Value;
-use std::io::{self, Write};
+use std::io::{self, IsTerminal, Write};
 
 /// Color scheme for JSON output. Keys are determined by `JC_COLORS` env var.
 #[derive(Debug, Clone)]
@@ -223,7 +223,7 @@ pub fn should_use_color(force_color: bool, mono: bool) -> bool {
     if mono && !force_color {
         return false;
     }
-    if !atty::is(atty::Stream::Stdout) && !force_color {
+    if !io::stdout().is_terminal() && !force_color {
         return false;
     }
     true
