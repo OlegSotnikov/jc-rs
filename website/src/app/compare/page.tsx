@@ -126,9 +126,10 @@ export default function Compare() {
       <section className="mt-12">
         <h2 className="text-2xl">Where the time goes</h2>
         <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-          Most of the difference is startup, paid once per invocation. That is why it shows up in
-          loops, git hooks and per-host automation rather than at an interactive prompt. On
-          throughput both are bound by the same per-field work.
+          Startup is where the gap is widest, and startup is what a loop pays. Over 200 hosts, jc
+          spends 21 seconds inside the Python interpreter before parsing a byte; jc-rs spends one.
+          On bulk throughput the lead settles at 3× to 6×, where both are bound by the same
+          per-field work.
         </p>
         <BenchChart />
       </section>

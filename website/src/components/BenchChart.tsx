@@ -8,9 +8,9 @@ import { benchmarks, benchmarkMeta } from "@/lib/site";
  * plain elements rather than SVG so they reflow on a phone without a viewBox
  * fighting the layout.
  *
- * Every bar carries its own value label. At a linear scale a 5 ms bar beside a
- * 547 ms one is a sliver — which is exactly the finding, so the geometry stays
- * honest and the number is what you read it from.
+ * Every bar carries its own value label, because at a linear scale a 5 ms bar
+ * beside a 547 ms one is a few pixels wide. The scale stays linear — that ratio
+ * is the result — so the label is what the value is read from.
  */
 export function BenchChart() {
   const peak = Math.max(...benchmarks.map((b) => Math.max(b.jc, b.rs)));
@@ -79,9 +79,9 @@ export function BenchChart() {
       </div>
 
       <figcaption className="mt-3 text-sm text-[var(--color-faint)]">
-        {benchmarkMeta.method}. jc {benchmarkMeta.jcVersion} on Python {benchmarkMeta.python},{" "}
-        {benchmarkMeta.platform}, measured {benchmarkMeta.measured}, one harness timing both
-        sides. Reproduce it with <code className="font-mono">make bench-vs-jc</code>.
+        One harness timing both sides, {benchmarkMeta.method}. jc {benchmarkMeta.jcVersion} on
+        Python {benchmarkMeta.python}, {benchmarkMeta.platform}, {benchmarkMeta.measured}. Run it
+        on your own machine with <code className="font-mono">make bench-vs-jc</code>.
       </figcaption>
     </figure>
   );

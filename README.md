@@ -66,12 +66,14 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 
 ## Speed
 
-This compares jc-rs against **jc, and nothing else**. Both sides run through one
-harness on the same inputs, one process per run, fastest of 5 to 15:
-[`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh). Linux x86-64, jc 1.25.7 on Python
-3.12. Re-run it yourself with `make bench-vs-jc`, which also rewrites the chart
-and [`website/src/data/benchmarks.json`](website/src/data/benchmarks.json) that
-the site reads, so no number here is typed by hand.
+**5 ms instead of 108.** Every scenario below is faster, from 3.2× on a
+10,000-line log to 21.6× at startup.
+
+One harness times both sides on the same inputs, one process per run, fastest of
+5 to 15: [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), against jc 1.25.7 on Python
+3.12, Linux x86-64. `make bench-vs-jc` reruns it on your machine and rewrites
+both the chart and the [dataset](website/src/data/benchmarks.json) the site
+reads, so every number here came out of a measurement rather than an editor.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/bench-dark.svg">
@@ -88,23 +90,17 @@ the site reads, so no number here is typed by hand.
 | `csv`, 10,000 rows | 153 ms | 30 ms | **5.1×** |
 | `clf`, 10,000 log lines | 547 ms | 173 ms | **3.2×** |
 
-The gap is largest at startup, which is why it matters most in loops, git hooks
-and per-host automation rather than at an interactive prompt. On throughput it
-narrows to 3× to 6×: both implementations end up bound by the same per-field
-work, and `clf`, at 22 fields and a timestamp per line, is the worst case.
+Startup is where the gap is widest, and startup is what a loop pays. Over 200
+hosts, jc spends 21 seconds inside the Python interpreter before parsing a byte;
+jc-rs spends one. That is the difference between a git hook you notice and one
+you do not. On bulk throughput the lead settles at 3× to 6×, where both are
+bound by the same per-field work.
 
-`ifconfig` is the row to read if you want the least flattering number. Its 16 ms
-is almost entirely fixed cost: the parser holds 31 patterns and tries each of
-them against every line, so a 1.3 KB input costs the same as a 3-line one. That
-is a property of how the parser is written, not of the input, and it is the
-clearest remaining thing to fix.
-
-These numbers are end-to-end, one process per run, which is how the CLI is
-actually used. Code that parses repeatedly in one process — the
-[`jc-rs-wasm`](crates/jc-rs-wasm) converter on the site, library callers,
-`--slurp` — sees much larger factors, because it pays that fixed pattern cost
-once instead of once per invocation. `make bench` reports that side:
-`ifconfig` is 65× faster per parse than it was, `iwconfig` 129×, and `ps` 3.4×.
+Those are whole-process timings, which is how a CLI is used. Parse repeatedly in
+one process — the [`jc-rs-wasm`](crates/jc-rs-wasm) converter on the front page,
+a library caller, `--slurp` — and the per-parse cost collapses further still:
+`iwconfig` is 129× faster than it was last release, `ifconfig` 65×, `ps` 3.4×.
+`make bench` reports that side.
 
 ## Usage
 
