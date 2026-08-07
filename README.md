@@ -26,9 +26,10 @@ and a dependency you cannot put in a `scratch` container or on an embedded box.
 
 jc-rs is that tool as a single static binary:
 
-1. A compatibility number you can check. Published continuously, honest when it
-   is bad, never rounded up by excluding awkward fixtures. jc-rs invents no
-   schemas. jc is the authority, and where the two disagree jc-rs has the bug.
+1. A compatibility number you can check. Every fixture jc ships enters the
+   denominator, including the awkward ones, and CI fails below 100%. jc-rs
+   invents no schemas: jc is the authority, and where the two disagree jc-rs has
+   the bug.
 2. Streaming that actually streams. jc emits NDJSON line-by-line as input
    arrives, and so does jc-rs: `tail -f access.log | jc-rs -u --clf-s` prints
    each record as the log grows, rather than one array at EOF.
@@ -73,7 +74,7 @@ One harness times both sides on the same inputs, one process per run, fastest of
 5 to 15: [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), against jc 1.25.7 on Python
 3.12, Linux x86-64. `make bench-vs-jc` reruns it on your machine and rewrites
 both the chart and the [dataset](website/src/data/benchmarks.json) the site
-reads, so every number here came out of a measurement rather than an editor.
+reads, so every figure here traces back to a run of that script.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/bench-dark.svg">
