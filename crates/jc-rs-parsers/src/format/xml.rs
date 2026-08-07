@@ -12,10 +12,26 @@ use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
 use jc_rs_core::traits::Parser;
 use jc_rs_core::types::{ParseOutput, ParserInfo, Platform, Tag};
-use quick_xml::events::Event;
+use quick_xml::events::{BytesText, Event};
 use quick_xml::reader::Reader;
 
 pub struct XmlParser;
+
+/// Decode a text event's bytes and expand its entity references.
+///
+/// quick-xml 0.41 removed `BytesText::unescape`, which did both. Its
+/// replacement pair is used here in the same order and with the same
+/// `decode` step: 0.41 also offers `xml10_content`, which additionally
+/// normalises end-of-line sequences, and that would change what the corpus
+/// records for every fixture carrying CRLF.
+fn decode_and_unescape(e: &BytesText<'_>, context: &str) -> Result<String, ParseError> {
+    let decoded = e
+        .decode()
+        .map_err(|err| ParseError::Generic(format!("{context}: {err}")))?;
+    quick_xml::escape::unescape(&decoded)
+        .map(|s| s.into_owned())
+        .map_err(|err| ParseError::Generic(format!("{context}: {err}")))
+}
 
 static XML_INFO: ParserInfo = ParserInfo {
     name: "xml",
@@ -102,9 +118,7 @@ fn parse_xml_tree(input: &str, attr_prefix: char) -> Result<Vec<XmlNode>, ParseE
                 }
             }
             Ok(Event::Text(e)) => {
-                let text = e
-                    .unescape()
-                    .map_err(|e| ParseError::Generic(format!("XML unescape error: {e}")))?;
+                let text = decode_and_unescape(&e, "XML unescape error")?;
                 let text = text.trim().to_string();
                 if !text.is_empty() {
                     let node = XmlNode::Text(text);
@@ -116,9 +130,7 @@ fn parse_xml_tree(input: &str, attr_prefix: char) -> Result<Vec<XmlNode>, ParseE
                 }
             }
             Ok(Event::Comment(e)) => {
-                let text = e
-                    .unescape()
-                    .map_err(|e| ParseError::Generic(format!("XML comment unescape error: {e}")))?;
+                let text = decode_and_unescape(&e, "XML comment unescape error")?;
                 let text = text.trim().to_string();
                 let node = XmlNode::Comment(text);
                 if let Some(parent) = stack.last_mut() {

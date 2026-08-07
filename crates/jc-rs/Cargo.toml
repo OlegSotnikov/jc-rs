@@ -33,7 +33,6 @@ serde_json = { workspace = true }
 serde_yaml = "0.9"
 colored = "2"
 dirs = "5"
-atty = "0.2"
 
 [dev-dependencies]
 serde_json = { workspace = true }

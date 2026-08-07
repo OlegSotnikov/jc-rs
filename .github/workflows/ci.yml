@@ -131,3 +131,38 @@ jobs:
       # published. jc-rs-bench is excluded because it is the only member that
       # is not published and its path dependencies carry no version.
       - run: cargo package --workspace --exclude jc-rs-bench
+
+  advisories:
+    name: dependency advisories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      # Every advisory published against anything jc-rs ships fails the build,
+      # the same as a test would. Before this job existed the check ran only
+      # when someone remembered to type it, and a release went out depending on
+      # `atty`, unmaintained since 2024, and on a quick-xml carrying two
+      # denial-of-service advisories. `deny.toml` says what is in scope.
+      - uses: EmbarkStudios/cargo-deny-action@30f817c6f72275c6d54dc744fbca09ebc958599f # v2
+        with:
+          command: check advisories
+
+  website:
+    name: website builds and audits clean
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+      # The site is deployed by hand, so nothing else would notice a
+      # vulnerable transitive dependency or a build that stopped compiling.
+      - run: npm audit --audit-level=high
+      - run: npx tsc --noEmit
+      - run: npx eslint .
+      - run: npm run build

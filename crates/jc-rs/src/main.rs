@@ -17,7 +17,7 @@ use jc_rs_core::find_parser;
 use jc_rs_core::registry::all_parsers;
 use jc_rs_core::types::{ParseOutput, Tag};
 use serde_json::{Map, Value};
-use std::io::{self, BufRead, Read};
+use std::io::{self, BufRead, IsTerminal, Read};
 use std::process;
 
 use args::parse_args;
@@ -632,7 +632,7 @@ fn run() -> i32 {
         match find_parser(pname) {
             Some(p) => {
                 // Read stdin
-                if atty::is(atty::Stream::Stdin) {
+                if io::stdin().is_terminal() {
                     eprintln!("jc-rs: error - Missing piped data. Use \"jc-rs -h\" for help.");
                     return EXIT_ERROR;
                 }
