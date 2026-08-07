@@ -6,13 +6,13 @@ SVG that assumes either one is unreadable on the other. `<picture>` with
 `prefers-color-scheme` picks between them.
 
 The colours are the site's own, snapped into the lightness band the dataviz
-validator enforces for each surface: the dark steps are chosen against
-`--color-surface` in dark mode rather than being an automatic lightening of the
-light ones. Run `node scripts/validate_palette.js` from the dataviz skill if you
-change them.
+validator enforces for each surface. Each dark step is chosen against
+`--color-surface` in dark mode and validated there; lightening the light pair
+lands outside that band. Run `node scripts/validate_palette.js` from the dataviz
+skill if you change them.
 
-Horizontal bars because the category labels are words, grouped rather than
-stacked because the two numbers are alternatives and never sum to anything.
+Horizontal bars because the category labels are words. Grouped, since the two
+numbers are alternatives and never sum to anything.
 Every bar is labelled with its value: at a linear scale a 5 ms bar next to a
 495 ms one is a sliver, and the sliver is the point, so the number has to be
 readable independently of the geometry.
@@ -117,7 +117,7 @@ def render(data: dict, t: dict) -> str:
         for k, y in (("jc", mid - BAR_H - BAR_GAP / 2), ("rs", mid + BAR_GAP / 2)):
             ms = r[k]
             # A floor so a 5 ms bar against a 495 ms peak is still a visible
-            # mark rather than nothing; the number beside it carries the value.
+            # mark of its own; the number beside it carries the value.
             w = max(round(plot_w * ms / peak), 3)
             o.append(
                 f'<rect x="{plot_x}" y="{y:.0f}" width="{w}" height="{BAR_H}" '

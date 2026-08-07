@@ -3,10 +3,9 @@ import { benchmarks, benchmarkMeta } from "@/lib/site";
 /**
  * jc against jc-rs, one grouped pair of bars per scenario.
  *
- * Horizontal because the categories are words; grouped rather than stacked
- * because the two numbers are alternatives that never sum to anything. Bars are
- * plain elements rather than SVG so they reflow on a phone without a viewBox
- * fighting the layout.
+ * Horizontal because the categories are words. Grouped, since the two numbers
+ * are alternatives that never sum to anything. Plain elements carry the bars, so
+ * they reflow on a phone without a viewBox fighting the layout.
  *
  * Every bar carries its own value label, because at a linear scale a 5 ms bar
  * beside a 547 ms one is a few pixels wide. The scale stays linear — that ratio

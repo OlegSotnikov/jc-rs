@@ -118,7 +118,7 @@ h3 {
 
 /* --- The measurement rule -------------------------------------------------
    A hairline with a tick at the 100% mark. It reads as a ruler rather than a
-   progress bar, which is the honest metaphor: this is a measurement, not a
+   progress bar, which is the right metaphor: this is a measurement, not a
    loading state. */
 
 .ruler {
