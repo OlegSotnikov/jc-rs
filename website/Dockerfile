@@ -7,8 +7,8 @@
 # shell and npm the build needs; the runtime tag carries neither, which is the
 # point of it.
 #
-# Pulling requires `docker login dhi.io`. The credentials are the group-level
-# DOCKER_HUB_LOGIN / DOCKER_HUB_TOKEN in GitLab, the same pair used to push.
+# Pulling requires `docker login dhi.io`; the deploy notes say where the
+# credentials live.
 
 FROM dhi.io/node:26-alpine3.24-dev AS deps
 WORKDIR /app

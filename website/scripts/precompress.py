@@ -5,7 +5,7 @@
 
 Copies each SRC tree into DST and writes NAME.br / NAME.gz next to every file
 worth compressing. nginx's `brotli_static` / `gzip_static` (already on globally
-on the-web-host) serve those variants when the browser asks, so nothing is
+on the host) serve those variants when the browser asks, so nothing is
 compressed per request and nothing is buffered to a temp file.
 
 Staged into a separate tree, and deliberately not written into .next/ itself:

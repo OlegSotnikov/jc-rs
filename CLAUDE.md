@@ -152,7 +152,7 @@ single-owner repository and the contributor list has to say so.
 ## The website
 
 `website/` is jc-rs.com: Next.js 16, statically rendered, deployed as a
-container behind the nginx container on `the-web-host`. `website/README.md` has
+container behind the nginx container on the web host. `website/README.md` has
 the deploy commands and the infrastructure table.
 
 The thing to know from here: **nothing on the site is hand-written data**.
