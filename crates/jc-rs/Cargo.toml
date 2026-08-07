@@ -32,7 +32,7 @@ jc-rs-utils = { path = "../jc-rs-utils", version = "0.3.1" }
 serde_json = { workspace = true }
 serde_yaml = "0.9"
 colored = "2"
-dirs = "5"
+dirs = "6"
 
 [dev-dependencies]
 serde_json = { workspace = true }
