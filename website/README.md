@@ -67,7 +67,14 @@ There is no GitLab CI for this project: the code lives on GitHub and the release
 pipeline there publishes the binary, not the site. The site is deployed by hand,
 which is four commands.
 
+The base image comes from `dhi.io`, which needs a login before the build can
+pull it. The credentials are the group-level `DOCKER_HUB_LOGIN` /
+`DOCKER_HUB_TOKEN` in GitLab — the same pair that pushes,
+and an ordinary Docker ID is enough: the subscription gates only the `-fips`
+and `-sfw-ent` tags.
+
 ```sh
+docker login dhi.io -u "$DOCKER_HUB_LOGIN" --password-stdin <<<"$DOCKER_HUB_TOKEN"
 make site                                   # dataset + wasm, from the repo root
 cd website && npm ci && npm run build       # fails the deploy early if it fails
 docker build -t appmasterio/jc-rs-website:master-latest .
@@ -103,7 +110,14 @@ environments and is scoped to the release workflow.
 | DNS | `jc-rs.com` and `www.jc-rs.com`, proxied CNAME to the `the-web-host` tunnel |
 | Tunnel | `REDACTED-TUNNEL-ID`, both hosts routed to `https://REDACTED-HOST-IP:443` |
 
-Three traps this deploy walked into, so the next one does not:
+Four traps this deploy walked into, so the next one does not:
+
+- **The hardened runtime has no shell and no package manager.** That is what it
+  is for, and it means `RUN` cannot appear in the runtime stage. The stock image
+  created its own user there; `dhi.io/node:26-alpine3.24` already runs as uid
+  1000 with `WORKDIR /app`, so the `adduser` step and the `USER` line are gone
+  and the `COPY` lines carry `--chown=1000:1000` instead. Build tooling lives in
+  the `-dev` tag, which does have npm and a shell.
 
 - **The compose project name is explicit.** The directory is `website`, as it is
   in every other project, so without `name: jc-rs` two unrelated stacks share
