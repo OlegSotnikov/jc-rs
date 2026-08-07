@@ -6,9 +6,10 @@
 // Force the linker to include all parser registrations (inventory::submit! macros).
 extern crate jc_rs_parsers;
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use jc_rs_core::registry::find_parser;
 use jc_rs_utils::{parse_timestamp, simple_table_parse, sparse_table_parse};
+use std::hint::black_box;
 
 // ---------------------------------------------------------------------------
 // Static fixtures (embedded at compile time)

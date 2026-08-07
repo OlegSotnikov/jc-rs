@@ -30,6 +30,16 @@ updates:
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Both majors are out and both break typescript-eslint, which
+      # eslint-config-next depends on: TS 7 is refused outright and ESLint 10
+      # fails on a scope-manager API it no longer has. Proposing them weekly is
+      # noise until typescript-eslint catches up — delete these entries when it
+      # does.
+      - dependency-name: typescript
+        versions: [">=7"]
+      - dependency-name: eslint
+        versions: [">=10"]
 
   # The workflows pin third-party actions to commit SHAs, which is what keeps a
   # compromised tag from publishing under our name — and also what makes them
