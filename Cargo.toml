@@ -21,7 +21,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 inventory = "0.3"
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.8", features = ["html_reports"] }
 
 # A CLI whose whole pitch is startup time should be built like one. `panic =
 # "abort"` also drops the unwind tables, which is most of the binary-size win.
