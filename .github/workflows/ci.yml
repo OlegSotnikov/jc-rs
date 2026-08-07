@@ -142,9 +142,16 @@ jobs:
       # when someone remembered to type it, and a release went out depending on
       # `atty`, unmaintained since 2024, and on a quick-xml carrying two
       # denial-of-service advisories. `deny.toml` says what is in scope.
-      - uses: EmbarkStudios/cargo-deny-action@30f817c6f72275c6d54dc744fbca09ebc958599f # v2
+      # cargo-deny is installed rather than taken from
+      # EmbarkStudios/cargo-deny-action, whose pinned release bundles its own
+      # copy: that copy could not read the advisory database at all, because
+      # RustSec now publishes entries scored with CVSS 4.0 and it only
+      # understands 3.x. A check that fails on the database rather than on the
+      # dependencies teaches people to ignore it.
+      - uses: taiki-e/install-action@91ddec75689c4c78665b598d188dc821c5a43e5c # v2.85.9
         with:
-          command: check advisories
+          tool: cargo-deny@0.20.2
+      - run: cargo deny check advisories
 
   website:
     name: website builds and audits clean
