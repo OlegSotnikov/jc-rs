@@ -63,24 +63,65 @@ fastest() {
 # an extra `bash -c` and the cold-start row without one, which charged every
 # other row for a shell it never needed.
 row() {
-  local label="$1" runs="$2" args="$3" input="${4:-}"
+  local label="$1" runs="$2" args="$3" input="${4:-}" scenario="$5" detail="$6"
   local jc_ms rs_ms
   jc_ms=$(fastest "$runs" "$input" env PYTHONPATH=jc python3 -m jc "$args")
   rs_ms=$(fastest "$runs" "$input" "$BIN" "$args")
   printf '| %-36s | %5s ms | %5s ms | **%sx** |\n' \
     "$label" "$jc_ms" "$rs_ms" \
     "$(python3 -c "print(f'{$jc_ms / max($rs_ms, 1):.1f}')")"
+  # The same measurement, in the form the site and the README chart read. Both
+  # used to carry their own hand-typed copy of these numbers, in three places
+  # that had already drifted apart by two releases.
+  python3 -c "
+import json,sys
+print(json.dumps({'scenario': sys.argv[1], 'detail': sys.argv[2],
+                  'jc': int(sys.argv[3]), 'rs': int(sys.argv[4])}))
+" "$scenario" "$detail" "$jc_ms" "$rs_ms" >> "$WORK/rows.jsonl"
 }
 
 echo "| Scenario | jc | jc-rs | Speedup |"
 echo "|---|---|---|---|"
-row 'Cold start (`-v`)'                 15 -v
-row '`ps aux`, 110 lines'               11 --ps            tests/fixtures/centos-7.7/ps-axu.out
+row 'Cold start (`-v`)'                 15 -v               ''                                            'Cold start'    'jc-rs -v'
+row '`ps aux`, 110 lines'               11 --ps            tests/fixtures/centos-7.7/ps-axu.out           'ps aux'        '110 lines'
 # Two small inputs whose cost is per-record rather than per-byte: both sides
 # carry a large pattern set here, so the row says something the throughput
 # rows do not.
-row '`traceroute`, 1.5 KB'              11 --traceroute    tests/fixtures/generic/traceroute1.out
-row '`ifconfig`, 1.3 KB'                11 --ifconfig      tests/fixtures/centos-7.7/ifconfig.out
-row '`clf`, 10,000 log lines'            7 --clf           "$WORK/big.clf"
-row '`csv`, 10,000 rows'                 7 --csv           "$WORK/rows.csv"
-row '`pkg-index-deb`, 1.5 MB'            5 --pkg-index-deb tests/fixtures/generic/pkg-index-deb.out
+row '`traceroute`, 1.5 KB'              11 --traceroute    tests/fixtures/generic/traceroute1.out         'traceroute'    '1.5 KB'
+row '`ifconfig`, 1.3 KB'                11 --ifconfig      tests/fixtures/centos-7.7/ifconfig.out         'ifconfig'      '1.3 KB'
+row '`clf`, 10,000 log lines'            7 --clf           "$WORK/big.clf"                                'clf'           '10,000 log lines'
+row '`csv`, 10,000 rows'                 7 --csv           "$WORK/rows.csv"                               'csv'           '10,000 rows'
+row '`pkg-index-deb`, 1.5 MB'            5 --pkg-index-deb tests/fixtures/generic/pkg-index-deb.out       'pkg-index-deb' '1.5 MB'
+
+# --- the same run, as data ----------------------------------------------------
+# `website/src/data/` is generated, never edited, and this is the one file in it
+# that build-data.py does not produce: it needs a jc to race against.
+OUT=website/src/data/benchmarks.json
+python3 - "$WORK/rows.jsonl" "$OUT" <<'PY'
+import json, platform, subprocess, sys, datetime
+
+rows_path, out_path = sys.argv[1], sys.argv[2]
+rows = [json.loads(l) for l in open(rows_path) if l.strip()]
+
+def cmd(*a):
+    try:
+        return subprocess.run(a, capture_output=True, text=True).stdout.strip()
+    except Exception:
+        return ""
+
+jc_version = cmd("python3", "-c",
+                 "import sys; sys.path.insert(0,'jc'); import jc; print(jc.__version__)")
+py = platform.python_version()
+
+json.dump({
+    "method": "fastest of 5 to 15 runs, one process per run",
+    "jcVersion": jc_version or "unknown",
+    "python": py,
+    "platform": f"{platform.system()} {platform.machine()}",
+    "measured": datetime.date.today().isoformat(),
+    "rows": rows,
+}, open(out_path, "w"), indent=1)
+print(f"\n{out_path}  {len(rows)} scenarios, jc {jc_version}, python {py}")
+PY
+
+python3 ci/render-bench-svg.py

@@ -12,14 +12,26 @@ export const site = {
   releases: "https://github.com/OlegSotnikov/jc-rs/releases",
 } as const;
 
-/** Measured by ci/bench-vs-jc.sh, median of 5-11 runs, Linux x86-64. */
-export const benchmarks = [
-  { scenario: "Cold start", detail: "jc-rs -v", jc: 138, rs: 7 },
-  { scenario: "ps aux", detail: "110 lines", jc: 156, rs: 12 },
-  { scenario: "csv", detail: "10,000 rows", jc: 200, rs: 41 },
-  { scenario: "pkg-index-deb", detail: "1.5 MB", jc: 309, rs: 88 },
-  { scenario: "clf", detail: "10,000 log lines", jc: 604, rs: 208 },
-] as const;
+import benchmarkData from "@/data/benchmarks.json";
+
+/**
+ * Measured by `ci/bench-vs-jc.sh`, which writes `data/benchmarks.json`.
+ *
+ * These numbers used to be typed here, and again in the compare page, and again
+ * in the README. All three drifted, and the two on the site were two releases
+ * out of date while claiming to describe the current one. Nothing on this site
+ * is hand-written data; this file was the exception, and is not any more.
+ */
+export const benchmarks = benchmarkData.rows;
+
+/** How the numbers above were obtained, for the caption under the chart. */
+export const benchmarkMeta = {
+  method: benchmarkData.method,
+  jcVersion: benchmarkData.jcVersion,
+  python: benchmarkData.python,
+  platform: benchmarkData.platform,
+  measured: benchmarkData.measured,
+} as const;
 
 export const install = [
   { label: "Cargo, prebuilt", cmd: "cargo binstall jc-rs" },

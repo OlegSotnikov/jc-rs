@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BenchChart } from "@/components/BenchChart";
 import { benchmarks, site } from "@/lib/site";
 import { summary } from "@/lib/parsers";
 
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
     "jc-rs is a single static binary with no runtime to install. jc is the original Python tool. They emit the same JSON, so switching costs one word in a pipeline.",
   alternates: { canonical: "/compare" },
 };
+
+const startup = benchmarks[0];
 
 const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
   {
@@ -24,8 +27,8 @@ const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
   },
   {
     label: "Cold start",
-    rs: "7 ms",
-    jc: "138 ms",
+    rs: `${startup.rs} ms`,
+    jc: `${startup.jc} ms`,
     note: "Per invocation. In a loop over 200 hosts that is 26 seconds of interpreter startup.",
   },
   {
@@ -63,8 +66,6 @@ const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
 ];
 
 export default function Compare() {
-  const startup = benchmarks[0];
-
   return (
     <div className="mx-auto max-w-5xl px-5 py-14">
       <p className="font-mono text-xs tracking-wide text-[var(--color-muted)] uppercase">
@@ -129,32 +130,7 @@ export default function Compare() {
           loops, git hooks and per-host automation rather than at an interactive prompt. On
           throughput both are bound by the same per-field work.
         </p>
-        <div className="mt-5 overflow-hidden rounded-xl border bg-[var(--color-surface)]">
-          {benchmarks.map((b) => (
-            <div
-              key={b.scenario}
-              className="grid grid-cols-[minmax(0,1fr)_5rem_5rem_4rem] items-baseline gap-4 border-b px-5 py-3 last:border-b-0"
-            >
-              <span className="font-mono text-sm">
-                {b.scenario}
-                <span className="ml-2 text-xs text-[var(--color-faint)]">{b.detail}</span>
-              </span>
-              <span className="text-right font-mono text-sm tabular-nums text-[var(--color-key)]">
-                {b.rs} ms
-              </span>
-              <span className="text-right font-mono text-sm tabular-nums text-[var(--color-muted)]">
-                {b.jc} ms
-              </span>
-              <span className="text-right font-mono text-sm tabular-nums text-[var(--color-str)]">
-                {(b.jc / b.rs).toFixed(1)}×
-              </span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-sm text-[var(--color-faint)]">
-          Median of 5 to 11 runs, Linux x86-64, Python 3.12, one harness timing both sides.
-          Reproduce it with <code className="font-mono">make bench-vs-jc</code>.
-        </p>
+        <BenchChart />
       </section>
 
       <section className="mt-12">

@@ -21,6 +21,15 @@
   --color-num: #bd5400;
   --color-punct: #94a0b2;
 
+  /* Chart fills. Deliberately not --color-key / --color-num: those are tuned
+     for text on this surface, and as large fills the dark pair sits outside the
+     lightness band a two-series categorical palette needs. These steps are
+     validated per surface (CVD separation, chroma, contrast) — see
+     ci/render-bench-svg.py, which draws the README's copy of the same chart in
+     the same colours. */
+  --color-chart-rs: #2d5bd0;
+  --color-chart-jc: #bd5400;
+
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", monospace;
@@ -46,6 +55,9 @@
   --color-str: #6ed3a3;
   --color-num: #f0a868;
   --color-punct: #6d7b90;
+
+  --color-chart-rs: #4f7fdb;
+  --color-chart-jc: #cf7f3c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -63,6 +75,9 @@
     --color-str: #6ed3a3;
     --color-num: #f0a868;
     --color-punct: #6d7b90;
+
+    --color-chart-rs: #4f7fdb;
+    --color-chart-jc: #cf7f3c;
   }
 }
 

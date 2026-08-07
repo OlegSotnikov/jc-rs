@@ -66,19 +66,27 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 
 ## Speed
 
-Measured by [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), which times both sides with
-one harness on the same inputs: fastest of 5 to 15 runs, Linux x86-64, jc 1.25.7
-on Python 3.12. Re-run it yourself with `make bench-vs-jc`.
+This compares jc-rs against **jc, and nothing else**. Both sides run through one
+harness on the same inputs, one process per run, fastest of 5 to 15:
+[`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh). Linux x86-64, jc 1.25.7 on Python
+3.12. Re-run it yourself with `make bench-vs-jc`, which also rewrites the chart
+and [`website/src/data/benchmarks.json`](website/src/data/benchmarks.json) that
+the site reads, so no number here is typed by hand.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/bench-dark.svg">
+  <img alt="Milliseconds per run for seven scenarios, jc against jc-rs; jc-rs is faster in every one, by 21.6× on cold start down to 3.2× on 10,000 log lines" src="docs/bench-light.svg">
+</picture>
 
 | Scenario | jc | jc-rs | Speedup |
 |---|---|---|---|
-| Cold start (`-v`) | 106 ms | 5 ms | **21.2×** |
-| `ps aux`, 110 lines | 111 ms | 6 ms | **18.5×** |
-| `traceroute`, 1.5 KB | 122 ms | 10 ms | **12.2×** |
-| `ifconfig`, 1.3 KB | 125 ms | 16 ms | **7.8×** |
-| `pkg-index-deb`, 1.5 MB | 234 ms | 36 ms | **6.5×** |
-| `csv`, 10,000 rows | 160 ms | 31 ms | **5.2×** |
-| `clf`, 10,000 log lines | 495 ms | 174 ms | **2.8×** |
+| Cold start (`-v`) | 108 ms | 5 ms | **21.6×** |
+| `ps aux`, 110 lines | 121 ms | 7 ms | **17.3×** |
+| `traceroute`, 1.5 KB | 128 ms | 10 ms | **12.8×** |
+| `ifconfig`, 1.3 KB | 138 ms | 15 ms | **9.2×** |
+| `pkg-index-deb`, 1.5 MB | 238 ms | 37 ms | **6.4×** |
+| `csv`, 10,000 rows | 153 ms | 30 ms | **5.1×** |
+| `clf`, 10,000 log lines | 547 ms | 173 ms | **3.2×** |
 
 The gap is largest at startup, which is why it matters most in loops, git hooks
 and per-host automation rather than at an interactive prompt. On throughput it
