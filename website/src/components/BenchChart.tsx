@@ -39,14 +39,21 @@ export function BenchChart() {
         {benchmarks.map((b) => (
           <div
             key={b.scenario}
-            className="grid grid-cols-[9rem_minmax(0,1fr)_3.5rem] items-center gap-4 border-b px-5 py-4 last:border-b-0"
+            // On a phone the label column would leave the bars ~120px to live
+            // in, where 108 ms and 547 ms draw the same. Below `sm` the label
+            // and the ratio take a row of their own and the bars get the width.
+            className="grid grid-cols-[minmax(0,1fr)_3.5rem] items-center gap-x-4 gap-y-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[9rem_minmax(0,1fr)_3.5rem] sm:gap-y-0"
           >
-            <div className="min-w-0">
+            <div className="min-w-0 sm:col-start-1 sm:row-start-1">
               <div className="truncate font-mono text-sm">{b.scenario}</div>
               <div className="truncate text-xs text-[var(--color-faint)]">{b.detail}</div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <span className="text-right font-mono text-sm tabular-nums sm:col-start-3 sm:row-start-1">
+              {(b.jc / Math.max(b.rs, 1)).toFixed(1)}×
+            </span>
+
+            <div className="col-span-2 flex flex-col gap-1.5 sm:col-span-1 sm:col-start-2 sm:row-start-1">
               {(
                 [
                   ["jc", b.jc, "var(--color-chart-jc)"],
@@ -69,10 +76,6 @@ export function BenchChart() {
                 </div>
               ))}
             </div>
-
-            <span className="text-right font-mono text-sm tabular-nums">
-              {(b.jc / Math.max(b.rs, 1)).toFixed(1)}×
-            </span>
           </div>
         ))}
       </div>

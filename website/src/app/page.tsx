@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { BenchChart } from "@/components/BenchChart";
 import { Converter, type Preset } from "@/components/Converter";
 import { CopyLine } from "@/components/CopyLine";
 import { benchmarks, install, site } from "@/lib/site";
@@ -121,65 +122,23 @@ function Evidence() {
 }
 
 function Speed() {
-  const max = Math.max(...benchmarks.map((b) => b.jc));
+  const startup = benchmarks[0];
   return (
     <section className="mx-auto max-w-6xl px-5 py-16">
       <h2 className="text-3xl">Startup is where it shows</h2>
       <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-        A compiled binary starts in single-digit milliseconds. The Python original pays ~160 ms
-        of interpreter startup on every invocation, which is most of the gap and why it matters
-        in loops, git hooks and per-host automation rather than at an interactive prompt. On
-        throughput both are bound by the same per-field work.{" "}
+        A compiled binary starts in {startup.rs} ms. The Python original spends {startup.jc} ms
+        inside its interpreter before it reads a byte, and pays that on every invocation — which
+        is what a loop, a git hook or a run across 200 hosts is made of. On bulk throughput both
+        are bound by the same per-field work.{" "}
         <Link href="/compare" className="text-[var(--color-key)] underline-offset-4 hover:underline">
           Full comparison
         </Link>
         .
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-xl border bg-[var(--color-surface)]">
-        {benchmarks.map((b) => (
-          <div
-            key={b.scenario}
-            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[14rem_minmax(0,1fr)_auto]"
-          >
-            <div>
-              <p className="font-mono text-sm">{b.scenario}</p>
-              <p className="text-xs text-[var(--color-faint)]">{b.detail}</p>
-            </div>
-            <div className="col-span-2 flex items-center gap-2 sm:col-span-1">
-              <div className="flex-1">
-                <Bar width={(b.jc / max) * 100} tone="var(--color-punct)" label={`jc ${b.jc} ms`} />
-                <Bar
-                  width={(b.rs / max) * 100}
-                  tone="var(--color-key)"
-                  label={`jc-rs ${b.rs} ms`}
-                />
-              </div>
-            </div>
-            <p className="font-mono text-sm tabular-nums text-[var(--color-str)]">
-              {(b.jc / b.rs).toFixed(1)}×
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="mt-3 text-sm text-[var(--color-faint)]">
-        Median of 5 to 11 runs, Linux x86-64, Python 3.12, one harness timing both sides.
-        Re-run it with <code className="font-mono">make bench-vs-jc</code>.
-      </p>
+      <BenchChart />
     </section>
-  );
-}
-
-function Bar({ width, tone, label }: { width: number; tone: string; label: string }) {
-  return (
-    <div className="flex items-center gap-3 py-0.5">
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--color-sunk)]">
-        <div className="h-full rounded-full" style={{ width: `${width}%`, background: tone }} />
-      </div>
-      <span className="w-28 shrink-0 font-mono text-[11px] tabular-nums text-[var(--color-muted)]">
-        {label}
-      </span>
-    </div>
   );
 }
 
