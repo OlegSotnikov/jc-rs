@@ -17,7 +17,7 @@ static YAML_INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "YAML file parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Universal],
     tags: &[Tag::File],
     magic_commands: &[],
@@ -25,44 +25,6 @@ static YAML_INFO: ParserInfo = ParserInfo {
     hidden: false,
     deprecated: false,
 };
-
-/// Convert a serde_yaml Value into a serde_json Value.
-fn yaml_to_json(v: serde_yaml::Value) -> Result<serde_json::Value, ParseError> {
-    match v {
-        serde_yaml::Value::Null => Ok(serde_json::Value::Null),
-        serde_yaml::Value::Bool(b) => Ok(serde_json::Value::Bool(b)),
-        serde_yaml::Value::Number(n) => {
-            if let Some(i) = n.as_i64() {
-                Ok(serde_json::Value::Number(serde_json::Number::from(i)))
-            } else if let Some(f) = n.as_f64() {
-                serde_json::Number::from_f64(f)
-                    .map(serde_json::Value::Number)
-                    .ok_or_else(|| ParseError::Generic("non-finite float in YAML".to_string()))
-            } else {
-                Ok(serde_json::Value::Null)
-            }
-        }
-        serde_yaml::Value::String(s) => Ok(serde_json::Value::String(s)),
-        serde_yaml::Value::Sequence(seq) => {
-            let arr: Result<Vec<_>, _> = seq.into_iter().map(yaml_to_json).collect();
-            Ok(serde_json::Value::Array(arr?))
-        }
-        serde_yaml::Value::Mapping(m) => {
-            let mut map = serde_json::Map::new();
-            for (k, v) in m {
-                let key = match k {
-                    serde_yaml::Value::String(s) => s,
-                    serde_yaml::Value::Number(n) => n.to_string(),
-                    serde_yaml::Value::Bool(b) => b.to_string(),
-                    other => format!("{other:?}"),
-                };
-                map.insert(key, yaml_to_json(v)?);
-            }
-            Ok(serde_json::Value::Object(map))
-        }
-        serde_yaml::Value::Tagged(tagged) => yaml_to_json(tagged.value),
-    }
-}
 
 impl Parser for YamlParser {
     fn info(&self) -> &'static ParserInfo {
@@ -74,10 +36,9 @@ impl Parser for YamlParser {
             return Err(ParseError::InvalidInput("empty input".to_string()));
         }
 
-        // Try multi-document parsing first
-        let docs: Vec<serde_yaml::Value> = serde_yaml::Deserializer::from_str(input)
-            .map(serde_yaml::Value::deserialize)
-            .collect::<Result<Vec<_>, _>>()
+        // One call covers both shapes: a single document comes back as a
+        // one-element vector.
+        let docs: Vec<serde_json::Value> = serde_saphyr::from_multiple(input)
             .map_err(|e| ParseError::Generic(format!("YAML parse error: {e}")))?;
 
         if docs.is_empty() {
@@ -85,24 +46,20 @@ impl Parser for YamlParser {
         }
 
         // jc always returns an Array for YAML (single or multi-doc)
-        let rows: Result<Vec<_>, _> = docs
+        let rows = docs
             .into_iter()
-            .map(|d| {
-                yaml_to_json(d).map(|v| match v {
-                    serde_json::Value::Object(m) => m,
-                    other => {
-                        let mut m = serde_json::Map::new();
-                        m.insert("value".to_string(), other);
-                        m
-                    }
-                })
+            .map(|v| match v {
+                serde_json::Value::Object(m) => m,
+                other => {
+                    let mut m = serde_json::Map::new();
+                    m.insert("value".to_string(), other);
+                    m
+                }
             })
             .collect();
-        Ok(ParseOutput::Array(rows?))
+        Ok(ParseOutput::Array(rows))
     }
 }
-
-use serde::Deserialize;
 
 static YAML_PARSER_INSTANCE: YamlParser = YamlParser;
 

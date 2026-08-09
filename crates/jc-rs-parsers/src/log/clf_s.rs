@@ -16,7 +16,7 @@ static CLF_S_INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "Common and Combined Log Format file streaming parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Universal],
     tags: &[Tag::Command, Tag::Slurpable, Tag::Streaming],
     magic_commands: &[],

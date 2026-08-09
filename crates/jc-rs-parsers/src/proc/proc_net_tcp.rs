@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "Converts `/proc/net/tcp` and `/proc/net/tcp6` files to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux],
     tags: &[Tag::File, Tag::Slurpable],
     magic_commands: &["/proc/net/tcp", "/proc/net/tcp6"],

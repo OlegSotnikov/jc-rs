@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.3.0",
     description: "Converts `systeminfo` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Windows],
     tags: &[Tag::Command],
     magic_commands: &["systeminfo"],

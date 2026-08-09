@@ -12,7 +12,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.4.0",
     description: "Converts `/etc/hosts` file content to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[
         Platform::Linux,
         Platform::Darwin,

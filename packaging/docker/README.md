@@ -67,7 +67,7 @@ binary.
 - `latest` is the most recent release
 - `vX.Y.Z` is a specific release
 
-2.3 MB compressed. `linux/amd64` and `linux/arm64` ship in one manifest, so
+2.5 MB compressed. `linux/amd64` and `linux/arm64` ship in one manifest, so
 `docker pull` picks the right one.
 
 ## Elsewhere

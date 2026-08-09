@@ -27,7 +27,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.4.0",
     description: "Converts `vmstat` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux],
     tags: &[Tag::Command],
     magic_commands: &["vmstat"],

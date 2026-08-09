@@ -17,7 +17,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.2.0",
     description: "ASCII and Unicode table parser",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[
         Platform::Linux,
         Platform::Darwin,

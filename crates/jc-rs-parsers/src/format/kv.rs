@@ -16,7 +16,7 @@ static KV_INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "Key/Value file and string parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Universal],
     tags: &[Tag::File],
     magic_commands: &[],

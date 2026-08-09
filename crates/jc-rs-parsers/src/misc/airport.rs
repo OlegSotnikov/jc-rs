@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.5.0",
     description: "`airport -I` command parser",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Darwin],
     tags: &[Tag::Command],
     magic_commands: &["airport -I"],

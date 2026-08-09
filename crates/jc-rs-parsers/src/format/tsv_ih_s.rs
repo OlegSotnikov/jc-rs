@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "TSV file streaming parser without implicit header row",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Universal],
     tags: &[Tag::File, Tag::Streaming],
     magic_commands: &[],

@@ -249,7 +249,7 @@ pub fn write_output_to_string(
     scheme: &ColorScheme,
 ) -> String {
     if yaml {
-        match serde_yaml::to_string(value) {
+        match serde_saphyr::to_string(value) {
             Ok(s) => s.trim_end().to_string(),
             Err(_) => to_json_string(value, pretty),
         }
@@ -303,12 +303,8 @@ pub fn render_output(
     scheme: &ColorScheme,
 ) -> String {
     if yaml {
-        match serde_yaml::to_string(value) {
-            Ok(s) => {
-                // serde_yaml adds a leading "---\n"; strip it to match jc behavior
-                // Actually keep it: jc uses ruamel which adds "---"
-                s.trim_end().to_string()
-            }
+        match serde_saphyr::to_string(value) {
+            Ok(s) => s.trim_end().to_string(),
             Err(e) => {
                 eprintln!(
                     "jc-rs: warning - YAML serialization failed: {}. Falling back to JSON.",
@@ -502,9 +498,9 @@ mod tests {
     #[test]
     fn test_yaml_output_round_trip() {
         let v = json!({"name": "alice", "age": 30});
-        let yaml_str = serde_yaml::to_string(&v).expect("serialize");
+        let yaml_str = serde_saphyr::to_string(&v).expect("serialize");
         // Parse back
-        let back: serde_json::Value = serde_yaml::from_str(&yaml_str).expect("deserialize");
+        let back: serde_json::Value = serde_saphyr::from_str(&yaml_str).expect("deserialize");
         assert_eq!(back["name"], json!("alice"));
         assert_eq!(back["age"], json!(30));
     }

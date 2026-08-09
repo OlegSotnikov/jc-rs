@@ -12,7 +12,6 @@ categories = ["encoding"]
 
 [dependencies]
 jc-rs-core = { path = "../jc-rs-core", version = "0.4.0" }
-serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { version = "0.4", features = ["serde"] }
 regex = "1"

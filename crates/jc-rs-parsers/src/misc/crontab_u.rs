@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.10.0",
     description: "Converts `crontab` file with user field to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[
         Platform::Linux,
         Platform::Darwin,

@@ -186,7 +186,7 @@ archive.
 ### Docker
 
 [`appmasterio/jc-rs`](https://hub.docker.com/r/appmasterio/jc-rs) on Docker Hub.
-A `scratch` image, 2.3 MB compressed: the binary and its licence, with no shell,
+A `scratch` image, 2.5 MB compressed: the binary and its licence, with no shell,
 no libc and no package manager. `linux/amd64` and `linux/arm64` ship in one
 manifest, so `docker pull` picks the right one.
 

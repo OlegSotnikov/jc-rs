@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.2.0",
     description: "Converts `certbot` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
     tags: &[Tag::Command],
     magic_commands: &["certbot"],

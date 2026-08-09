@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "Windows `net user` command parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Windows],
     tags: &[Tag::Command],
     magic_commands: &["net user"],

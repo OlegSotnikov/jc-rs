@@ -19,7 +19,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "2.4.0",
     description: "Converts `ifconfig` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
     tags: &[Tag::Command, Tag::Slurpable],
     magic_commands: &["ifconfig"],

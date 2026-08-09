@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.0.0",
     description: "Common Event Format (CEF) string parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Universal],
     tags: &[Tag::String, Tag::File, Tag::Slurpable],
     magic_commands: &[],

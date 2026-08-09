@@ -15,14 +15,12 @@ jc-rs-core = { path = "../jc-rs-core", version = "0.4.0" }
 jc-rs-utils = { path = "../jc-rs-utils", version = "0.4.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
-thiserror = { workspace = true }
 regex = "1"
 csv = "1"
-serde_yaml = "0.9"
+serde-saphyr = "1"
 quick-xml = { version = "0.41", features = ["serialize"] }
 toml = "1"
 inventory = "0.3"
-ini = "1"
 plist = "1"
 url = "2"
 base64 = "0.23"

@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.6.0",
     description: "Streaming parser for `ping` and `ping6` command output",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux, Platform::Darwin, Platform::FreeBSD],
     tags: &[Tag::Command, Tag::Streaming],
     magic_commands: &[],

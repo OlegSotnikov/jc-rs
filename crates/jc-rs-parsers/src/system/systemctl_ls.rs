@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.5.0",
     description: "Converts `systemctl list-sockets` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux],
     tags: &[Tag::Command],
     magic_commands: &["systemctl list-sockets"],

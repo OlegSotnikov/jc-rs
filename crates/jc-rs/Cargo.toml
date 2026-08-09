@@ -30,7 +30,7 @@ jc-rs-core = { path = "../jc-rs-core", version = "0.4.0" }
 jc-rs-parsers = { path = "../jc-rs-parsers", version = "0.4.0" }
 jc-rs-utils = { path = "../jc-rs-utils", version = "0.4.0" }
 serde_json = { workspace = true }
-serde_yaml = "0.9"
+serde-saphyr = "1"
 colored = "3"
 
 [dev-dependencies]

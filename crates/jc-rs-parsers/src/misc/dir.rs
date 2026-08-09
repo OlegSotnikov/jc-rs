@@ -17,7 +17,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.5.0",
     description: "Windows `dir` command parser",
     author: "jc-rs contributors",
-    author_email: "jc-rs@example.com",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Windows],
     tags: &[Tag::Command, Tag::Slurpable],
     magic_commands: &["dir"],

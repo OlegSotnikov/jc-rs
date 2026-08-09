@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.7.0",
     description: "Converts `ntpq -p` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux, Platform::FreeBSD],
     tags: &[Tag::Command],
     magic_commands: &["ntpq"],

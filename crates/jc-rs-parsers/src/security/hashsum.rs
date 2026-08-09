@@ -14,7 +14,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.2.0",
     description: "Converts hashsum command output to JSON (md5sum, sha1sum, sha256sum, etc.)",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[
         Platform::Linux,
         Platform::Darwin,

@@ -23,7 +23,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.8.0",
     description: "Converts `ss` command output to JSON",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux],
     tags: &[Tag::Command, Tag::Slurpable],
     magic_commands: &["ss"],

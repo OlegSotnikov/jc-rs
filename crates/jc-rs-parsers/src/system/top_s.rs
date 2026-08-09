@@ -15,7 +15,7 @@ static INFO: ParserInfo = ParserInfo {
     version: "1.3.0",
     description: "Streaming `top -b` command parser",
     author: "jc-rs contributors",
-    author_email: "",
+    author_email: "os@g1sw.com",
     compatible: &[Platform::Linux],
     tags: &[Tag::Command, Tag::Streaming],
     magic_commands: &[],

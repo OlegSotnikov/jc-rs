@@ -121,9 +121,11 @@ the number to move, and update the CI floor.
 - **Key order.** Keys serialise alphabetically; jc preserves schema order. Values
   agree so the differential passes, but no two outputs ever `diff` clean. Fixing
   it needs `serde_json`'s `preserve_order` plus per-parser key sequences.
-- **Lint debt.** The workspace manifest bulk-allows ~80 clippy lints plus
-  `dead_code`, `unused_imports`, `unused_variables`, `unused_mut`. CI is already
-  at `-D warnings`, so removing them in batches is self-verifying.
+- **Lint debt.** Three clippy allows are left in the workspace manifest, each
+  with the site count and the reason it has not been cleared: `manual_strip`
+  (47), `type_complexity` (7), `if_same_then_else` (2). CI is at `-D warnings`,
+  so removing one is self-verifying. Nothing else is bulk-allowed; if you add
+  an allow, write down why next to it.
 - **Streaming is only live under `-u`.** Without it both jc and jc-rs
   block-buffer stdout when piped; that is jc's behaviour, not an oversight.
   `crates/jc-rs/tests/streaming.rs` covers what the differential structurally
@@ -142,6 +144,26 @@ the number to move, and update the CI floor.
   argument and cannot be a `static`.
 
 `tests/differential/report.json` has every failing case with paths and diffs.
+
+## Dependencies
+
+Two rules, both enforced rather than remembered:
+
+- **Nothing abandoned ships.** `cargo deny check advisories` runs on every push
+  with an empty ignore list, and an upstream archive counts against a crate even
+  when no advisory exists. That is why YAML goes through `serde-saphyr` and not
+  `serde_yaml`: dtolnay archived `serde_yaml` in March 2024 and it pulls
+  `unsafe-libyaml` behind it. The swap costs ~590 KB of binary, almost all of it
+  `encoding_rs`, which is the price of not shipping an abandoned parser.
+  It carries one known deviation from jc that no fixture covers: a zero-padded
+  scalar such as `007` types as a float, where jc gives the integer `7`.
+  (`serde_yaml` gave the string `"007"`, so this was already wrong before.)
+- **A dependency nobody imports is a bug.** v0.5.0 dropped six declared-but-unused
+  crates, one of which (`ini`, last released 2020, pinning `configparser` 1.0.0)
+  was the only thing standing between this workspace and a Debian archive that
+  already packages every other crate it needs. Before adding a crate, grep for
+  the one it would replace; before a release, check that each declared dep is
+  reachable from code.
 
 ## Commits
 
