@@ -13,6 +13,13 @@ mod streaming;
 // Force the parsers crate to be linked (and its inventory::submit! calls run).
 extern crate jc_rs_parsers;
 
+// musl's mallocng trades allocation speed for size and predictability, which is
+// the wrong trade for a parser that builds a Map per record. glibc's allocator
+// needs no help; only the static builds get this one.
+#[cfg(target_env = "musl")]
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 use jc_rs_core::find_parser;
 use jc_rs_core::registry::all_parsers;
 use jc_rs_core::types::{ParseOutput, Tag};

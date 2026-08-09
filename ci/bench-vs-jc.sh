@@ -97,10 +97,22 @@ row '`pkg-index-deb`, 1.5 MB'            5 --pkg-index-deb tests/fixtures/generi
 # `website/src/data/` is generated, never edited, and this is the one file in it
 # that build-data.py does not produce: it needs a jc to race against.
 OUT=website/src/data/benchmarks.json
-python3 - "$WORK/rows.jsonl" "$OUT" <<'PY'
+
+# Which binary was timed, because it is not always the same one. `make build`
+# produces a glibc binary; the Linux artifacts on the releases page are static
+# musl and carry mimalloc, which musl's own allocator makes worth having. The
+# rows change between the two, so the caption has to say which was measured
+# rather than leave a reader to guess.
+if ldd "$BIN" 2>&1 | grep -qE 'not a dynamic executable|statically linked'; then
+  LIBC="static musl"
+else
+  LIBC="glibc"
+fi
+
+python3 - "$WORK/rows.jsonl" "$OUT" "$LIBC" <<'PY'
 import json, platform, subprocess, sys, datetime
 
-rows_path, out_path = sys.argv[1], sys.argv[2]
+rows_path, out_path, libc = sys.argv[1], sys.argv[2], sys.argv[3]
 rows = [json.loads(l) for l in open(rows_path) if l.strip()]
 
 def cmd(*a):
@@ -117,7 +129,7 @@ json.dump({
     "method": "fastest of 5 to 15 runs, one process per run",
     "jcVersion": jc_version or "unknown",
     "python": py,
-    "platform": f"{platform.system()} {platform.machine()}",
+    "platform": f"{platform.system()} {platform.machine()}, {libc}",
     "measured": datetime.date.today().isoformat(),
     "rows": rows,
 }, open(out_path, "w"), indent=1)

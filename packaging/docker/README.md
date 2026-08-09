@@ -27,15 +27,16 @@ everything that does not qualify is reported by category rather than dropped.
 
 ## Speed
 
-Median of 5 to 11 runs against jc 1.25.7 on Python 3.12, same harness both sides
+Fastest of 5 to 15 runs against jc 1.25.7 on Python 3.12, same harness both
+sides, timing the same static musl binary this image ships
 ([`ci/bench-vs-jc.sh`](https://github.com/OlegSotnikov/jc-rs/blob/master/ci/bench-vs-jc.sh)):
 
 | Scenario | jc | jc-rs |
 |---|---|---|
-| Cold start | 138 ms | 7 ms |
-| `ps aux`, 110 lines | 156 ms | 12 ms |
-| `csv`, 10,000 rows | 200 ms | 41 ms |
-| `pkg-index-deb`, 1.5 MB | 309 ms | 88 ms |
+| Cold start | 109 ms | 4 ms |
+| `ps aux`, 110 lines | 112 ms | 6 ms |
+| `csv`, 10,000 rows | 167 ms | 29 ms |
+| `pkg-index-deb`, 1.5 MB | 241 ms | 46 ms |
 
 The gap is largest at startup, which is why it matters most in loops, git hooks
 and per-host automation rather than at an interactive prompt.
@@ -67,7 +68,7 @@ binary.
 - `latest` is the most recent release
 - `vX.Y.Z` is a specific release
 
-2.5 MB compressed. `linux/amd64` and `linux/arm64` ship in one manifest, so
+2.6 MB compressed. `linux/amd64` and `linux/arm64` ship in one manifest, so
 `docker pull` picks the right one.
 
 ## Elsewhere

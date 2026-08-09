@@ -33,6 +33,11 @@ serde_json = { workspace = true }
 serde-saphyr = "1"
 colored = "3"
 
+# musl only: measured, not assumed. On glibc mimalloc is a wash on big
+# inputs and 22% slower on small ones; on musl it is worth up to 2.2x.
+[target.'cfg(target_env = "musl")'.dependencies]
+mimalloc = { version = "0.1", default-features = false }
+
 [dev-dependencies]
 serde_json = { workspace = true }
 

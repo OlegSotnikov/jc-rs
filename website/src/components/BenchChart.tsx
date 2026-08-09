@@ -7,8 +7,8 @@ import { benchmarks, benchmarkMeta } from "@/lib/site";
  * are alternatives that never sum to anything. Plain elements carry the bars, so
  * they reflow on a phone without a viewBox fighting the layout.
  *
- * Every bar carries its own value label, because at a linear scale a 5 ms bar
- * beside a 547 ms one is a few pixels wide. The scale stays linear — that ratio
+ * Every bar carries its own value label, because at a linear scale a 4 ms bar
+ * beside a 516 ms one is a few pixels wide. The scale stays linear — that ratio
  * is the result — so the label is what the value is read from.
  */
 export function BenchChart() {
@@ -40,7 +40,7 @@ export function BenchChart() {
           <div
             key={b.scenario}
             // On a phone the label column would leave the bars ~120px to live
-            // in, where 108 ms and 547 ms draw the same. Below `sm` the label
+            // in, where 109 ms and 516 ms draw the same. Below `sm` the label
             // and the ratio take a row of their own and the bars get the width.
             className="grid grid-cols-[minmax(0,1fr)_3.5rem] items-center gap-x-4 gap-y-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[9rem_minmax(0,1fr)_3.5rem] sm:gap-y-0"
           >

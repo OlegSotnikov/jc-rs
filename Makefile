@@ -77,8 +77,21 @@ wasm: ## build the npm package into crates/jc-rs-wasm/pkg (needs wasm-pack)
 	@echo "package at crates/jc-rs-wasm/pkg"
 
 .PHONY: bench-vs-jc
-bench-vs-jc: build submodule ## time jc-rs against jc on the same inputs
-	./ci/bench-vs-jc.sh
+bench-vs-jc: submodule ## time jc-rs against jc on the same inputs
+	@# The published numbers time the published binary. On Linux that is the
+	@# static musl build, which carries mimalloc and is therefore not the same
+	@# program as `make build` produces; timing the convenient one and printing
+	@# it next to a download link would be a quiet lie.
+	@if rustup target list --installed 2>/dev/null | grep -q x86_64-unknown-linux-musl; then \
+	  CC_x86_64_unknown_linux_musl=$${CC_x86_64_unknown_linux_musl:-musl-gcc} \
+	    cargo build --release --target x86_64-unknown-linux-musl -p jc-rs && \
+	  BIN=target/x86_64-unknown-linux-musl/release/jc-rs ./ci/bench-vs-jc.sh; \
+	else \
+	  echo "musl target absent; timing the local glibc build instead."; \
+	  echo "for the published numbers: rustup target add x86_64-unknown-linux-musl"; \
+	  echo "                           apt install musl-tools   # mimalloc needs a C compiler"; \
+	  cargo build --release -p jc-rs && ./ci/bench-vs-jc.sh; \
+	fi
 
 .PHONY: site-wasm
 site-wasm: ## build the wasm bundle the website's converter runs on

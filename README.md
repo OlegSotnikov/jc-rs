@@ -67,8 +67,8 @@ reported but not tested: oracle_reject=9 unmapped=149 no_input=18
 
 ## Speed
 
-**5 ms instead of 108.** Every scenario below is faster, from 3.2× on a
-10,000-line log to 21.6× at startup.
+**4 ms instead of 109.** Every scenario below is faster, from 2.9× on a
+10,000-line log to 27.2× at startup.
 
 One harness times both sides on the same inputs, one process per run, fastest of
 5 to 15: [`ci/bench-vs-jc.sh`](ci/bench-vs-jc.sh), against jc 1.25.7 on Python
@@ -76,20 +76,25 @@ One harness times both sides on the same inputs, one process per run, fastest of
 both the chart and the [dataset](website/src/data/benchmarks.json) the site
 reads, so every figure here traces back to a run of that script.
 
+The binary it times is the one the releases page hands you: the static musl
+build, which links mimalloc because musl's own allocator costs up to 2.2× on
+allocation-heavy parsers. A glibc build from `cargo install` is the same program
+otherwise — a shade slower to start, a shade faster on the 1.5 MB row.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/bench-dark.svg">
-  <img alt="Milliseconds per run for seven scenarios, jc against jc-rs; jc-rs is faster in every one, by 21.6× on cold start down to 3.2× on 10,000 log lines" src="docs/bench-light.svg">
+  <img alt="Milliseconds per run for seven scenarios, jc against jc-rs; jc-rs is faster in every one, by 27.2× on cold start down to 2.9× on 10,000 log lines" src="docs/bench-light.svg">
 </picture>
 
 | Scenario | jc | jc-rs | Speedup |
 |---|---|---|---|
-| Cold start (`-v`) | 108 ms | 5 ms | **21.6×** |
-| `ps aux`, 110 lines | 121 ms | 7 ms | **17.3×** |
-| `traceroute`, 1.5 KB | 128 ms | 10 ms | **12.8×** |
-| `ifconfig`, 1.3 KB | 138 ms | 15 ms | **9.2×** |
-| `pkg-index-deb`, 1.5 MB | 238 ms | 37 ms | **6.4×** |
-| `csv`, 10,000 rows | 153 ms | 30 ms | **5.1×** |
-| `clf`, 10,000 log lines | 547 ms | 173 ms | **3.2×** |
+| Cold start (`-v`) | 109 ms | 4 ms | **27.2×** |
+| `ps aux`, 110 lines | 112 ms | 6 ms | **18.7×** |
+| `traceroute`, 1.5 KB | 119 ms | 10 ms | **11.9×** |
+| `ifconfig`, 1.3 KB | 122 ms | 15 ms | **8.1×** |
+| `csv`, 10,000 rows | 167 ms | 29 ms | **5.8×** |
+| `pkg-index-deb`, 1.5 MB | 241 ms | 46 ms | **5.2×** |
+| `clf`, 10,000 log lines | 516 ms | 178 ms | **2.9×** |
 
 Startup is where the gap is widest, and startup is what a loop pays. Over 200
 hosts, jc spends 21 seconds inside the Python interpreter before parsing a byte;
@@ -186,7 +191,7 @@ archive.
 ### Docker
 
 [`appmasterio/jc-rs`](https://hub.docker.com/r/appmasterio/jc-rs) on Docker Hub.
-A `scratch` image, 2.5 MB compressed: the binary and its licence, with no shell,
+A `scratch` image, 2.6 MB compressed: the binary and its licence, with no shell,
 no libc and no package manager. `linux/amd64` and `linux/arm64` ship in one
 manifest, so `docker pull` picks the right one.
 

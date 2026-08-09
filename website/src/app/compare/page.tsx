@@ -168,7 +168,7 @@ export default function Compare() {
           </li>
           <li>
             Startup time is irrelevant to you and a runtime is already installed. One invocation
-            at a prompt does not care about 130 ms.
+            at a prompt does not care about 110 ms.
           </li>
         </ul>
       </section>
