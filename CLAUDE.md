@@ -153,8 +153,11 @@ Two rules, both enforced rather than remembered:
   with an empty ignore list, and an upstream archive counts against a crate even
   when no advisory exists. That is why YAML goes through `serde-saphyr` and not
   `serde_yaml`: dtolnay archived `serde_yaml` in March 2024 and it pulls
-  `unsafe-libyaml` behind it. The swap costs ~590 KB of binary, almost all of it
-  `encoding_rs`, which is the price of not shipping an abandoned parser.
+  `unsafe-libyaml` behind it. The swap costs ~590 KB of binary, which
+  `cargo bloat --crates` puts on `granit_parser` (249 KB of `.text`),
+  `serde_saphyr` itself (176 KB) and `annotate_snippets` (121 KB); `encoding_rs`
+  comes along in the tree but the linker drops nearly all of it. That is the
+  price of not shipping an abandoned parser.
   It carries one known deviation from jc that no fixture covers: a zero-padded
   scalar such as `007` types as a float, where jc gives the integer `7`.
   (`serde_yaml` gave the string `"007"`, so this was already wrong before.)
