@@ -215,20 +215,47 @@ jobs:
       # The Docker Hub overview is the first thing anyone sees; keeping it in
       # the repo means it ships with the image instead of drifting.
       #
-      # `continue-on-error` because the stored credential is a push/pull PAT:
+      # `continue-on-error` because `DOCKERHUB_TOKEN` is a push/pull PAT:
       # editing repository metadata needs a wider scope and answers
-      # "access denied: insufficient scope". The image must still publish when
-      # only its description cannot. Give the `dockerhub` environment a PAT
-      # with write access to remove this caveat.
+      # "access denied: insufficient scope" from both `/v2/auth/token` and the
+      # legacy `/v2/users/login`. The image must still publish when only its
+      # description cannot. `DOCKERHUB_DESCRIPTION_TOKEN` is the way out: a
+      # separate PAT with Read/Write/Delete, used by this step alone so the
+      # push credential stays as narrow as it is. Without it this falls back
+      # to the push token and the step below says so out loud.
       - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
         if: steps.creds.outputs.have == 'true'
         continue-on-error: true
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_DESCRIPTION_TOKEN || secrets.DOCKERHUB_TOKEN }}
           repository: appmasterio/jc-rs
           short-description: "Convert CLI output, file formats and strings to JSON from one static binary, 100% jc-compatible"
           readme-filepath: packaging/docker/README.md
+
+      # The step above exits 0 whether or not anything changed, which is how
+      # the overview sat two releases behind without a single red run. Read the
+      # page back and compare it to the file that was meant to become it.
+      - name: did the overview actually change?
+        if: steps.creds.outputs.have == 'true'
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          live=$(curl -sf https://hub.docker.com/v2/repositories/appmasterio/jc-rs/ \
+                 | python3 -c 'import json,sys; print(json.load(sys.stdin).get("full_description") or "")')
+          if [ "$live" = "$(cat packaging/docker/README.md)" ]; then
+            echo "docker hub overview matches packaging/docker/README.md"
+          else
+            {
+              echo "### Docker Hub overview did not update"
+              echo
+              echo "The page still differs from \`packaging/docker/README.md\`."
+              echo "Add \`DOCKERHUB_DESCRIPTION_TOKEN\` to the \`dockerhub\` environment:"
+              echo "a Docker Hub PAT with Read/Write/Delete. The push token cannot"
+              echo "edit repository metadata and never could."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Docker Hub overview is stale; see the job summary"
+          fi
 
   homebrew:
     name: homebrew tap
