@@ -13,7 +13,8 @@ served as a container behind the nginx container on the web host.
 | `/compatibility` | How the number is produced, what it excludes, per-parser coverage |
 | `/install` | Five channels, the `jc` alias caveat, container and library usage |
 
-241 URLs in the sitemap, every one statically rendered at build time.
+242 URLs in the sitemap, every one statically rendered at build time: the 237
+parser pages, `/parsers` itself, and the four top-level pages above.
 
 ## The converter is the real parser
 
