@@ -241,16 +241,11 @@ dependencies carry no version, and packaging refuses that.)
   path published, with a `provenance/v1` attestation tying the tarball to the
   run that built it.
 - The Docker Hub overview does not update. `peter-evans/dockerhub-description`
-  exits 0 and changes nothing, because `DOCKERHUB_TOKEN` is a push/pull PAT and
-  editing repository metadata needs a wider scope: `PATCH
-  /v2/repositories/appmasterio/jc-rs/` answers `access denied: insufficient
-  scope` whether the JWT came from `/v2/auth/token` or the legacy
-  `/v2/users/login`, so it is the token and not the endpoint. Add
-  `DOCKERHUB_DESCRIPTION_TOKEN` (a PAT with Read/Write/Delete) to the
-  `dockerhub` environment and the step picks it up; the push token stays narrow
-  because nothing else uses the new one. Until then the release annotates a
-  warning rather than passing quietly, which is how the overview managed to sit
-  two releases behind.
+  exits 0 and changes nothing, because `DOCKERHUB_TOKEN` is a push/pull PAT:
+  `PATCH /v2/repositories/appmasterio/jc-rs/` answers `insufficient scope` from
+  both `/v2/auth/token` and `/v2/users/login`, so it is the token, not the
+  endpoint. Replace that secret with a Read/Write/Delete PAT and it works; no
+  workflow change is needed.
 - Only one long-lived credential remains. `HOMEBREW_TAP_TOKEN` exists because
   `GITHUB_TOKEN` cannot reach another repository, and it is the only long-lived
   secret in the release path.
