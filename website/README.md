@@ -168,4 +168,7 @@ GA4 is loaded after the page becomes interactive when
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` is present at build time. The canonical value
 lives in `_factory/specs/jc-rs/project.env`; both the local preflight and the
 Docker build must receive it, or the resulting image deliberately contains no
-Google tag.
+Google tag. Automatic page views are disabled: the client component sends one
+explicit `page_view` for the initial render and for every App Router pathname or
+query-string change, so client-side navigation is counted once rather than
+missed or doubled.
