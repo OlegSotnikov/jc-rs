@@ -76,10 +76,13 @@ every command below sources it, and nothing host-specific appears here.
 
 ```sh
 source ~/sysadmin/secrets/jc-rs-deploy.env   # DEPLOY, DEPLOY_PORT, CF_ZONE_ID
+source /storage/webdev/_factory/specs/jc-rs/project.env # GA measurement ID
 docker login dhi.io -u "$DOCKER_HUB_LOGIN" --password-stdin <<<"$DOCKER_HUB_TOKEN"
 make site                                   # dataset + wasm, from the repo root
-cd website && npm ci && npm run build       # fails the deploy early if it fails
-docker build -t appmasterio/jc-rs-website:master-latest .
+cd website && npm ci
+NEXT_PUBLIC_GA_MEASUREMENT_ID="$NEXT_PUBLIC_GA_MEASUREMENT_ID" npm run build
+docker build --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID="$NEXT_PUBLIC_GA_MEASUREMENT_ID" \
+  -t appmasterio/jc-rs-website:master-latest .
 
 # Static goes to the host, precompressed, BEFORE the container swap: nginx
 # serves /_next/static/ and /wasm/ from /storage/jc-rs/static/ on disk, where
@@ -156,6 +159,13 @@ Five traps this deploy walked into, so the next one does not:
   it, and an unsubmitted sitemap is the defect that hid ten sites' articles for
   a year. Submit `https://jc-rs.com/sitemap.xml` against the verified property
   and check it appears under `GET /webmasters/v3/sites/{siteUrl}/sitemaps`.
-- **No analytics and no Sentry.** `NEXT_PUBLIC_GA_MEASUREMENT_ID` and the
-  website DSN are both unset in `project.env`. Both are build-time variables, so
-  adding either needs a rebuild, not just a restart.
+- **No Sentry.** The website DSN is unset in `project.env`. It is a build-time
+  variable, so adding it needs a rebuild, not just a restart.
+
+## Analytics
+
+GA4 is loaded after the page becomes interactive when
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` is present at build time. The canonical value
+lives in `_factory/specs/jc-rs/project.env`; both the local preflight and the
+Docker build must receive it, or the resulting image deliberately contains no
+Google tag.
