@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     "Compare JSON, YAML, TOML and XML for configuration, CLI pipelines and interchange: comments, types, schemas, streaming and conversion trade-offs.",
   alternates: { canonical: slug },
   openGraph: {
+    siteName: site.name,
     type: "article",
     title: "JSON vs YAML vs TOML: which format fits?",
     description:
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     title: "JSON vs YAML vs TOML: which format fits?",
     description:
       "A practical format comparison for configuration and command-line work, including where XML remains the right model.",
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

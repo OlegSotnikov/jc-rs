@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/compatibility" },
   openGraph: {
+    siteName: site.name,
+    type: "website",
     title: "How jc-rs measures compatibility",
     description,
     url: `${site.origin}/compatibility`,
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "How jc-rs measures compatibility",
     description,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

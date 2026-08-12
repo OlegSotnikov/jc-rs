@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // The converter versions these URLs with the jc-rs release, so they can
-        // be cached hard without pairing a new client with an old wasm API.
+        // The converter versions these URLs with content hashes, so they can be
+        // cached hard without pairing a new client with an old wasm API.
         // Without this the browser refetches 1.5 MB on every navigation.
         source: "/wasm/:path*",
         headers: [

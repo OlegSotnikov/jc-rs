@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     "Learn the difference between JSON, NDJSON, JSONL and JSON Lines, when line-delimited data wins, and how to stream or convert it safely.",
   alternates: { canonical: slug },
   openGraph: {
+    siteName: site.name,
     type: "article",
     title: "NDJSON vs JSON vs JSONL: a practical streaming guide",
     description:
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     title: "NDJSON vs JSON vs JSONL: a practical streaming guide",
     description:
       "One document or one record per line? Compare the formats, trade-offs, conversion commands and real jc-rs streaming behavior.",
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

@@ -35,6 +35,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: seo?.description ?? fallbackDescription,
     alternates: { canonical: `/parsers/${canonicalSlug}` },
     openGraph: {
+      siteName: site.name,
+      type: "website",
       title: seo?.title ?? fallbackTitle,
       description: seo?.description ?? fallbackDescription,
       url: `${site.origin}/parsers/${canonicalSlug}`,
@@ -44,7 +46,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       card: "summary_large_image",
       title: seo?.title ?? fallbackTitle,
       description: seo?.description ?? fallbackDescription,
-      images: [site.socialImage.url],
+      images: [site.socialImage],
     },
   };
 }

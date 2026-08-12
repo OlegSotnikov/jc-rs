@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical },
   openGraph: {
+    siteName: site.name,
     type: "article",
     title,
     description,
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     authors: [site.authorUrl],
     images: [site.socialImage],
   },
-  twitter: { card: "summary_large_image", title, description, images: [site.socialImage.url] },
+  twitter: { card: "summary_large_image", title, description, images: [site.socialImage] },
 };
 
 const articleJsonLd = {

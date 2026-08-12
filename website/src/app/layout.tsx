@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `jc-rs — ${site.tagline}`,
     description: `${summary.documented} parsers in one static binary, checked against ${summary.tested} oracle-valid reference fixture pairs.`,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
   alternates: { canonical: "/" },
 };

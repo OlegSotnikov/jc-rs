@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical },
   openGraph: {
+    siteName: site.name,
     type: "article",
     title,
     description,
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

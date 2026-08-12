@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/compare" },
   openGraph: {
+    siteName: site.name,
+    type: "website",
     title: "jc-rs vs jc vs jq",
     description,
     url: `${site.origin}/compare`,
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "jc-rs vs jc vs jq",
     description,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

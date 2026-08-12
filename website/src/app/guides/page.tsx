@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     "Practical jc-rs guides for NDJSON, JSONL, YAML, TOML, Linux logs, jq, Git output, curl headers, and reliable command-line parsing.",
   alternates: { canonical: "/guides" },
   openGraph: {
+    siteName: site.name,
+    type: "website",
     title: "jc-rs guides",
     description: "Format decisions and tested command-line pipelines, written around the parsers that jc-rs actually ships.",
     url: `${site.origin}/guides`,
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "jc-rs guides",
     description: "Format decisions and tested command-line pipelines, written around the parsers that jc-rs actually ships.",
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

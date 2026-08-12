@@ -1,6 +1,7 @@
 "use client";
 
 import summaryData from "@/data/summary.json";
+import wasmData from "@/data/wasm.json";
 
 export const MAX_INTERACTIVE_INPUT_CHARACTERS = 3_000_000;
 
@@ -27,14 +28,18 @@ export function loadJcRs(): Promise<JcRs> {
     pending = (async () => {
       // Kept out of the bundle on purpose: the file is served from public/ so
       // that a visitor who never opens the converter never downloads it.
-      // The assets are cached as immutable, so the release version is part of
-      // the URL. A returning visitor must not pair a new client chunk with a
-      // year-cached WebAssembly API from an older release.
-      const assetVersion = encodeURIComponent(summaryData.version);
-      const mod = await import(
-        /* webpackIgnore: true */ /* turbopackIgnore: true */ `/wasm/jc-rs.js?v=${assetVersion}`
+      // The assets are cached as immutable, so their content hashes are part
+      // of the URLs. A returning visitor must not pair a new client chunk with
+      // a year-cached WebAssembly API, even when a site-only fix keeps the same
+      // jc-rs release number.
+      const jsVersion = encodeURIComponent(`${summaryData.version}-${wasmData.js.slice(0, 16)}`);
+      const wasmVersion = encodeURIComponent(
+        `${summaryData.version}-${wasmData.wasm.slice(0, 16)}`,
       );
-      await mod.default({ module_or_path: `/wasm/jc-rs_bg.wasm?v=${assetVersion}` });
+      const mod = await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ `/wasm/jc-rs.js?v=${jsVersion}`
+      );
+      await mod.default({ module_or_path: `/wasm/jc-rs_bg.wasm?v=${wasmVersion}` });
       return mod as JcRs;
     })().catch((err) => {
       // Let the next attempt retry rather than caching a transport failure as

@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/parsers" },
   openGraph: {
+    siteName: site.name,
+    type: "website",
     title: `All ${summary.documented} jc-rs parsers`,
     description,
     url: `${site.origin}/parsers`,
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `All ${summary.documented} jc-rs parsers`,
     description,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

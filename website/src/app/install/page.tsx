@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/install" },
   openGraph: {
+    siteName: site.name,
+    type: "website",
     title: "Install jc-rs",
     description,
     url: `${site.origin}/install`,
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Install jc-rs",
     description,
-    images: [site.socialImage.url],
+    images: [site.socialImage],
   },
 };
 

@@ -98,6 +98,12 @@ site-wasm: ## build the wasm bundle the website's converter runs on
 	wasm-pack build crates/jc-rs-wasm --release --target web --out-name jc-rs
 	@mkdir -p website/public/wasm
 	@cp crates/jc-rs-wasm/pkg/jc-rs.js crates/jc-rs-wasm/pkg/jc-rs_bg.wasm website/public/wasm/
+	@{ \
+	  printf '{\n'; \
+	  printf '  "js": "%s",\n' "$$(sha256sum website/public/wasm/jc-rs.js | cut -d' ' -f1)"; \
+	  printf '  "wasm": "%s"\n' "$$(sha256sum website/public/wasm/jc-rs_bg.wasm | cut -d' ' -f1)"; \
+	  printf '}\n'; \
+	} > website/src/data/wasm.json
 	@echo "website/public/wasm updated ($$(du -h website/public/wasm/jc-rs_bg.wasm | cut -f1))"
 
 .PHONY: site-data
