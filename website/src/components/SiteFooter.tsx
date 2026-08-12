@@ -7,6 +7,7 @@ const COLUMNS = [
     title: "Reference",
     links: [
       { href: "/parsers", label: `All ${summary.documented} parsers` },
+      { href: "/guides", label: "Guides" },
       { href: "/compatibility", label: "How the number is measured" },
       { href: "/compare", label: "Compared with jc" },
       { href: "/install", label: "Install" },
@@ -40,8 +41,8 @@ export function SiteFooter() {
             jc<span className="text-[var(--color-key)]">-rs</span>
           </p>
           <p className="mt-2 max-w-56 text-sm text-[var(--color-muted)]">
-            {summary.documented} parsers in one static binary. Verified against the full
-            reference corpus on every commit.
+            {summary.documented} parsers in one static binary. Checked against {summary.tested}{" "}
+            oracle-valid reference pairs on every commit.
           </p>
         </div>
 
@@ -82,7 +83,8 @@ export function SiteFooter() {
             <a href={site.jc} className="underline-offset-4 hover:underline">
               jc
             </a>
-            , the original Python tool, so anything already reading that JSON keeps working.
+            , the original Python tool. The compatibility run reports which fixture pairs match
+            under the published structural JSON comparison.
           </p>
           <p className="shrink-0">
             Created by{" "}

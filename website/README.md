@@ -9,21 +9,23 @@ served as a container behind the nginx container on the web host.
 |---|---|
 | `/` | The converter, then the measurement, the speed table, install, the catalogue |
 | `/parsers` | All 237 parsers grouped by domain, with client-side search |
-| `/parsers/<name>` | One page per parser: platforms, tags, magic command, a real fixture pair, coverage |
+| `/parsers/<name>` | One page per parser: reference evidence, CLI use, and an in-browser workbench for the intent-matched format tools |
+| `/guides` | Nine practical guides for formats, shell pipelines, and parser decisions |
 | `/compatibility` | How the number is produced, what it excludes, per-parser coverage |
 | `/install` | Five channels, the `jc` alias caveat, container and library usage |
 
-242 URLs in the sitemap, every one statically rendered at build time: the 237
-parser pages, `/parsers` itself, and the four top-level pages above.
+252 URLs in the sitemap, every one statically rendered at build time: the 237
+parser pages, nine guides, the two indexes, and the four other top-level pages.
 
 ## The converter is the real parser
 
-The front page runs `jc-rs-wasm` in the browser. Nothing is sent anywhere: the
-same parsers that ship in the binary are compiled to WebAssembly and parse what
-you type locally.
+The front page and the intent-matched format tools run `jc-rs-wasm` in the
+browser. Parser input stays in the tab: the same parsers that ship in the binary
+are compiled to WebAssembly and parse what you type locally. Tool pages can open
+a supported file, restore a verified sample, copy the result, or download JSON.
 
-The bundle is 4 MB (1.3 MB over the wire), so the first paint does not wait for
-it. The server renders a fixture pair it already knows, and the module is
+The bundle is about 4.2 MiB raw (1.5 MiB compressed), so the first paint does
+not wait for it. The server renders a fixture pair it already knows, and the module is
 fetched on browser idle or on the first keystroke, whichever comes first. If the
 fetch fails the pre-rendered pair stays and only the live upgrade is lost.
 
@@ -41,7 +43,7 @@ this repository, so the site cannot drift from the product:
 | `jc-rs -a` | parser list, descriptions, versions, streaming/hidden flags |
 | `ParserInfo` literals in `crates/jc-rs-parsers/src/**` | platforms, tags, magic commands |
 | `tests/differential/report.json` | per-parser fixture coverage |
-| `tests/fixtures/` | one real input/output pair per parser, smallest that fits |
+| `tests/fixtures/` | the smallest available real input/output pair for each parser |
 
 Regenerate with `make site-data` from the repository root. The output is
 committed so the Docker build needs neither Python nor the fixture corpus.
@@ -150,7 +152,7 @@ Five traps this deploy walked into, so the next one does not:
   `_factory/specs/jc-rs/project.env`; change it there or the upstream 502s.
 - **`.wasm` needed a Cloudflare cache rule.** The zone's first rule bypasses
   browser caching for everything outside `/api/`, which appended `no-store` to
-  the 4 MB module and made every visit re-download it. `bin/factory-cf.sh` now
+  the 4+ MiB module and made every visit re-download it. `bin/factory-cf.sh` now
   covers `.wasm` alongside `/_next/static/` in its immutable-assets rule.
 
 ## Still to do by hand

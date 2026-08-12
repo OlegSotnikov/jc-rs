@@ -30,6 +30,18 @@ pub fn parse(name: &str, input: &str) -> Result<JsValue, JsError> {
     to_js(&output)
 }
 
+/// Parse `input` and return the CLI-compatible, pretty-printed JSON text.
+///
+/// This is the lossless path for browser converters. Going through a JS value
+/// would turn integers above `Number.MAX_SAFE_INTEGER` into an error (or lose
+/// precision after a JSON round trip), while `Option::None` becomes
+/// `undefined` and is omitted by `JSON.stringify`.
+#[wasm_bindgen(js_name = parseJson)]
+pub fn parse_json(name: &str, input: &str) -> Result<String, JsError> {
+    let output = jc_rs_parsers::parse(name, input).map_err(|e| JsError::new(&e.to_string()))?;
+    serde_json::to_string_pretty(&output).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Parse without the conversions that shape output to jc's schema, which is
 /// jc's `-r`.
 #[wasm_bindgen(js_name = parseRaw)]

@@ -361,6 +361,13 @@ pub fn parse_name(data: &[u8]) -> Map<String, Value> {
             };
             let value_str = parse_string(atv_items[1].tag, atv_items[1].value);
 
+            // jc preserves string-valued serialNumber RDNs in both byte and text form.
+            if key == "serial_number" {
+                result.insert(key, Value::String(bytes_to_hex(value_str.as_bytes())));
+                result.insert("serial_number_str".to_string(), Value::String(value_str));
+                continue;
+            }
+
             // Handle multiple values for same key (like multiple OUs)
             if let Some(existing) = result.get(&key) {
                 match existing {
@@ -816,10 +823,12 @@ fn parse_extension_value(ext_id: &str, data: &[u8]) -> Value {
                                 // Email: no prefix, use \xNN escapes for invalid UTF-8 bytes
                                 Some(Value::String(bytes_to_python_repr(item.value)))
                             }
-                            2 => Some(Value::String(format!(
-                                "dns:{}",
-                                String::from_utf8_lossy(item.value)
-                            ))),
+                            // jc exposes DNS GeneralNames as the hostname itself. Keep the
+                            // tag-specific handling here so email and IP names retain their
+                            // existing representations.
+                            2 => Some(Value::String(
+                                String::from_utf8_lossy(item.value).into_owned(),
+                            )),
                             7 => {
                                 // IP address
                                 if item.value.len() == 4 {
@@ -932,5 +941,41 @@ fn parse_extension_value(ext_id: &str, data: &[u8]) -> Value {
             // Default: return hex-encoded value
             Value::String(bytes_to_hex(data))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn subject_alt_name_normalizes_only_dns_names() {
+        // SEQUENCE { rfc822Name "a@b.c", dNSName "localhost", iPAddress 192.0.2.1 }
+        let der = [
+            0x30, 0x18, 0x81, 0x05, b'a', b'@', b'b', b'.', b'c', 0x82, 0x09, b'l', b'o', b'c',
+            b'a', b'l', b'h', b'o', b's', b't', 0x87, 0x04, 192, 0, 2, 1,
+        ];
+
+        assert_eq!(
+            parse_extension_value("subject_alt_name", &der),
+            serde_json::json!(["a@b.c", "localhost", "ip:192.0.2.1"])
+        );
+    }
+
+    #[test]
+    fn string_serial_number_name_keeps_hex_and_text_forms() {
+        // SET { SEQUENCE { OID 2.5.4.5 (serialNumber), PrintableString "SN-1234" } }
+        let name = [
+            0x31, 0x10, 0x30, 0x0e, 0x06, 0x03, 0x55, 0x04, 0x05, 0x13, 0x07, b'S', b'N', b'-',
+            b'1', b'2', b'3', b'4',
+        ];
+
+        assert_eq!(
+            Value::Object(parse_name(&name)),
+            serde_json::json!({
+                "serial_number": "53:4e:2d:31:32:33:34",
+                "serial_number_str": "SN-1234"
+            })
+        );
     }
 }

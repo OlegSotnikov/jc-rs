@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
 import { ParserSearch } from "@/components/ParserSearch";
-import { grouped, slugOf, summary } from "@/lib/parsers";
+import { getParserSeo, parserSeoNames } from "@/lib/parser-seo";
+import { getParser, grouped, slugOf, summary } from "@/lib/parsers";
+import { site } from "@/lib/site";
+
+const description = `Every one of the ${summary.documented} parsers jc-rs ships, grouped by domain, with the platforms each supports and the fixture coverage behind it.`;
 
 export const metadata: Metadata = {
   title: "All parsers",
-  description: `Every one of the ${summary.documented} parsers jc-rs ships, grouped by domain, with the platforms each supports and the fixture coverage behind it.`,
+  description,
   alternates: { canonical: "/parsers" },
+  openGraph: {
+    title: `All ${summary.documented} jc-rs parsers`,
+    description,
+    url: `${site.origin}/parsers`,
+    images: [site.socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `All ${summary.documented} jc-rs parsers`,
+    description,
+    images: [site.socialImage.url],
+  },
 };
 
 export default function ParsersIndex() {
@@ -36,6 +52,38 @@ export default function ParsersIndex() {
           )}
         />
       </div>
+
+      <section className="mt-12 border-y py-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl">Use a parser in this tab</h2>
+            <p className="mt-2 max-w-2xl text-sm text-[var(--color-muted)]">
+              These pages load the Rust parser as WebAssembly. Paste or open text, inspect the
+              resulting JSON, then take the same command to your shell.
+            </p>
+          </div>
+          <span className="font-mono text-[11px] text-[var(--color-str)]">local · no input upload</span>
+        </div>
+
+        <ul className="mt-6 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+          {parserSeoNames.map((name) => {
+            const parser = getParser(name)!;
+            const seo = getParserSeo(name)!;
+            return (
+              <li key={name} className="border-t first:border-t-0 sm:first:border-t">
+                <a href={`/parsers/${slugOf(parser)}`} className="group block py-3.5">
+                  <span className="font-display font-semibold transition-colors group-hover:text-[var(--color-key)]">
+                    {seo.title}
+                  </span>
+                  <span className="mt-1 block line-clamp-2 text-xs leading-5 text-[var(--color-muted)]">
+                    {seo.description}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       {groups.map((g) => (
         <section

@@ -618,6 +618,7 @@ dependencies = [
  "jc-rs-parsers",
  "serde",
  "serde-wasm-bindgen",
+ "serde_json",
  "wasm-bindgen",
 ]
 

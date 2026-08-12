@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const pkg = join(dirname(fileURLToPath(import.meta.url)), "..", "pkg");
-const { default: init, parse, parseRaw, parsers, parserInfo, version, StreamSession } =
+const { default: init, parse, parseJson, parseRaw, parsers, parserInfo, version, StreamSession } =
   await import(join(pkg, "jc-rs.js"));
 
 await init({ module_or_path: await readFile(join(pkg, "jc-rs_bg.wasm")) });
@@ -24,6 +24,31 @@ const [row] = parse("df", df);
 assert.equal(row.filesystem, "devtmpfs", "field access works");
 assert.equal(row.use_percent, 0, "numbers stay numbers");
 assert.equal(JSON.parse(JSON.stringify(row)).filesystem, "devtmpfs", "survives stringify");
+
+// The website consumes JSON text rather than round-tripping through JS values:
+// null fields must remain present, and parser conversions from strings such as
+// `100%` and `on` must be identical to the CLI schema.
+const sparseDf = `Filesystem    Type 1024-blocks Used Available Capacity Mounted on
+proc          proc           0    0         0        - /proc`;
+const [sparseRow] = JSON.parse(parseJson("df", sparseDf));
+assert.ok(Object.hasOwn(sparseRow, "capacity_percent"), "null field is not omitted");
+assert.equal(sparseRow.capacity_percent, null);
+assert.match(parseJson("df", sparseDf), /"capacity_percent": null/);
+
+const amixer = `Simple mixer control 'Master',0
+  Capabilities: pvolume pvolume-joined pswitch pswitch-joined
+  Playback channels: Mono
+  Limits: Playback 0 - 87
+  Mono: Playback 87 [100%] [0.00dB] [on]`;
+assert.deepEqual(JSON.parse(parseJson("amixer", amixer)), parse("amixer", amixer));
+
+// JSON.parse would round this to a JavaScript Number. The text API preserves
+// the exact CLI integer instead.
+const procStat = await readFile(
+  join(dirname(fileURLToPath(import.meta.url)), "../../../tests/fixtures/linux-proc/pid_stat"),
+  "utf8",
+);
+assert.match(parseJson("proc_pid_stat", procStat), /"rsslim": 18446744073709551615/);
 
 // Any spelling of the name.
 assert.deepEqual(parse("--df", df), parse("df", df));

@@ -5,6 +5,7 @@ import summary from "@/data/summary.json";
 
 const NAV = [
   { href: "/parsers", label: "Parsers" },
+  { href: "/guides", label: "Guides" },
   { href: "/compatibility", label: "Compatibility" },
   { href: "/compare", label: "Compare" },
   { href: "/install", label: "Install" },
@@ -19,6 +20,7 @@ export function SiteHeader() {
         </Link>
 
         <nav
+          aria-label="Primary navigation"
           className="hidden gap-5 text-sm text-[var(--color-muted)] sm:flex"
           itemScope
           itemType="https://schema.org/SiteNavigationElement"
@@ -48,6 +50,21 @@ export function SiteHeader() {
           </a>
         </div>
       </div>
+
+      <nav
+        aria-label="Primary navigation on mobile"
+        className="mx-auto flex max-w-6xl gap-5 overflow-x-auto border-t px-5 py-2 text-xs whitespace-nowrap text-[var(--color-muted)] sm:hidden"
+      >
+        {NAV.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="transition-colors hover:text-[var(--color-ink)]"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   );
 }

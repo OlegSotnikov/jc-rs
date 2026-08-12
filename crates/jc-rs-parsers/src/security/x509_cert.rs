@@ -1,9 +1,9 @@
 //! Parser for X.509 Certificate files (PEM and DER).
 
 use crate::security::der::{
-    TAG_BITSTRING, TAG_INTEGER, TAG_SEQUENCE, bytes_to_hex, decode_pem, parse_algorithm_identifier,
-    parse_extensions, parse_name, parse_sequence_items, parse_serial_number, parse_spki, parse_tlv,
-    parse_validity,
+    TAG_BITSTRING, TAG_GENERALIZEDTIME, TAG_INTEGER, TAG_OID, TAG_SEQUENCE, TAG_UTCTIME, Tlv,
+    bytes_to_hex, decode_pem, parse_algorithm_identifier, parse_extensions, parse_name,
+    parse_sequence_items, parse_serial_number, parse_spki, parse_tlv, parse_validity,
 };
 use jc_rs_core::error::ParseError;
 use jc_rs_core::registry::ParserEntry;
@@ -39,17 +39,141 @@ inventory::submit! {
     ParserEntry::new(&X509_CERT_PARSER)
 }
 
+fn parse_all_tlvs(data: &[u8]) -> Option<Vec<Tlv<'_>>> {
+    let mut items = Vec::new();
+    let mut remaining = data;
+    while !remaining.is_empty() {
+        let (item, rest) = parse_tlv(remaining)?;
+        items.push(item);
+        remaining = rest;
+    }
+    Some(items)
+}
+
+fn is_algorithm_identifier(item: &Tlv<'_>) -> bool {
+    if item.tag != TAG_SEQUENCE {
+        return false;
+    }
+    let Some(parts) = parse_all_tlvs(item.value) else {
+        return false;
+    };
+    matches!(parts.len(), 1 | 2) && parts[0].tag == TAG_OID && !parts[0].value.is_empty()
+}
+
+fn is_validity(item: &Tlv<'_>) -> bool {
+    if item.tag != TAG_SEQUENCE {
+        return false;
+    }
+    let Some(times) = parse_all_tlvs(item.value) else {
+        return false;
+    };
+    times.len() == 2
+        && times.iter().all(|time| {
+            matches!(time.tag, TAG_UTCTIME | TAG_GENERALIZEDTIME) && !time.value.is_empty()
+        })
+}
+
+fn is_subject_public_key_info(item: &Tlv<'_>) -> bool {
+    if item.tag != TAG_SEQUENCE {
+        return false;
+    }
+    let Some(parts) = parse_all_tlvs(item.value) else {
+        return false;
+    };
+    parts.len() == 2
+        && is_algorithm_identifier(&parts[0])
+        && parts[1].tag == TAG_BITSTRING
+        && parts[1].value.len() > 1
+        && parts[1].value[0] <= 7
+}
+
+fn has_certificate_structure(der: &[u8]) -> bool {
+    let Some((certificate, trailing)) = parse_tlv(der) else {
+        return false;
+    };
+    if certificate.tag != TAG_SEQUENCE || !trailing.is_empty() {
+        return false;
+    }
+
+    let Some(parts) = parse_all_tlvs(certificate.value) else {
+        return false;
+    };
+    if parts.len() != 3
+        || parts[0].tag != TAG_SEQUENCE
+        || !is_algorithm_identifier(&parts[1])
+        || parts[2].tag != TAG_BITSTRING
+        || parts[2].value.len() <= 1
+        || parts[2].value[0] != 0
+    {
+        return false;
+    }
+
+    let Some(tbs) = parse_all_tlvs(parts[0].value) else {
+        return false;
+    };
+    let mut idx = 0;
+    if tbs.first().is_some_and(|item| item.tag == 0xA0) {
+        let Some(version) = parse_all_tlvs(tbs[0].value) else {
+            return false;
+        };
+        if version.len() != 1
+            || version[0].tag != TAG_INTEGER
+            || version[0].value.len() != 1
+            || version[0].value[0] > 2
+        {
+            return false;
+        }
+        idx += 1;
+    }
+
+    if tbs.len() < idx + 6
+        || tbs[idx].tag != TAG_INTEGER
+        || tbs[idx].value.is_empty()
+        || !is_algorithm_identifier(&tbs[idx + 1])
+        || tbs[idx + 2].tag != TAG_SEQUENCE
+        || !is_validity(&tbs[idx + 3])
+        || tbs[idx + 4].tag != TAG_SEQUENCE
+        || !is_subject_public_key_info(&tbs[idx + 5])
+    {
+        return false;
+    }
+    idx += 6;
+
+    // TBSCertificate permits these optional fields, in this order, after SPKI.
+    let mut last_optional = 0;
+    for item in &tbs[idx..] {
+        let rank = match item.tag {
+            0x81 | 0xA1 => 1, // issuerUniqueID
+            0x82 | 0xA2 => 2, // subjectUniqueID
+            0xA3 => {
+                let Some(extension_wrapper) = parse_all_tlvs(item.value) else {
+                    return false;
+                };
+                if extension_wrapper.len() != 1 || extension_wrapper[0].tag != TAG_SEQUENCE {
+                    return false;
+                }
+                3
+            }
+            _ => return false,
+        };
+        if rank <= last_optional {
+            return false;
+        }
+        last_optional = rank;
+    }
+
+    true
+}
+
 fn parse_certificate(der: &[u8]) -> Option<Map<String, Value>> {
-    // Certificate ::= SEQUENCE { tbsCertificate, signatureAlgorithm, signature }
-    let (cert_tlv, _) = parse_tlv(der)?;
-    if cert_tlv.tag != TAG_SEQUENCE {
+    if !has_certificate_structure(der) {
         return None;
     }
 
+    // Certificate ::= SEQUENCE { tbsCertificate, signatureAlgorithm, signature }
+    let (cert_tlv, _) = parse_tlv(der)?;
+
     let items = parse_sequence_items(cert_tlv.value);
-    if items.len() < 3 {
-        return None;
-    }
 
     // TBSCertificate
     let tbs = parse_tbs_certificate(items[0].value)?;
@@ -215,6 +339,14 @@ impl Parser for X509CertParser {
 mod tests {
     use super::*;
 
+    fn fixture(name: &str) -> Vec<u8> {
+        std::fs::read(format!(
+            "{}/../../tests/fixtures/generic/{name}",
+            env!("CARGO_MANIFEST_DIR")
+        ))
+        .unwrap()
+    }
+
     #[test]
     fn test_x509_cert_empty() {
         let parser = X509CertParser;
@@ -237,5 +369,29 @@ BAcMBkxpbmRvbjEWMBQGA1UECgwNRGlnaUNlcnQgSW5jLjERMA8GA1UECwwIRGln
         // This will fail to parse (truncated cert), but should not crash
         let result = parser.parse(input, false);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn accepts_certificate_der_fixtures() {
+        for name in [
+            "x509-ca-cert.der",
+            "x509-cert-bad-email2.der",
+            "x509-string-serialnumber.der",
+        ] {
+            assert!(
+                parse_certificate(&fixture(name)).is_some(),
+                "rejected {name}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_other_x509_der_structures() {
+        for name in ["x509-csr.der", "x509-crl.der"] {
+            assert!(
+                parse_certificate(&fixture(name)).is_none(),
+                "accepted {name}"
+            );
+        }
     }
 }

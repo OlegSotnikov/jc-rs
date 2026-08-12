@@ -21,15 +21,16 @@ $ dig example.com | jc-rs -p --dig
 
 jc is the standard for this job and the reason the category exists. It decided
 which commands are worth parsing and what the JSON for each should look like.
-Its one weakness is the Python runtime: ~160 ms of startup on every invocation,
-and a dependency you cannot put in a `scratch` container or on an embedded box.
+Its trade-off here is whole-process startup: 109 ms in the published run versus
+4 ms for jc-rs, plus a runtime dependency that does not fit a `scratch` container
+or many embedded systems.
 
 jc-rs is that tool as a single static binary:
 
-1. A compatibility number you can check. Every fixture jc ships enters the
-   denominator, including the awkward ones, and CI fails below 100%. jc-rs
-   invents no schemas: jc is the authority, and where the two disagree jc-rs has
-   the bug.
+1. A compatibility number you can check. Every discoverable fixture is evaluated:
+   qualifying pairs enter the denominator, exclusions stay visible, and CI fails
+   below 100%. jc-rs invents no schemas: jc is the authority, and where the two
+   disagree jc-rs has the bug.
 2. Streaming that actually streams. jc emits NDJSON line-by-line as input
    arrives, and so does jc-rs: `tail -f access.log | jc-rs -u --clf-s` prints
    each record as the log grows, rather than one array at EOF.
@@ -41,11 +42,14 @@ jc-rs is that tool as a single static binary:
 `tests/differential/validate.py` walks every `.json` fixture in the pinned jc
 source (submodule at `./jc`, currently **v1.25.7**) and applies one rule:
 
-> A fixture pair enters the denominator **only when jc itself reproduces that
-> fixture exactly.**
+> A fixture pair enters the denominator **only when jc itself matches that
+> fixture under the published structural JSON comparison.**
 
 Everything that does not qualify is reported by category (`oracle_reject`,
-`unmapped`, `no_input`) and never dropped from the count.
+`unmapped`, `no_input`) alongside the denominator rather than hidden. The
+comparison decodes JSON or NDJSON, ignores object-key order, and treats an
+integer and float as equal only when their numeric values are equal; array
+order, fields, other types, and values must agree.
 
 Two details decide whether the number means anything:
 

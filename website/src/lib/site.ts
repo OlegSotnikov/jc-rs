@@ -10,6 +10,12 @@ export const site = {
   cratesIo: "https://crates.io/crates/jc-rs",
   npm: "https://www.npmjs.com/package/jc-rs-wasm",
   releases: "https://github.com/OlegSotnikov/jc-rs/releases",
+  socialImage: {
+    url: "/opengraph-image",
+    width: 1200,
+    height: 630,
+    alt: "jc-rs command-output parser compatibility overview",
+  },
 } as const;
 
 import benchmarkData from "@/data/benchmarks.json";

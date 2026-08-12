@@ -13,13 +13,13 @@
   --color-sunk: #eceff3;
   --color-ink: #0f1319;
   --color-muted: #5a6474;
-  --color-faint: #8996a8;
+  --color-faint: #657183;
   --color-rule: #dfe4ea;
 
   --color-key: #2d5bd0;
   --color-str: #12805a;
-  --color-num: #bd5400;
-  --color-punct: #94a0b2;
+  --color-num: #b84f00;
+  --color-punct: #657183;
 
   /* Chart fills. Deliberately not --color-key / --color-num: those are tuned
      for text on this surface, and as large fills the dark pair sits outside the
@@ -48,13 +48,13 @@
   --color-sunk: #0f141b;
   --color-ink: #e7ecf3;
   --color-muted: #97a3b6;
-  --color-faint: #6d7b90;
+  --color-faint: #74839a;
   --color-rule: #212936;
 
   --color-key: #7aa2f7;
   --color-str: #6ed3a3;
   --color-num: #f0a868;
-  --color-punct: #6d7b90;
+  --color-punct: #74839a;
 
   --color-chart-rs: #4f7fdb;
   --color-chart-jc: #cf7f3c;
@@ -68,13 +68,13 @@
     --color-sunk: #0f141b;
     --color-ink: #e7ecf3;
     --color-muted: #97a3b6;
-    --color-faint: #6d7b90;
+    --color-faint: #74839a;
     --color-rule: #212936;
 
     --color-key: #7aa2f7;
     --color-str: #6ed3a3;
     --color-num: #f0a868;
-    --color-punct: #6d7b90;
+    --color-punct: #74839a;
 
     --color-chart-rs: #4f7fdb;
     --color-chart-jc: #cf7f3c;

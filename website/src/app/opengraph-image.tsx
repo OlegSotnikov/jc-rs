@@ -43,7 +43,7 @@ export default function OpengraphImage() {
             <div style={{ width: "100%", background: "#6ed3a3" }} />
           </div>
           <span style={{ fontSize: 32, color: "#97a3b6", marginTop: 28 }}>
-            {summary.matched} of {summary.tested} reference fixture pairs, byte for byte
+            {summary.matched} of {summary.tested} structural JSON matches
           </span>
         </div>
 

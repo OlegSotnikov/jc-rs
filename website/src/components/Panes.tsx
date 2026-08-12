@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { matchesLiteral, tokenizeJson, tokenizeRaw } from "@/lib/tokens";
 
 /**
@@ -17,6 +17,7 @@ export function Panes({
   outputLabel,
   error,
   onInputChange,
+  inputAriaLabel,
   busy,
 }: {
   input: string;
@@ -25,20 +26,42 @@ export function Panes({
   outputLabel: React.ReactNode;
   error?: string | null;
   onInputChange?: (value: string) => void;
+  inputAriaLabel?: string;
   busy?: boolean;
 }) {
-  const [lit, setLit] = useState<string | null>(null);
+  const [hoverLit, setHoverLit] = useState<string | null>(null);
+  const [keyboardIndex, setKeyboardIndex] = useState<number | null>(null);
   const highlight = useRef<HTMLPreElement>(null);
+  const inputLabelId = useId();
+  const outputLabelId = useId();
+  const keyboardHintId = useId();
 
   const rawTokens = useMemo(() => tokenizeRaw(input), [input]);
   const jsonTokens = useMemo(() => tokenizeJson(output), [output]);
+  const valueLiterals = useMemo(
+    () =>
+      jsonTokens.flatMap((token) =>
+        token.kind !== "punct" && token.kind !== "plain" && token.kind !== "key" && token.literal
+          ? [token.literal]
+          : [],
+      ),
+    [jsonTokens],
+  );
+  const keyboardLit =
+    keyboardIndex === null || valueLiterals.length === 0
+      ? null
+      : valueLiterals[Math.min(keyboardIndex, valueLiterals.length - 1)];
+  const lit = hoverLit ?? keyboardLit;
 
   const editable = Boolean(onInputChange);
 
   return (
     <div className="grid gap-px overflow-hidden rounded-xl border bg-[var(--color-rule)] md:grid-cols-2">
-      <section className="flex min-w-0 flex-col bg-[var(--color-surface)]">
-        <PaneBar>{inputLabel}</PaneBar>
+      <section
+        aria-labelledby={inputLabelId}
+        className="flex min-w-0 flex-col bg-[var(--color-surface)]"
+      >
+        <PaneBar id={inputLabelId}>{inputLabel}</PaneBar>
 
         {/* Editable: the textarea is the only thing that scrolls, and the
             highlighted layer under it is moved to match. Letting both scroll
@@ -80,18 +103,49 @@ export function Panes({
               }}
               spellCheck={false}
               wrap="off"
-              aria-label="Command output to convert"
+              aria-label={inputAriaLabel ?? "Command output to convert"}
               className="absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent px-4 py-3 font-mono text-[12.5px] leading-[1.65] whitespace-pre text-transparent caret-[var(--color-ink)] outline-none focus-visible:outline-none"
             />
           )}
         </div>
       </section>
 
-      <section className="flex min-w-0 flex-col bg-[var(--color-surface)]">
-        <PaneBar>{outputLabel}</PaneBar>
-        <div className="max-h-[26rem] min-h-[12rem] flex-1 overflow-auto">
+      <section
+        aria-labelledby={outputLabelId}
+        className="flex min-w-0 flex-col bg-[var(--color-surface)]"
+      >
+        <PaneBar id={outputLabelId}>{outputLabel}</PaneBar>
+        <div
+          className="max-h-[26rem] min-h-[12rem] flex-1 overflow-auto"
+          tabIndex={valueLiterals.length > 0 ? 0 : undefined}
+          aria-busy={busy || undefined}
+          aria-labelledby={outputLabelId}
+          aria-describedby={valueLiterals.length > 0 ? keyboardHintId : undefined}
+          onFocus={() => {
+            if (valueLiterals.length > 0) setKeyboardIndex((current) => current ?? 0);
+          }}
+          onBlur={() => setKeyboardIndex(null)}
+          onKeyDown={(event) => {
+            if (valueLiterals.length === 0) return;
+            if (event.key === "ArrowRight") {
+              setKeyboardIndex((current) => ((current ?? -1) + 1) % valueLiterals.length);
+            } else if (event.key === "ArrowLeft") {
+              setKeyboardIndex(
+                (current) => ((current ?? 0) - 1 + valueLiterals.length) % valueLiterals.length,
+              );
+            }
+          }}
+        >
+          {valueLiterals.length > 0 && (
+            <span id={keyboardHintId} className="sr-only">
+              Use the Left and Right arrow keys to highlight the matching value in the input.
+            </span>
+          )}
           {error ? (
-            <p className="px-4 py-3 font-mono text-[12.5px] leading-[1.65] text-[var(--color-num)]">
+            <p
+              role="alert"
+              className="px-4 py-3 font-mono text-[12.5px] leading-[1.65] text-[var(--color-num)]"
+            >
               {error}
             </p>
           ) : (
@@ -111,8 +165,8 @@ export function Panes({
                   <span
                     key={i}
                     className={cls}
-                    onMouseEnter={() => setLit(t.literal ?? null)}
-                    onMouseLeave={() => setLit(null)}
+                    onMouseEnter={() => setHoverLit(t.literal ?? null)}
+                    onMouseLeave={() => setHoverLit(null)}
                     data-lit={lit !== null && lit === t.literal}
                   >
                     {t.text}
@@ -127,9 +181,12 @@ export function Panes({
   );
 }
 
-function PaneBar({ children }: { children: React.ReactNode }) {
+function PaneBar({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b bg-[var(--color-sunk)] px-4 py-2 font-mono text-[11px] tracking-wide text-[var(--color-muted)] uppercase">
+    <div
+      id={id}
+      className="flex items-center justify-between gap-3 border-b bg-[var(--color-sunk)] px-4 py-2 font-mono text-[11px] tracking-wide text-[var(--color-muted)] uppercase"
+    >
       {children}
     </div>
   );

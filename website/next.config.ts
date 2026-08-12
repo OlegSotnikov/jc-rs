@@ -12,9 +12,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // The wasm binary is content-hashed by the build and never mutates in
-        // place, so it can be cached hard. Without this the browser refetches
-        // 1.5 MB on every navigation to the playground.
+        // The converter versions these URLs with the jc-rs release, so they can
+        // be cached hard without pairing a new client with an old wasm API.
+        // Without this the browser refetches 1.5 MB on every navigation.
         source: "/wasm/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },

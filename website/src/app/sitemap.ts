@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { guides } from "@/lib/guides";
 import { parsers, slugOf } from "@/lib/parsers";
 import { site } from "@/lib/site";
 
@@ -10,11 +11,12 @@ import { site } from "@/lib/site";
  * sitemap as the truth and drops what is missing.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const guidePublished = new Date("2026-08-11T00:00:00Z");
 
   const fixed: MetadataRoute.Sitemap = [
     { url: `${site.origin}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${site.origin}/parsers`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${site.origin}/guides`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.origin}/compatibility`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${site.origin}/compare`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.origin}/install`, changeFrequency: "monthly", priority: 0.8 },
@@ -26,5 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: p.coverage ? 0.7 : 0.5,
   }));
 
-  return [...fixed, ...pages].map((e) => ({ ...e, lastModified: now }));
+  const guidePages: MetadataRoute.Sitemap = guides.map((guide) => ({
+    url: `${site.origin}${guide.href}`,
+    changeFrequency: "monthly" as const,
+    priority: guide.category === "Formats" ? 0.8 : 0.7,
+    lastModified: guidePublished,
+  }));
+
+  return [...fixed, ...pages, ...guidePages];
 }

@@ -4,11 +4,25 @@ import { BenchChart } from "@/components/BenchChart";
 import { benchmarks, site } from "@/lib/site";
 import { summary } from "@/lib/parsers";
 
+const description =
+  "Compare jc-rs with the original Python jc, and see where jq fits: jc-rs and jc create structured JSON; jq filters and transforms it.";
+
 export const metadata: Metadata = {
-  title: "jc-rs compared with jc",
-  description:
-    "jc-rs is a single static binary with no runtime to install. jc is the original Python tool. They emit the same JSON, so switching costs one word in a pipeline.",
+  title: "jc-rs vs jc vs jq",
+  description,
   alternates: { canonical: "/compare" },
+  openGraph: {
+    title: "jc-rs vs jc vs jq",
+    description,
+    url: `${site.origin}/compare`,
+    images: [site.socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "jc-rs vs jc vs jq",
+    description,
+    images: [site.socialImage.url],
+  },
 };
 
 const startup = benchmarks[0];
@@ -16,7 +30,7 @@ const startup = benchmarks[0];
 const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
   {
     label: "What you install",
-    rs: "One static binary, 2.3 MB",
+    rs: "One static binary",
     jc: "A Python package and its interpreter",
   },
   {
@@ -29,7 +43,7 @@ const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
     label: "Cold start",
     rs: `${startup.rs} ms`,
     jc: `${startup.jc} ms`,
-    note: "Per invocation. In a loop over 200 hosts that is 26 seconds of interpreter startup.",
+    note: `Whole-process wall time per invocation. Repeated 200 times, that is ${(startup.rs * 200 / 1000).toFixed(1)} s versus ${(startup.jc * 200 / 1000).toFixed(1)} s in this benchmark.`,
   },
   {
     label: "Parsers",
@@ -38,9 +52,9 @@ const ROWS: { label: string; rs: string; jc: string; note?: string }[] = [
   },
   {
     label: "Output",
-    rs: "Identical JSON",
-    jc: "Identical JSON",
-    note: "Same schemas, same field names, same types. Anything downstream keeps working.",
+    rs: "jc-compatible schemas",
+    jc: "Reference schemas",
+    note: `${summary.matched}/${summary.tested} oracle-valid fixture pairs have no structural or value differences under the published JSON comparison. Test the inputs your pipeline depends on.`,
   },
   {
     label: "Streaming",
@@ -71,11 +85,12 @@ export default function Compare() {
       <p className="font-mono text-xs tracking-wide text-[var(--color-muted)] uppercase">
         Comparison
       </p>
-      <h1 className="mt-3 text-4xl">jc-rs and jc</h1>
+      <h1 className="mt-3 text-4xl">jc-rs, jc, and jq</h1>
       <p className="mt-4 max-w-2xl text-lg text-[var(--color-muted)]">
         jc is the original tool that decided this category: a Python program that turns command
-        output into JSON. jc-rs does the same job as a compiled binary, and emits the same JSON,
-        so moving between them costs one word in a pipeline.
+        output into JSON. jc-rs implements those schemas in a compiled binary and measures its
+        output against the shared fixture corpus. jq starts after that conversion: it reads JSON
+        and selects, reshapes, or aggregates it.
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -101,6 +116,47 @@ export default function Compare() {
       </div>
 
       <section className="mt-12">
+        <h2 className="text-2xl">Where jq fits</h2>
+        <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
+          jq does not know where the columns in <code className="font-mono">ss</code> output end,
+          and jc-rs does not provide jq&apos;s query language. Put them next to each other: the
+          parser establishes the records, then jq asks a question of those records.
+        </p>
+        <div className="mt-5 overflow-hidden rounded-xl border bg-[var(--color-surface)]">
+          <div className="grid gap-px bg-[var(--color-rule)] sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
+            {[
+              ["raw output", "ss -tlnp"],
+              ["parse", "jc-rs --ss"],
+              ["query JSON", "jq '[.[].local_port] | unique'"],
+            ].map(([label, command], index) => (
+              <div key={label} className="contents">
+                {index > 0 && (
+                  <span className="hidden items-center bg-[var(--color-paper)] px-3 font-mono text-[var(--color-faint)] sm:flex">
+                    |
+                  </span>
+                )}
+                <div className="bg-[var(--color-surface)] p-4">
+                  <p className="font-mono text-[10px] tracking-wide text-[var(--color-faint)] uppercase">
+                    {label}
+                  </p>
+                  <code className="mt-2 block overflow-x-auto font-mono text-xs text-[var(--color-ink)]">
+                    {command}
+                  </code>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="mt-3 text-sm text-[var(--color-muted)]">
+          For quoting, exit handling, and complete Bash examples, read{" "}
+          <Link href="/guides/bash-jc-rs-jq" className="text-[var(--color-key)] underline-offset-4 hover:underline">
+            Bash, jc-rs, and jq
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="mt-12">
         <h2 className="text-2xl">Side by side</h2>
         <div className="mt-5 overflow-hidden rounded-xl border bg-[var(--color-surface)]">
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-4 border-b bg-[var(--color-sunk)] px-5 py-2.5 font-mono text-[11px] tracking-wide text-[var(--color-faint)] uppercase">
@@ -124,12 +180,13 @@ export default function Compare() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Where the time goes</h2>
+        <h2 className="text-2xl">Measured process time</h2>
         <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-          Startup is where the gap is widest, and startup is what a loop pays. Over 200 hosts, jc
-          spends 21 seconds inside the Python interpreter before parsing a byte; jc-rs spends one.
-          On bulk throughput the lead settles at 3× to 6×, where both are bound by the same
-          per-field work.
+          The harness measures complete process wall time, once per invocation. Repeating the cold
+          start row 200 times totals {(startup.jc * 200 / 1000).toFixed(1)} seconds for jc and{" "}
+          {(startup.rs * 200 / 1000).toFixed(1)} seconds for jc-rs on the measured host. The larger
+          fixture rows below measure parsing and process overhead together; the benchmark does not
+          assign those milliseconds to individual runtime components.
         </p>
         <BenchChart />
       </section>
@@ -137,8 +194,8 @@ export default function Compare() {
       <section className="mt-12">
         <h2 className="text-2xl">Switching</h2>
         <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-          The output is the same, so the change is the command name. Nothing downstream of the
-          pipe needs touching.
+          For a parser and input that match the compatibility contract, the command name can be
+          the only change. Compare representative output before moving a production pipeline.
         </p>
         <pre className="mt-4 overflow-x-auto rounded-lg border bg-[var(--color-sunk)] p-4 font-mono text-xs leading-relaxed">
           {`- ps aux | jc --ps | jq '.[0]'
@@ -177,8 +234,9 @@ export default function Compare() {
         <h2 className="text-xl">The compatibility claim, and how to check it</h2>
         <p className="mt-3 text-sm text-[var(--color-muted)]">
           &ldquo;Same JSON&rdquo; is easy to say, so jc-rs measures it: {summary.matched} of{" "}
-          {summary.tested} oracle-valid pairs from the full reference corpus match byte for byte,
-          and the run fails CI below 100%. What the number excludes is published next to it.
+          {summary.tested} oracle-valid pairs drawn from the full corpus have no structural or
+          value differences under the published comparison, and the run fails CI below 100%.
+          What the number excludes is published next to it.
         </p>
         <Link
           href="/compatibility"
@@ -190,7 +248,8 @@ export default function Compare() {
 
       <p className="mt-10 text-sm text-[var(--color-faint)]">
         Cold start figure above: {startup.jc} ms against {startup.rs} ms, the widest gap in the
-        set and the one most workloads actually pay.
+        measured set. Method: one fresh process per run, fastest result retained from repeated
+        runs.
       </p>
     </div>
   );

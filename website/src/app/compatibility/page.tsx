@@ -2,10 +2,24 @@ import type { Metadata } from "next";
 import { parsers, summary } from "@/lib/parsers";
 import { site } from "@/lib/site";
 
+const description = `See how jc-rs measures ${summary.matched}/${summary.tested} oracle-valid pairs drawn from the full fixture corpus, including its comparison rule and exclusions.`;
+
 export const metadata: Metadata = {
   title: "How the compatibility number is produced",
-  description: `jc-rs measures ${summary.matchRate}% against the full reference corpus. This is the rule that decides what enters the denominator, and what the number deliberately excludes.`,
+  description,
   alternates: { canonical: "/compatibility" },
+  openGraph: {
+    title: "How jc-rs measures compatibility",
+    description,
+    url: `${site.origin}/compatibility`,
+    images: [site.socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How jc-rs measures compatibility",
+    description,
+    images: [site.socialImage.url],
+  },
 };
 
 export default function Compatibility() {
@@ -27,18 +41,20 @@ export default function Compatibility() {
         <h2 className="text-2xl">One rule</h2>
         <blockquote className="mt-4 border-l-2 border-[var(--color-key)] pl-5 text-lg">
           A fixture pair enters the denominator only when the reference implementation
-          reproduces that fixture exactly.
+          matches that fixture under the published structural JSON comparison.
         </blockquote>
         <p className="mt-4 text-[var(--color-muted)]">
           <code className="font-mono text-sm">tests/differential/validate.py</code> walks every{" "}
           <code className="font-mono text-sm">.json</code> fixture in the pinned corpus, runs
           the reference against the same input, and only then compares jc-rs. If the reference
-          cannot reproduce its own expected output on this machine, neither implementation is
+          does not match its own expected output under this comparison, neither implementation is
           being tested and the pair is reported instead of counted. The reference is{" "}
           <a href={site.jc} className="text-[var(--color-key)] underline-offset-4 hover:underline">
             jc {summary.jcVersion}
           </a>
-          , the original Python tool.
+          , the original Python tool. The comparison decodes JSON or NDJSON and ignores object-key
+          order. Numerically equal integers and floats count as equal; array order, fields, other
+          types, and values must agree.
         </p>
       </section>
 
@@ -49,17 +65,17 @@ export default function Compatibility() {
             {
               k: "Tested",
               v: summary.tested,
-              d: "The reference reproduces the fixture, so the comparison means something.",
+              d: "The reference matches the fixture under the comparison, so the result means something.",
             },
             {
               k: "Matching",
               v: summary.matched,
-              d: "jc-rs writes the same bytes. This over the line above is the number.",
+              d: "jc-rs has no structural or value differences under the published comparison. Dividing this count by Tested gives the published percentage.",
             },
             {
               k: "Oracle reject",
               v: summary.oracleReject,
-              d: "The reference cannot reproduce its own fixture here. Nothing to measure against.",
+              d: "The reference does not match its own fixture here. Nothing to measure against.",
             },
             {
               k: "Unmapped",

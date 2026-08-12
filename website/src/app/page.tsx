@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { BenchChart } from "@/components/BenchChart";
 import { Converter, type Preset } from "@/components/Converter";
 import { CopyLine } from "@/components/CopyLine";
+import { guides } from "@/lib/guides";
 import { benchmarks, install, site } from "@/lib/site";
 import { featured, grouped, parsers, summary } from "@/lib/parsers";
 
@@ -38,7 +39,8 @@ export default function Home() {
           v{summary.version} · {summary.documented} parsers · one static binary
         </p>
         <h1 className="mt-4 max-w-3xl text-[clamp(2.4rem,6vw,4.1rem)]">
-          Pipe anything into <span className="text-[var(--color-key)]">jq</span>.
+          Convert command output to JSON. Pipe anything into{" "}
+          <span className="text-[var(--color-key)]">jq</span>.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-[var(--color-muted)]">
           jc-rs turns the output of the commands you already run into JSON. One static
@@ -53,9 +55,63 @@ export default function Home() {
 
       <Evidence />
       <Speed />
+      <GuideShelf />
       <Install />
       <Catalogue groups={groups} />
     </>
+  );
+}
+
+function GuideShelf() {
+  const picked = [
+    guides.find((guide) => guide.href.endsWith("ndjson-vs-json-vs-jsonl"))!,
+    guides.find((guide) => guide.href.endsWith("bash-jc-rs-jq"))!,
+    guides.find((guide) => guide.href.endsWith("native-json-or-jc-rs"))!,
+  ];
+
+  return (
+    <section className="border-y bg-[var(--color-surface)]">
+      <div className="mx-auto max-w-6xl px-5 py-16">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div>
+            <p className="font-mono text-xs tracking-wide text-[var(--color-faint)] uppercase">
+              Guides
+            </p>
+            <h2 className="mt-3 max-w-md text-3xl">The parser is one step in the pipeline.</h2>
+            <p className="mt-3 max-w-md text-[var(--color-muted)]">
+              Format choices, shell failure modes, and complete examples for the work around
+              the conversion.
+            </p>
+            <Link
+              href="/guides"
+              className="mt-5 inline-block text-sm text-[var(--color-key)] underline-offset-4 hover:underline"
+            >
+              Browse all guides →
+            </Link>
+          </div>
+
+          <ol className="divide-y border-y">
+            {picked.map((guide) => (
+              <li key={guide.href}>
+                <Link href={guide.href} className="group block py-4">
+                  <span className="flex items-baseline justify-between gap-5">
+                    <span className="font-display text-lg font-semibold transition-colors group-hover:text-[var(--color-key)]">
+                      {guide.title}
+                    </span>
+                    <span className="shrink-0 font-mono text-xs text-[var(--color-faint)]">
+                      {guide.readingMinutes} min
+                    </span>
+                  </span>
+                  <span className="mt-1 block max-w-2xl text-sm text-[var(--color-muted)]">
+                    {guide.description}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -76,9 +132,9 @@ function Evidence() {
               <span style={{ width: `${summary.matchRate}%` }} />
             </div>
             <p className="mt-4 max-w-md text-[var(--color-muted)]">
-              {summary.matched} of {summary.tested} pairs from the full reference corpus,
-              byte for byte, checked on every commit. CI fails below 100%, so the number
-              cannot quietly drift.
+              {summary.matched} of {summary.tested} oracle-valid pairs drawn from the full corpus
+              have no structural or value differences under the published JSON comparison.
+              Checked on every commit, the number cannot quietly drift.
             </p>
           </div>
 
@@ -87,15 +143,15 @@ function Evidence() {
               What the number excludes, and why it says so
             </p>
             <p className="mt-4 text-[var(--color-muted)]">
-              A pair counts only when the reference implementation reproduces its own
-              fixture exactly. Everything else is reported by category rather than dropped: a
-              harness that silently skips what it cannot handle is how a project reports 100%
-              while being blind to a third of the evidence.
+              A pair counts only when the reference implementation matches its own fixture under
+              the same structural JSON comparison. Everything else is reported by category: a
+              harness that silently skips what it cannot handle can report 100% while remaining
+              blind to a third of the evidence.
             </p>
             <dl className="mt-6 divide-y border-y">
               {[
-                ["Tested, and matching", summary.matched, "the reference reproduces it, so do we"],
-                ["Oracle reject", summary.oracleReject, "the reference cannot reproduce its own fixture"],
+                ["Tested, and matching", summary.matched, "the reference matches it under the comparison, so do we"],
+                ["Oracle reject", summary.oracleReject, "the reference does not match its own fixture here"],
                 ["Unmapped", summary.unmapped, "the filename resolves to no parser"],
                 ["No input", summary.noInput, "expected output ships without an input file"],
               ].map(([label, value, note]) => (
@@ -127,10 +183,9 @@ function Speed() {
     <section className="mx-auto max-w-6xl px-5 py-16">
       <h2 className="text-3xl">Startup is where it shows</h2>
       <p className="mt-3 max-w-2xl text-[var(--color-muted)]">
-        A compiled binary starts in {startup.rs} ms. The Python original spends {startup.jc} ms
-        inside its interpreter before it reads a byte, and pays that on every invocation — which
-        is what a loop, a git hook or a run across 200 hosts is made of. On bulk throughput both
-        are bound by the same per-field work.{" "}
+        The measured cold-start invocation takes {startup.rs} ms for jc-rs and {startup.jc} ms for
+        jc. A loop, git hook, or run across many hosts pays that whole-process cost each time. The
+        larger fixtures in the chart measure parsing and process overhead together.{" "}
         <Link href="/compare" className="text-[var(--color-key)] underline-offset-4 hover:underline">
           Full comparison
         </Link>

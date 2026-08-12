@@ -23,7 +23,7 @@ type View = {
  * The hero converter.
  *
  * Renders the server-known fixture pair immediately, so the first paint carries
- * real content and costs no JavaScript. The 1.3 MB WebAssembly build arrives
+ * real content and costs no JavaScript. The 1.5 MB compressed WebAssembly build arrives
  * afterwards, on idle or on the first keystroke, and from then on every edit is
  * parsed by the same code that ships in the binary.
  *
@@ -41,6 +41,8 @@ export function Converter({ presets }: { presets: Preset[] }) {
   const [live, setLive] = useState(false);
   const [failed, setFailed] = useState(false);
   const mod = useRef<JcRs | null>(null);
+  const loadingRef = useRef(false);
+  const activeRef = useRef(0);
 
   const preset = presets[active];
 
@@ -55,18 +57,23 @@ export function Converter({ presets }: { presets: Preset[] }) {
   }, []);
 
   const warm = useCallback(async () => {
-    if (mod.current || failed) return;
+    if (mod.current || loadingRef.current) return;
+    loadingRef.current = true;
+    setFailed(false);
     try {
       const m = await loadJcRs();
       mod.current = m;
       setLive(true);
       // Re-parse what is on screen so the timing line stops saying "loading".
-      setView((v) => render(presets[0].name, v.input, m));
+      setView((v) => render(presets[activeRef.current].name, v.input, m));
     } catch {
       // The pre-rendered pair stays on screen; only the live upgrade is lost.
       setFailed(true);
+      setLive(false);
+    } finally {
+      loadingRef.current = false;
     }
-  }, [failed, presets, render]);
+  }, [presets, render]);
 
   // Fetch the module once the browser is otherwise idle. Safari has no
   // requestIdleCallback, so fall back to a timer there.
@@ -82,6 +89,7 @@ export function Converter({ presets }: { presets: Preset[] }) {
   }, [warm]);
 
   function choose(index: number) {
+    activeRef.current = index;
     setActive(index);
     const p = presets[index];
     setView(
@@ -145,9 +153,9 @@ export function Converter({ presets }: { presets: Preset[] }) {
       />
 
       <p className="mt-3 text-sm text-[var(--color-muted)]">
-        Hover a value on the right to see where it was read from. Edit the left pane and it
-        re-parses as you type: the WebAssembly build runs the same parsers as the binary, so
-        nothing you paste here leaves the page.
+        Hover over a JSON value, or focus the JSON pane and use the Left and Right arrow keys, to
+        highlight its source. Edits are parsed in this page by the same WebAssembly parser code
+        that ships in the binary; jc-rs does not send pasted input to a server.
       </p>
     </div>
   );

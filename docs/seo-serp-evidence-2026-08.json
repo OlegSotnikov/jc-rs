@@ -1,0 +1,7774 @@
+{
+  "research_date": "2026-08-11",
+  "market": "Google US, English",
+  "serps": {
+    "bash jq": [
+      {
+        "rank": 1,
+        "title": "jq",
+        "url": "https://jqlang.org/"
+      },
+      {
+        "rank": 2,
+        "title": "Work with JSON in BASH using jq",
+        "url": "https://github.com/bobbyiliev/introduction-to-bash-scripting/blob/main/ebook/en/content/018-working-with-json-in-bash-using-jq.md"
+      },
+      {
+        "rank": 3,
+        "title": "Guide to Linux jq Command for JSON Processing",
+        "url": "https://www.baeldung.com/linux/jq-command-json"
+      },
+      {
+        "rank": 4,
+        "title": "JSON Processing for the Command Line with jq",
+        "url": "https://eliatra.com/blog/json-processing-command-line-jq/"
+      },
+      {
+        "rank": 5,
+        "title": "Working with JSON in bash using jq",
+        "url": "https://cameronnokes.com/blog/working-with-json-in-bash-using-jq/"
+      },
+      {
+        "rank": 6,
+        "title": "How to use jq syntax within a bash script?",
+        "url": "https://stackoverflow.com/questions/71394745/how-to-use-jq-syntax-within-a-bash-script"
+      },
+      {
+        "rank": 7,
+        "title": "JSON in Bash and CLI with jq | Marcin Copik - GitHub Pages",
+        "url": "https://mcopik.github.io/blog/2021/jq/"
+      },
+      {
+        "rank": 8,
+        "title": "How to Handle JSON Parsing in Bash with jq",
+        "url": "https://oneuptime.com/blog/post/2026-01-24-bash-json-parsing-jq/view"
+      }
+    ],
+    "bash parse json": [
+      {
+        "rank": 1,
+        "title": "bash - Parsing JSON with Unix tools",
+        "url": "https://stackoverflow.com/questions/1955505/parsing-json-with-unix-tools"
+      },
+      {
+        "rank": 2,
+        "title": "How to Handle JSON Parsing in Bash with jq",
+        "url": "https://oneuptime.com/blog/post/2026-01-24-bash-json-parsing-jq/view"
+      },
+      {
+        "rank": 3,
+        "title": "command line - Parse JSON in Bash",
+        "url": "https://askubuntu.com/questions/1410433/parse-json-in-bash"
+      },
+      {
+        "rank": 4,
+        "title": "JSON Structs with bash",
+        "url": "https://dev.to/vaiolabs_io/json-structs-with-bash-ml5"
+      },
+      {
+        "rank": 5,
+        "title": "How to Parse JSON in command line",
+        "url": "https://medium.com/@pingkunga/how-to-parse-json-in-command-line-2d13294cf8e6"
+      },
+      {
+        "rank": 6,
+        "title": "How to parse JSON with shell scripting in Linux?",
+        "url": "https://unix.stackexchange.com/questions/121718/how-to-parse-json-with-shell-scripting-in-linux"
+      },
+      {
+        "rank": 7,
+        "title": "JSON/JSONC bash parser",
+        "url": "https://github.com/d2r2/jsonc-bash"
+      },
+      {
+        "rank": 8,
+        "title": "Parsing, Validating, and Printing JSON in Shell Scripts",
+        "url": "https://www.baeldung.com/linux/json-shell-parse-validate-print"
+      },
+      {
+        "rank": 9,
+        "title": "How to parse JSON in Bash with pipe operators (Linux ...",
+        "url": "https://www.quora.com/How-do-you-parse-JSON-in-Bash-with-pipe-operators-Linux-Bash-Amazon-Web-Services-Ubuntu-20-04-JSON-admin"
+      }
+    ],
+    "certificate decoder": [
+      {
+        "rank": 1,
+        "title": "Decode certificates to view their contents",
+        "url": "https://www.sslshopper.com/certificate-decoder.html"
+      },
+      {
+        "rank": 2,
+        "title": "SSL Certificate Decoder",
+        "url": "https://www.sslchecker.com/certdecoder"
+      },
+      {
+        "rank": 3,
+        "title": "Free CSR & Certificate Decoder | CertLogik",
+        "url": "https://certlogik.com/decoder"
+      },
+      {
+        "rank": 4,
+        "title": "Certificate Decoder",
+        "url": "https://www.geocerts.com/certificate-decoder"
+      },
+      {
+        "rank": 5,
+        "title": "Certificate Decoder - Online X.509 certificate decoder",
+        "url": "https://certificatedecoder.dev/"
+      },
+      {
+        "rank": 6,
+        "title": "Certificate Decoder",
+        "url": "https://ssltools.godaddy.com/views/certDecoder"
+      },
+      {
+        "rank": 7,
+        "title": "SSL & CSR Decoder",
+        "url": "https://decoder.link/result"
+      },
+      {
+        "rank": 8,
+        "title": "Free Online SSL Certificate Decoder Tool",
+        "url": "https://comodosslstore.com/ssltools/cert-decoder.php"
+      },
+      {
+        "rank": 9,
+        "title": "Free CSR & SSL Certificate Decoder - Red Kestrel",
+        "url": "https://www.redkestrel.co.uk/tools/decoder"
+      },
+      {
+        "rank": 10,
+        "title": "Free SSL Certificate Decoder | View & Verify Cert Details",
+        "url": "https://www.ssltrust.com/ssl-tools/certificate-decoder"
+      }
+    ],
+    "convert text to json": [
+      {
+        "rank": 1,
+        "title": "Online String to JSON Converter",
+        "url": "https://dadroit.com/string-to-json/"
+      },
+      {
+        "rank": 2,
+        "title": "String to JSON Converter",
+        "url": "https://jsonformatter.org/string-to-json-converter"
+      },
+      {
+        "rank": 3,
+        "title": "Converting a string to JSON object - javascript",
+        "url": "https://stackoverflow.com/questions/10976897/converting-a-string-to-json-object"
+      },
+      {
+        "rank": 4,
+        "title": "JavaScript JSON.parse()",
+        "url": "https://www.w3schools.com/js/js_json_parse.asp"
+      },
+      {
+        "rank": 5,
+        "title": "How to convert a text document to json? Is that even ...",
+        "url": "https://www.reddit.com/r/gamemaker/comments/wvyjff/how_to_convert_a_text_document_to_json_is_that/"
+      },
+      {
+        "rank": 6,
+        "title": "Free Online Text to JSON Converter",
+        "url": "https://amirch1.github.io/blog/text2json/index.html"
+      },
+      {
+        "rank": 7,
+        "title": "TXT to JSON Converter • Online & Free",
+        "url": "https://mconverter.eu/convert/txt/json/"
+      },
+      {
+        "rank": 8,
+        "title": "JSON.stringify() - JavaScript - MDN Web Docs",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"
+      },
+      {
+        "rank": 9,
+        "title": "Text to JSON - Questions",
+        "url": "https://community.make.com/t/text-to-json/47332"
+      }
+    ],
+    "crt viewer": [
+      {
+        "rank": 1,
+        "title": "Decode certificates to view their contents",
+        "url": "https://www.sslshopper.com/certificate-decoder.html"
+      },
+      {
+        "rank": 2,
+        "title": "SSL Certificate Decoder",
+        "url": "https://www.sslchecker.com/certdecoder"
+      },
+      {
+        "rank": 3,
+        "title": "Free CSR & Certificate Decoder | CertLogik",
+        "url": "https://certlogik.com/decoder"
+      },
+      {
+        "rank": 4,
+        "title": "Free Online SSL Certificate Decoder Tool",
+        "url": "https://comodosslstore.com/ssltools/cert-decoder.php"
+      },
+      {
+        "rank": 5,
+        "title": "Crt.sh",
+        "url": "https://crt.sh/"
+      },
+      {
+        "rank": 6,
+        "title": "Online Certificate Viewer",
+        "url": "https://kjur.github.io/jsrsasign/tool/tool_certview.html"
+      },
+      {
+        "rank": 7,
+        "title": "Certificate Decoder",
+        "url": "https://ssltools.godaddy.com/views/certDecoder"
+      },
+      {
+        "rank": 8,
+        "title": "Certificate Decoder - Online X.509 certificate decoder",
+        "url": "https://certificatedecoder.dev/"
+      },
+      {
+        "rank": 9,
+        "title": "Certificate File Viewer – PEM, CRT & CER Inspector",
+        "url": "https://apps.microsoft.com/detail/9p6g10df18j5?hl=en-US&gl=US"
+      },
+      {
+        "rank": 10,
+        "title": "SSL Checker",
+        "url": "https://www.ssl.org/"
+      }
+    ],
+    "csr decoder": [
+      {
+        "rank": 1,
+        "title": "CSR Decoder - Check CSR to verify its contents",
+        "url": "https://www.sslshopper.com/csr-decoder.html"
+      },
+      {
+        "rank": 2,
+        "title": "Free CSR & Certificate Decoder | CertLogik",
+        "url": "https://certlogik.com/decoder"
+      },
+      {
+        "rank": 3,
+        "title": "CSR Decoder",
+        "url": "https://www.ssl.com/csr-decoder/"
+      },
+      {
+        "rank": 4,
+        "title": "CSR Decoder",
+        "url": "https://www.geocerts.com/csr-decoder"
+      },
+      {
+        "rank": 5,
+        "title": "CSR Decoder",
+        "url": "https://ssltools.godaddy.com/views/csrDecoder"
+      },
+      {
+        "rank": 6,
+        "title": "CSR Decoder",
+        "url": "https://www.thesslstore.com/ssltools/csr-decoder.php"
+      },
+      {
+        "rank": 7,
+        "title": "SSL & CSR Decoder",
+        "url": "https://decoder.link/result"
+      },
+      {
+        "rank": 8,
+        "title": "SSL Certificate & CSR Decoder",
+        "url": "https://www.ssl.org/csr-decoder"
+      },
+      {
+        "rank": 9,
+        "title": "CSR Decoder",
+        "url": "https://comodosslstore.com/ssltools/csr-decoder.php"
+      },
+      {
+        "rank": 10,
+        "title": "CSR Decoder | Instantly Analyze Certificate Signing ...",
+        "url": "https://goteleport.com/resources/tools/csr-decoder/"
+      }
+    ],
+    "csv parser": [
+      {
+        "rank": 1,
+        "title": "csv-parser",
+        "url": "https://www.npmjs.com/package/csv-parser"
+      },
+      {
+        "rank": 2,
+        "title": "Online CSV parser and JSON converter",
+        "url": "https://mockoon.com/tools/csv-parser-json-converter/"
+      },
+      {
+        "rank": 3,
+        "title": "Vince's CSV Parser",
+        "url": "https://github.com/vincentlaucsb/csv-parser"
+      },
+      {
+        "rank": 4,
+        "title": "CSVParser (Apache Commons CSV 1.14.2-SNAPSHOT API)",
+        "url": "https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVParser.html"
+      },
+      {
+        "rank": 5,
+        "title": "Introduction to Parsing CSV Files with TypeScript",
+        "url": "https://codesignal.com/learn/courses/parsing-table-data-in-ts/lessons/introduction-to-parsing-csv-files-with-typescript"
+      },
+      {
+        "rank": 6,
+        "title": "csv-parse",
+        "url": "https://www.npmjs.com/package/csv-parse"
+      },
+      {
+        "rank": 7,
+        "title": "Can someone eli5 what a CSV parser is?",
+        "url": "https://www.reddit.com/r/learnprogramming/comments/dzsgnh/can_someone_eli5_what_a_csv_parser_is/"
+      },
+      {
+        "rank": 8,
+        "title": "Papa Parse - Powerful CSV Parser for JavaScript",
+        "url": "https://www.papaparse.com/"
+      }
+    ],
+    "csv to json": [
+      {
+        "rank": 1,
+        "title": "CSVJSON - CSVJSON",
+        "url": "https://csvjson.com/"
+      },
+      {
+        "rank": 2,
+        "title": "CSV To JSON Converter",
+        "url": "https://www.convertcsv.com/csv-to-json.htm"
+      },
+      {
+        "rank": 3,
+        "title": "How to convert csv to json?",
+        "url": "https://www.reddit.com/r/json/comments/1obgwza/how_to_convert_csv_to_json/"
+      },
+      {
+        "rank": 4,
+        "title": "CSV to JSON Converter | Free, Open Source & Ad-free",
+        "url": "https://jam.dev/utilities/csv-to-json"
+      },
+      {
+        "rank": 5,
+        "title": "CSV to JSON with Examples",
+        "url": "https://www.youtube.com/watch?v=PrO5mr8gt-U"
+      },
+      {
+        "rank": 6,
+        "title": "convert-csv-to-json",
+        "url": "https://www.npmjs.com/package/convert-csv-to-json"
+      },
+      {
+        "rank": 7,
+        "title": "Free CSV to JSON Converter",
+        "url": "https://www.tooloogle.com/tools/csv-to-json-converter"
+      },
+      {
+        "rank": 8,
+        "title": "How to convert CSV file to multiline JSON? - python",
+        "url": "https://stackoverflow.com/questions/19697846/how-to-convert-csv-file-to-multiline-json"
+      },
+      {
+        "rank": 9,
+        "title": "CSV Records to JSON Files",
+        "url": "https://www.youtube.com/watch?v=vrlCvIxVk3k"
+      }
+    ],
+    "csv viewer": [
+      {
+        "rank": 1,
+        "title": "Online CSV Editor and Viewer",
+        "url": "https://convertcsv.com/csv-viewer-editor.htm"
+      },
+      {
+        "rank": 2,
+        "title": "CSV Viewer & Editor Online — view and edit CSV files in your ...",
+        "url": "https://csv-viewer-online.github.io/"
+      },
+      {
+        "rank": 3,
+        "title": "CSV File Viewer - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=csv.file.reader&hl=en_US"
+      },
+      {
+        "rank": 4,
+        "title": "Flow CSV Viewer - Free download and install on Windows",
+        "url": "https://apps.microsoft.com/detail/9nq7z06vrxbw?hl=en-US&gl=US"
+      },
+      {
+        "rank": 5,
+        "title": "View CSV Data",
+        "url": "https://dataconverter.io/view/csv"
+      },
+      {
+        "rank": 6,
+        "title": "Modern CSV: CSV File Editor and Viewer for Windows, Mac ...",
+        "url": "https://www.moderncsv.com/"
+      },
+      {
+        "rank": 7,
+        "title": "Download free fast CSV file viewer",
+        "url": "https://csviewer.com/"
+      },
+      {
+        "rank": 8,
+        "title": "Free CSV viewer: Open and view CSV files online",
+        "url": "https://www.canva.com/features/csv-viewer/"
+      },
+      {
+        "rank": 9,
+        "title": "What's the best CSV viewer? : r/dataanalysis",
+        "url": "https://www.reddit.com/r/dataanalysis/comments/p2we43/whats_the_best_csv_viewer/"
+      },
+      {
+        "rank": 10,
+        "title": "Free Online CSV Editor & Viewer | Open-Source - Grist",
+        "url": "https://www.getgrist.com/csv-viewer/"
+      }
+    ],
+    "decode jwt": [
+      {
+        "rank": 1,
+        "title": "JSON Web Tokens - jwt.io",
+        "url": "https://jwt.io/"
+      },
+      {
+        "rank": 2,
+        "title": "JWT Decoder",
+        "url": "https://supertokens.com/jwt-encoder-decoder"
+      },
+      {
+        "rank": 3,
+        "title": "Decode JWT on a browser. Without a npm package - Allen Kim",
+        "url": "https://allenhwkim.medium.com/decode-jwt-on-a-browser-7e6aa6deb937"
+      },
+      {
+        "rank": 4,
+        "title": "JWT Decoder",
+        "url": "https://www.jstoolset.com/jwt"
+      },
+      {
+        "rank": 5,
+        "title": "JWT Decoder | FusionAuth Docs",
+        "url": "https://fusionauth.io/docs/dev-tools/jwt-decoder"
+      },
+      {
+        "rank": 6,
+        "title": "jwt.ms: Welcome!",
+        "url": "https://jwt.ms/"
+      },
+      {
+        "rank": 7,
+        "title": "javascript - How to decode JWT token without using a library?",
+        "url": "https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-without-using-a-library"
+      },
+      {
+        "rank": 8,
+        "title": "JWT decoder & encoder | Secure, simple, and user-friendly",
+        "url": "https://logto.io/jwt-decoder"
+      },
+      {
+        "rank": 9,
+        "title": "Free JWT Token Decoder & Inspector Online",
+        "url": "https://domainscan.in/dev/jwt-decode"
+      }
+    ],
+    "df to json": [
+      {
+        "rank": 1,
+        "title": "pandas.DataFrame.to_json — pandas 3.0.5 documentation",
+        "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_json.html"
+      },
+      {
+        "rank": 2,
+        "title": "Convert Pandas DataFrame to JSON format",
+        "url": "https://stackoverflow.com/questions/39257147/convert-pandas-dataframe-to-json-format"
+      },
+      {
+        "rank": 3,
+        "title": "How to convert pandas DataFrame into JSON in Python?",
+        "url": "https://www.geeksforgeeks.org/pandas/how-to-convert-pandas-dataframe-into-json-in-python/"
+      },
+      {
+        "rank": 4,
+        "title": "Pandas Read JSON",
+        "url": "https://www.w3schools.com/python/pandas/pandas_json.asp"
+      },
+      {
+        "rank": 5,
+        "title": "DataFrame.toJSON | Danfo.js",
+        "url": "https://danfo.jsdata.org/api-reference/dataframe/dataframe.to_json"
+      },
+      {
+        "rank": 6,
+        "title": "Pandas DataFrame to JSON [8 Code Examples]",
+        "url": "https://medium.com/@machinelearningpy123/pandas-dataframe-to-json-8-code-examples-8f76a41599ef"
+      },
+      {
+        "rank": 7,
+        "title": "pyspark.pandas.DataFrame.to_json",
+        "url": "https://api-docs.databricks.com/python/pyspark/latest/pyspark.pandas/api/pyspark.pandas.DataFrame.to_json.html"
+      },
+      {
+        "rank": 8,
+        "title": "How to Convert & Save Pandas DataFrame to Json String ...",
+        "url": "https://www.youtube.com/watch?v=fh05MCowBIE"
+      },
+      {
+        "rank": 9,
+        "title": "pyspark.pandas.DataFrame.to_json - Apache Spark",
+        "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.pandas/api/pyspark.pandas.DataFrame.to_json.html"
+      }
+    ],
+    "git log to json": [
+      {
+        "rank": 1,
+        "title": "Git log output to XML, JSON, or YAML?",
+        "url": "https://stackoverflow.com/questions/4600445/git-log-output-to-xml-json-or-yaml"
+      },
+      {
+        "rank": 2,
+        "title": "Convert git log output to JSON using jq",
+        "url": "https://til.simonwillison.net/jq/git-log-json"
+      },
+      {
+        "rank": 3,
+        "title": "Git log in JSON format",
+        "url": "https://gist.github.com/varemenos/e95c2e098e657c7688fd"
+      },
+      {
+        "rank": 4,
+        "title": "Convert your git log output to JSON with the new git- ...",
+        "url": "https://www.reddit.com/r/git/comments/udatkb/convert_your_git_log_output_to_json_with_the_new/"
+      },
+      {
+        "rank": 5,
+        "title": "pretty-formats Documentation",
+        "url": "https://git-scm.com/docs/pretty-formats"
+      },
+      {
+        "rank": 6,
+        "title": "Git log in JSON format",
+        "url": "https://news.ycombinator.com/item?id=9871841"
+      },
+      {
+        "rank": 7,
+        "title": "Easily Convert git log Output to JSON - Brazil's Blog",
+        "url": "https://blog.kellybrazil.com/2022/05/17/easily-convert-git-log-output-to-json/"
+      },
+      {
+        "rank": 8,
+        "title": "Git Log as JSON in Go",
+        "url": "https://maori.geek.nz/posts/2019/2019-07-23_git-log-as-json-in-go/"
+      },
+      {
+        "rank": 9,
+        "title": "Git can do JSON (almost) (Example)",
+        "url": "https://coderwall.com/p/pmamka/git-can-do-json-almost"
+      }
+    ],
+    "jc online": [
+      {
+        "rank": 1,
+        "title": "Journal & Courier",
+        "url": "https://www.jconline.com/"
+      },
+      {
+        "rank": 2,
+        "title": "Journal & Courier (@journalandcourier)",
+        "url": "https://www.facebook.com/journalandcourier/"
+      },
+      {
+        "rank": 3,
+        "title": "Journal & Courier (@jconline) / Posts / X",
+        "url": "https://x.com/jconline"
+      },
+      {
+        "rank": 4,
+        "title": "WVJC Online: WVJC | West Virginia Junior College",
+        "url": "https://www.wvjc.edu/"
+      },
+      {
+        "rank": 5,
+        "title": "Journal & Courier - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=com.gannett.local.library.news.jconline&hl=en_US"
+      }
+    ],
+    "jc tool": [
+      {
+        "rank": 1,
+        "title": "JC GFX Tools - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=com.jcgfxtools.toosdeargfxnow&hl=en_US"
+      },
+      {
+        "rank": 2,
+        "title": "JC Tool Company",
+        "url": "https://www.jctoolcompany.com/"
+      },
+      {
+        "rank": 3,
+        "title": "JC Prime Tools for Android - Download",
+        "url": "https://jc-prime-tools.en.softonic.com/android"
+      },
+      {
+        "rank": 4,
+        "title": "JC Tools: Home",
+        "url": "https://jctoolsstore.com/"
+      },
+      {
+        "rank": 5,
+        "title": "JC Tool Company",
+        "url": "https://www.linkedin.com/company/jc-tool-company"
+      },
+      {
+        "rank": 6,
+        "title": "JC Tools GFX APK for Android",
+        "url": "https://download.cnet.com/jc-tools-gfx/3000-android-jc-tools-gfx.html"
+      },
+      {
+        "rank": 7,
+        "title": "JC tools | San Jose CA",
+        "url": "https://www.facebook.com/JCtool84/"
+      },
+      {
+        "rank": 8,
+        "title": "JC Tools V2 for Android - Download the APK from Uptodown",
+        "url": "https://jc-tools-gfx.en.uptodown.com/android"
+      },
+      {
+        "rank": 9,
+        "title": "JC Tool Company, 25702 Aldine Westfield Rd, #101, ...",
+        "url": "https://www.mapquest.com/us/texas/jc-tool-company-419383603"
+      }
+    ],
+    "json lines": [
+      {
+        "rank": 1,
+        "title": "JSON Lines",
+        "url": "https://jsonlines.org/"
+      },
+      {
+        "rank": 2,
+        "title": "What is JSONL? JSON Lines Explained with Examples",
+        "url": "https://jsonltools.com/what-is-jsonl"
+      },
+      {
+        "rank": 3,
+        "title": "JSON Lines |Examples",
+        "url": "https://jsonlines.org/examples/"
+      },
+      {
+        "rank": 4,
+        "title": "JSONL vs JSON",
+        "url": "https://scrapfly.io/blog/posts/jsonl-vs-json"
+      },
+      {
+        "rank": 5,
+        "title": "Handling JSON Lines Format",
+        "url": "https://gist.github.com/datacustodian/bb8d2f3ffe249b8d0f526ad91801bd40"
+      },
+      {
+        "rank": 6,
+        "title": "jsonlines — jsonlines documentation",
+        "url": "https://jsonlines.readthedocs.io/"
+      },
+      {
+        "rank": 7,
+        "title": "JSON line format is better than JSON when storing list of ...",
+        "url": "https://medium.com/@yiqun.rong2/json-line-format-is-better-than-json-when-storing-list-of-objects-in-file-3aaaafd7adef"
+      },
+      {
+        "rank": 8,
+        "title": "Why JSON and JSON Lines - NCBI",
+        "url": "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/file-formats/metadata-files/why-jsonl/"
+      }
+    ],
+    "json vs jsonl": [
+      {
+        "rank": 1,
+        "title": "JSONL vs JSON",
+        "url": "https://scrapfly.io/blog/posts/jsonl-vs-json"
+      },
+      {
+        "rank": 2,
+        "title": "JSON and JSONL: Understanding Two Essential Data ...",
+        "url": "https://medium.com/@ayasc/json-and-jsonl-understanding-two-essential-data-formats-7a1b999ce5db"
+      },
+      {
+        "rank": 3,
+        "title": "Why jsonl is better than a regular JSON for web scraping",
+        "url": "https://www.reddit.com/r/JSON_Treehouse/comments/1imthyr/json_lines_format_why_jsonl_is_better_than_a/"
+      },
+      {
+        "rank": 4,
+        "title": "JSONL vs JSON: Key Differences, Examples, and Use Cases",
+        "url": "https://jsonltools.com/jsonl-vs-json"
+      },
+      {
+        "rank": 5,
+        "title": "JSONL vs JSON: When to Use JSON Lines Format for Data ...",
+        "url": "https://superjson.ai/blog/2025-09-07-jsonl-vs-json-data-processing/"
+      },
+      {
+        "rank": 6,
+        "title": "JSON versus JSON Lines",
+        "url": "https://www.ibm.com/docs/en/taw/1.3.0?topic=analytics-json-versus-json-lines"
+      },
+      {
+        "rank": 7,
+        "title": "JSON Lines",
+        "url": "https://jsonlines.org/"
+      },
+      {
+        "rank": 8,
+        "title": "JSON / JSONL feed format - variations",
+        "url": "https://docs.constructor.com/docs/integrating-with-constructor-product-catalog-catalog-files-via-http-or-ftps-json-jsonl-feed-format-variations"
+      },
+      {
+        "rank": 9,
+        "title": "What is the Difference Between .jsonl and .json files?",
+        "url": "https://medium.com/@garybao/what-is-the-difference-between-jsonl-and-json-files-fbe18d80e5ff"
+      }
+    ],
+    "json vs yaml": [
+      {
+        "rank": 1,
+        "title": "YAML vs. JSON : r/golang",
+        "url": "https://www.reddit.com/r/golang/comments/vsq41i/yaml_vs_json/"
+      },
+      {
+        "rank": 2,
+        "title": "YAML vs JSON - Difference Between Data Serialization ...",
+        "url": "https://aws.amazon.com/compare/the-difference-between-yaml-and-json/"
+      },
+      {
+        "rank": 3,
+        "title": "What is the difference between YAML and JSON? [closed]",
+        "url": "https://stackoverflow.com/questions/1726802/what-is-the-difference-between-yaml-and-json"
+      },
+      {
+        "rank": 4,
+        "title": "YAML vs. JSON: Which Is More Efficient for Language ...",
+        "url": "https://betterprogramming.pub/yaml-vs-json-which-is-more-efficient-for-language-models-5bc11dd0f6df"
+      },
+      {
+        "rank": 5,
+        "title": "JSON vs YAML: What's the Difference and Which Do I Use?",
+        "url": "https://www.snaplogic.com/blog/json-vs-yaml-whats-the-difference-and-which-one-is-right-for-your-enterprise"
+      },
+      {
+        "rank": 6,
+        "title": "YAML vs XML vs JSON: Which Format Wins, and When",
+        "url": "https://www.kai-waehner.de/blog/2026/06/24/yaml-vs-xml-vs-json-history-trade-offs-and-where-each-wins-in-the-age-of-agentic-ai/"
+      },
+      {
+        "rank": 7,
+        "title": "What is the difference between YAML vs JSON?",
+        "url": "https://www.youtube.com/watch?v=-nJiJNNnAHo"
+      },
+      {
+        "rank": 8,
+        "title": "Difference Between YAML and JSON",
+        "url": "https://www.geeksforgeeks.org/html/what-is-the-difference-between-yaml-and-json/"
+      }
+    ],
+    "jsonl vs json": [
+      {
+        "rank": 1,
+        "title": "JSONL vs JSON",
+        "url": "https://scrapfly.io/blog/posts/jsonl-vs-json"
+      },
+      {
+        "rank": 2,
+        "title": "JSON and JSONL: Understanding Two Essential Data ...",
+        "url": "https://medium.com/@ayasc/json-and-jsonl-understanding-two-essential-data-formats-7a1b999ce5db"
+      },
+      {
+        "rank": 3,
+        "title": "Why jsonl is better than a regular JSON for web scraping",
+        "url": "https://www.reddit.com/r/JSON_Treehouse/comments/1imthyr/json_lines_format_why_jsonl_is_better_than_a/"
+      },
+      {
+        "rank": 4,
+        "title": "JSONL vs JSON: Key Differences, Examples, and Use Cases",
+        "url": "https://jsonltools.com/jsonl-vs-json"
+      },
+      {
+        "rank": 5,
+        "title": "JSON Lines format: Why jsonl is better than a regular ...",
+        "url": "https://hackernoon.com/json-lines-format-76353b4e588d"
+      },
+      {
+        "rank": 6,
+        "title": "JSONL vs JSON: When to Use JSON Lines Format for Data ...",
+        "url": "https://superjson.ai/blog/2025-09-07-jsonl-vs-json-data-processing/"
+      },
+      {
+        "rank": 7,
+        "title": "What is the Difference Between .jsonl and .json files?",
+        "url": "https://medium.com/@garybao/what-is-the-difference-between-jsonl-and-json-files-fbe18d80e5ff"
+      }
+    ],
+    "jwt decoder": [
+      {
+        "rank": 1,
+        "title": "JSON Web Tokens - jwt.io",
+        "url": "https://jwt.io/"
+      },
+      {
+        "rank": 2,
+        "title": "JWT Decoder",
+        "url": "https://supertokens.com/jwt-encoder-decoder"
+      },
+      {
+        "rank": 3,
+        "title": "JWT Decoder | FusionAuth Docs",
+        "url": "https://fusionauth.io/docs/dev-tools/jwt-decoder"
+      },
+      {
+        "rank": 4,
+        "title": "JWT Decoder",
+        "url": "https://www.jstoolset.com/jwt"
+      },
+      {
+        "rank": 5,
+        "title": "JWT decoder & encoder | Secure, simple, and user-friendly",
+        "url": "https://logto.io/jwt-decoder"
+      },
+      {
+        "rank": 6,
+        "title": "jwt.ms: Welcome!",
+        "url": "https://jwt.ms/"
+      },
+      {
+        "rank": 7,
+        "title": "vscode-jwt-decoder",
+        "url": "https://marketplace.visualstudio.com/items?itemName=AndrewButson.vscode-jwt-decoder"
+      },
+      {
+        "rank": 8,
+        "title": "Decode JWT tokens; useful for browser applications. · GitHub",
+        "url": "https://github.com/auth0/jwt-decode"
+      },
+      {
+        "rank": 9,
+        "title": "JWT Decoder | Instantly Decode & Validate JWTs",
+        "url": "https://goteleport.com/resources/tools/jwt-decoder/"
+      }
+    ],
+    "jwt parser": [
+      {
+        "rank": 1,
+        "title": "JSON Web Tokens - jwt.io",
+        "url": "https://jwt.io/"
+      },
+      {
+        "rank": 2,
+        "title": "JWT Decoder",
+        "url": "https://www.jstoolset.com/jwt"
+      },
+      {
+        "rank": 3,
+        "title": "javascript - How to decode JWT token without using a library?",
+        "url": "https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-without-using-a-library"
+      },
+      {
+        "rank": 4,
+        "title": "JWT Decoder | FusionAuth Docs",
+        "url": "https://fusionauth.io/docs/dev-tools/jwt-decoder"
+      },
+      {
+        "rank": 5,
+        "title": "Decode a JWT Token in Java",
+        "url": "https://www.baeldung.com/java-jwt-token-decode"
+      },
+      {
+        "rank": 6,
+        "title": "jwt.ms: Welcome!",
+        "url": "https://jwt.ms/"
+      },
+      {
+        "rank": 7,
+        "title": "JWT Decoder",
+        "url": "https://supertokens.com/jwt-encoder-decoder"
+      },
+      {
+        "rank": 8,
+        "title": "JWT decoder & encoder | Secure, simple, and user-friendly",
+        "url": "https://logto.io/jwt-decoder"
+      },
+      {
+        "rank": 9,
+        "title": "Decode JWT tokens; useful for browser applications. · GitHub",
+        "url": "https://github.com/auth0/jwt-decode"
+      },
+      {
+        "rank": 10,
+        "title": "JWT Decoder | Instantly Decode & Validate JWTs",
+        "url": "https://goteleport.com/resources/tools/jwt-decoder/"
+      }
+    ],
+    "linux json parser": [
+      {
+        "rank": 1,
+        "title": "bash - Parsing JSON with Unix tools",
+        "url": "https://stackoverflow.com/questions/1955505/parsing-json-with-unix-tools"
+      },
+      {
+        "rank": 2,
+        "title": "Parsing, Validating, and Printing JSON in Shell Scripts",
+        "url": "https://www.baeldung.com/linux/json-shell-parse-validate-print"
+      },
+      {
+        "rank": 3,
+        "title": "jq",
+        "url": "https://jqlang.org/"
+      },
+      {
+        "rank": 4,
+        "title": "Parsing JSON in command-line with jq: basic filters and ...",
+        "url": "https://medium.com/@varunsonavni/parsing-json-in-command-line-with-jq-basic-filters-and-functions-c7d85d68fc4a"
+      },
+      {
+        "rank": 5,
+        "title": "How to parse JSON with shell scripting in Linux?",
+        "url": "https://unix.stackexchange.com/questions/121718/how-to-parse-json-with-shell-scripting-in-linux"
+      },
+      {
+        "rank": 6,
+        "title": "How to Handle JSON Parsing in Bash with jq",
+        "url": "https://oneuptime.com/blog/post/2026-01-24-bash-json-parsing-jq/view"
+      },
+      {
+        "rank": 7,
+        "title": "JSON/JSONC bash parser",
+        "url": "https://github.com/d2r2/jsonc-bash"
+      },
+      {
+        "rank": 8,
+        "title": "How to parse a json file from Linux command line using jq",
+        "url": "https://linuxconfig.org/how-to-parse-a-json-file-from-linux-command-line-using-jq"
+      }
+    ],
+    "log to json": [
+      {
+        "rank": 1,
+        "title": "JSON Logging Best Practices - Loggly",
+        "url": "https://www.loggly.com/use-cases/json-logging-best-practices/"
+      },
+      {
+        "rank": 2,
+        "title": "JSON Logging: A Quick Guide for Engineers",
+        "url": "https://www.dash0.com/guides/json-logging"
+      },
+      {
+        "rank": 3,
+        "title": "Why is json logging the “standard”? : r/golang",
+        "url": "https://www.reddit.com/r/golang/comments/11ng4of/why_is_json_logging_the_standard/"
+      },
+      {
+        "rank": 4,
+        "title": "Online Log to JSON Converter",
+        "url": "https://getloglens.com/tools/log-to-json.html"
+      },
+      {
+        "rank": 5,
+        "title": "Script to convert .log files to JSON",
+        "url": "https://techcommunity.microsoft.com/discussions/windowspowershell/script-to-convert-log-files-to-json/3914106"
+      },
+      {
+        "rank": 6,
+        "title": "Log",
+        "url": "https://jsonformatter.org/029beb658b34d9d644d0298ed11c4221"
+      },
+      {
+        "rank": 7,
+        "title": "Online LOG to JSON Converter - Aspose Products",
+        "url": "https://products.aspose.app/cells/conversion/log-to-json"
+      },
+      {
+        "rank": 8,
+        "title": "Get Log Output in JSON",
+        "url": "https://www.baeldung.com/java-log-json-output"
+      },
+      {
+        "rank": 9,
+        "title": "JSON Logging: Best Practices with Examples",
+        "url": "https://coralogix.com/blog/json-logging-why-how-what-tips/"
+      }
+    ],
+    "ndjson": [
+      {
+        "rank": 1,
+        "title": "ndjson/ndjson-spec: Specification",
+        "url": "https://github.com/ndjson/ndjson-spec"
+      },
+      {
+        "rank": 2,
+        "title": "NDJSON.com - JSON Lines Format Guide | NDJSON.com",
+        "url": "https://ndjson.com/"
+      },
+      {
+        "rank": 3,
+        "title": "What about NDJSON makes it better suited than JSON for ...",
+        "url": "https://www.reddit.com/r/learnprogramming/comments/1i0sapp/what_about_ndjson_makes_it_better_suited_than/"
+      },
+      {
+        "rank": 4,
+        "title": "JSON streaming",
+        "url": "https://en.wikipedia.org/wiki/JSON_streaming"
+      },
+      {
+        "rank": 5,
+        "title": "Newline Delimited JSON (ndjson) Format",
+        "url": "https://docs.mulesoft.com/dataweave/latest/dataweave-formats-ndjson"
+      },
+      {
+        "rank": 6,
+        "title": "What is NDJSON / JSON Lines? | Engineering",
+        "url": "https://clickhouse.com/resources/engineering/what-is-ndjson"
+      },
+      {
+        "rank": 7,
+        "title": "JSON / NDJSON - Docs",
+        "url": "https://docs.foursquare.com/analytics-products/docs/data-formats-json"
+      },
+      {
+        "rank": 8,
+        "title": "Wicked-Fast Streaming 'JSON' ('ndjson') Reader - cran",
+        "url": "https://cran.r-universe.dev/ndjson"
+      },
+      {
+        "rank": 9,
+        "title": "What is NDJSON and Why Should You Care?",
+        "url": "https://python.plainenglish.io/what-is-ndjson-and-why-should-you-care-bdb666424e08"
+      }
+    ],
+    "ndjson vs json": [
+      {
+        "rank": 1,
+        "title": "What about NDJSON makes it better suited than JSON for ...",
+        "url": "https://www.reddit.com/r/learnprogramming/comments/1i0sapp/what_about_ndjson_makes_it_better_suited_than/"
+      },
+      {
+        "rank": 2,
+        "title": "Use ndjson instead of JSON array",
+        "url": "https://medium.com/@mbh023/use-ndjson-instead-of-json-array-c0589972f5fa"
+      },
+      {
+        "rank": 3,
+        "title": "JSON / NDJSON - Docs",
+        "url": "https://docs.foursquare.com/analytics-products/docs/data-formats-json"
+      },
+      {
+        "rank": 4,
+        "title": "JSONL vs NDJSON: Complete Comparison Guide",
+        "url": "https://jsonltools.com/jsonl-vs-ndjson"
+      },
+      {
+        "rank": 5,
+        "title": "What is NDJSON / JSON Lines? | Engineering",
+        "url": "https://clickhouse.com/resources/engineering/what-is-ndjson"
+      },
+      {
+        "rank": 6,
+        "title": "Why NDJSON instead of JSON? · Issue #9068 · yarnpkg/yarn",
+        "url": "https://github.com/yarnpkg/yarn/issues/9068"
+      },
+      {
+        "rank": 7,
+        "title": "JSON streaming",
+        "url": "https://en.wikipedia.org/wiki/JSON_streaming"
+      },
+      {
+        "rank": 8,
+        "title": "What is NDJSON and Why Should You Care?",
+        "url": "https://python.plainenglish.io/what-is-ndjson-and-why-should-you-care-bdb666424e08"
+      },
+      {
+        "rank": 9,
+        "title": "CSV vs JSON vs NDJSON — Which Format Should You ...",
+        "url": "https://thetexttool.com/compare/csv-vs-json-vs-ndjson"
+      }
+    ],
+    "ndjson vs jsonl": [
+      {
+        "rank": 1,
+        "title": "JSONL vs NDJSON: Complete Comparison Guide",
+        "url": "https://jsonltools.com/jsonl-vs-ndjson"
+      },
+      {
+        "rank": 2,
+        "title": "Relationship to jsonlines.org · Issue #1 · ndjson/ ...",
+        "url": "https://github.com/ndjson/ndjson.github.io/issues/1"
+      },
+      {
+        "rank": 3,
+        "title": "JSONL vs NDJSON: Complete Comparison Guide",
+        "url": "https://www.linkedin.com/posts/kylelawrencejensen_jsonl-vs-ndjson-complete-comparison-guide-activity-7439422770842705920-Trk7"
+      },
+      {
+        "rank": 4,
+        "title": "JSONL Definition & Specification - NDJSON.com",
+        "url": "https://ndjson.com/definition/"
+      },
+      {
+        "rank": 5,
+        "title": "From a quick lookup, aren't \"newline-delimited json\" and ...",
+        "url": "https://news.ycombinator.com/item?id=44148235"
+      },
+      {
+        "rank": 6,
+        "title": "Newline-delimited JSON: an unstandardized standard",
+        "url": "https://www.hypertesto.me/en/blog/jsonl-and-ndjson/"
+      },
+      {
+        "rank": 7,
+        "title": "What is NDJSON / JSON Lines? | Engineering",
+        "url": "https://clickhouse.com/resources/engineering/what-is-ndjson"
+      },
+      {
+        "rank": 8,
+        "title": "I was wondering how this compared to jsonlines/jsonl https: ...",
+        "url": "https://news.ycombinator.com/item?id=27281476"
+      },
+      {
+        "rank": 9,
+        "title": "JSON streaming",
+        "url": "https://en.wikipedia.org/wiki/JSON_streaming"
+      }
+    ],
+    "plain text to json": [
+      {
+        "rank": 1,
+        "title": "Online String to JSON Converter",
+        "url": "https://dadroit.com/string-to-json/"
+      },
+      {
+        "rank": 2,
+        "title": "Free Online XML to JSON Converter: JSON STUDIO",
+        "url": "https://jsonstudio.io/convert/TEXT-to-JSON-Converter"
+      },
+      {
+        "rank": 3,
+        "title": "JSON to Text Converter",
+        "url": "https://codebeautify.org/json-to-text-converter"
+      },
+      {
+        "rank": 4,
+        "title": "Convert JSON to Plain Text",
+        "url": "https://onlinetools.com/json/convert-json-to-text"
+      },
+      {
+        "rank": 5,
+        "title": "wooorm/plain-text-data-to-json",
+        "url": "https://github.com/wooorm/plain-text-data-to-json"
+      },
+      {
+        "rank": 6,
+        "title": "Text to JSON - Questions",
+        "url": "https://community.make.com/t/text-to-json/47332"
+      },
+      {
+        "rank": 7,
+        "title": "TXT to JSON Converter (Free, No Signup)",
+        "url": "https://aslitools.com/tools/txt-to-json"
+      },
+      {
+        "rank": 8,
+        "title": "TXT to JSON Converter • Online & Free",
+        "url": "https://mconverter.eu/convert/txt/json/"
+      }
+    ],
+    "plist viewer": [
+      {
+        "rank": 1,
+        "title": "Online Plist Viewer & Editor | View, Edit and Analyze .plist ...",
+        "url": "https://plist-viewer.com/index.html"
+      },
+      {
+        "rank": 2,
+        "title": "PLIST Editor Reader - App Store - Apple",
+        "url": "https://apps.apple.com/us/app/plist-editor-reader/id6468020241"
+      },
+      {
+        "rank": 3,
+        "title": "Plist Viewer",
+        "url": "https://belkasoft.com/plist_viewer"
+      },
+      {
+        "rank": 4,
+        "title": "TingPing/plist-viewer: Gtk application to view property list files",
+        "url": "https://github.com/TingPing/plist-viewer"
+      },
+      {
+        "rank": 5,
+        "title": "PLIST Viewer - Obsidian Plugin",
+        "url": "https://community.obsidian.md/plugins/plist-viewer"
+      },
+      {
+        "rank": 6,
+        "title": "Plist Viewer - Download",
+        "url": "https://plist-viewer.en.softonic.com/"
+      },
+      {
+        "rank": 7,
+        "title": "Plist viewer",
+        "url": "https://www.osforensics.com/plist-viewer.html"
+      },
+      {
+        "rank": 8,
+        "title": "Free PList Viewer (Property List File Viewer) for Windows 10",
+        "url": "https://www.imactools.com/tutorial/property-list-file-viewer-on-windows-10"
+      },
+      {
+        "rank": 9,
+        "title": "How to Edit PLIST Files (Xcode or Notepad++)",
+        "url": "https://www.youtube.com/watch?v=SwxG253VF-Y"
+      },
+      {
+        "rank": 10,
+        "title": "PLIST Viewer - BHE User Guide",
+        "url": "https://www.foxtonforensics.com/browser-history-examiner/docs/plist-viewer"
+      }
+    ],
+    "srt viewer": [
+      {
+        "rank": 1,
+        "title": "SRT File Viewer - View Subtitle Files Online Free",
+        "url": "https://convertico.com/srt-file-viewer/"
+      },
+      {
+        "rank": 2,
+        "title": "SRT Viewer & Reader Online — Open SRT Files",
+        "url": "https://products.aspose.app/pdf/viewer/srt"
+      },
+      {
+        "rank": 3,
+        "title": "SRT file Subtitle Translator - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=com.srtfileviewer.srtfileviewertranslator&hl=en_US"
+      },
+      {
+        "rank": 4,
+        "title": "DJI SRT Flight Data Viewer",
+        "url": "https://djitelemetryoverlay.com/srt-viewer/"
+      },
+      {
+        "rank": 5,
+        "title": "Convert SRT to Text",
+        "url": "https://www.happyscribe.com/tools/convert-srt-to-text"
+      },
+      {
+        "rank": 6,
+        "title": "Download Srt Viewer for Mac | MacUpdate",
+        "url": "https://srt-viewer.macupdate.com/"
+      },
+      {
+        "rank": 7,
+        "title": "Open SRT File",
+        "url": "https://opensrtfile.com/"
+      },
+      {
+        "rank": 8,
+        "title": "Open SRT File Online | View and Edit Subtitles Easily",
+        "url": "https://tubetranscript.com/open-srt-file/"
+      },
+      {
+        "rank": 9,
+        "title": "I made a subtitle player for the browser : r/javascript",
+        "url": "https://www.reddit.com/r/javascript/comments/kq4xhz/i_made_a_subtitle_player_for_the_browser/"
+      }
+    ],
+    "ssl certificate decoder": [
+      {
+        "rank": 1,
+        "title": "Decode certificates to view their contents",
+        "url": "https://www.sslshopper.com/certificate-decoder.html"
+      },
+      {
+        "rank": 2,
+        "title": "SSL Certificate Decoder",
+        "url": "https://www.sslchecker.com/certdecoder"
+      },
+      {
+        "rank": 3,
+        "title": "Free CSR & Certificate Decoder | CertLogik",
+        "url": "https://certlogik.com/decoder"
+      },
+      {
+        "rank": 4,
+        "title": "Free Online SSL Certificate Decoder Tool",
+        "url": "https://comodosslstore.com/ssltools/cert-decoder.php"
+      },
+      {
+        "rank": 5,
+        "title": "SSL Certificate & CSR Decoder",
+        "url": "https://www.ssl.org/csr-decoder"
+      },
+      {
+        "rank": 6,
+        "title": "Certificate Decoder",
+        "url": "https://ssltools.godaddy.com/views/certDecoder"
+      },
+      {
+        "rank": 7,
+        "title": "Certificate Decoder",
+        "url": "https://www.geocerts.com/certificate-decoder"
+      },
+      {
+        "rank": 8,
+        "title": "SSL & CSR Decoder",
+        "url": "https://decoder.link/result"
+      },
+      {
+        "rank": 9,
+        "title": "Certificate Decoder - Online X.509 certificate decoder",
+        "url": "https://certificatedecoder.dev/"
+      },
+      {
+        "rank": 10,
+        "title": "Free CSR & SSL Certificate Decoder - Red Kestrel",
+        "url": "https://www.redkestrel.co.uk/tools/decoder"
+      }
+    ],
+    "syslog parser": [
+      {
+        "rank": 1,
+        "title": "How to parse syslog messages? : r/elasticsearch",
+        "url": "https://www.reddit.com/r/elasticsearch/comments/14s8oig/how_to_parse_syslog_messages/"
+      },
+      {
+        "rank": 2,
+        "title": "influxdata/go-syslog: Blazing fast syslog parser",
+        "url": "https://github.com/influxdata/go-syslog"
+      },
+      {
+        "rank": 3,
+        "title": "syslog",
+        "url": "https://docs.fluentd.org/parser/syslog"
+      },
+      {
+        "rank": 4,
+        "title": "Syslog | Fluent Bit: Official Manual",
+        "url": "https://docs.fluentbit.io/manual/data-pipeline/inputs/syslog"
+      },
+      {
+        "rank": 5,
+        "title": "Syslog-ng 101, part 10: Parsing - Blog",
+        "url": "https://www.syslog-ng.com/community/b/blog/posts/syslog-ng-101-part-10-parsing"
+      },
+      {
+        "rank": 6,
+        "title": "syslog-ng Open Source Edition 3.36 - Administration Guide",
+        "url": "https://support.oneidentity.com/technical-documents/syslog-ng-open-source-edition/3.36/administration-guide/parser-parse-and-segment-structured-messages"
+      },
+      {
+        "rank": 7,
+        "title": "Syslog Parser Extension Syntax",
+        "url": "https://security.googlecloudcommunity.com/google-security-operations-2/syslog-parser-extension-syntax-360"
+      },
+      {
+        "rank": 8,
+        "title": "Parsing syslog",
+        "url": "https://techcommunity.microsoft.com/discussions/microsoftsentinel/parsing-syslog/917451"
+      },
+      {
+        "rank": 9,
+        "title": "Parse::Syslog - Parse Unix syslog files",
+        "url": "https://metacpan.org/pod/Parse::Syslog"
+      }
+    ],
+    "syslog viewer": [
+      {
+        "rank": 1,
+        "title": "AudioCodes Utilities",
+        "url": "https://tools.audiocodes.com/install/"
+      },
+      {
+        "rank": 2,
+        "title": "Local syslog viewer with nice web UI? : r/selfhosted",
+        "url": "https://www.reddit.com/r/selfhosted/comments/196j8m8/local_syslog_viewer_with_nice_web_ui/"
+      },
+      {
+        "rank": 3,
+        "title": "Syslog Viewer download",
+        "url": "https://sourceforge.net/projects/syslogviewer/"
+      },
+      {
+        "rank": 4,
+        "title": "Installing Syslog Viewer",
+        "url": "https://techdocs.audiocodes.com/utilities/syslog-viewer/Content/SyslogViewer/Installing%20Syslog%20Viewer.htm"
+      },
+      {
+        "rank": 5,
+        "title": "9 Best Syslog and Log Viewers",
+        "url": "https://www.dnsstuff.com/log-syslog-viewer"
+      },
+      {
+        "rank": 6,
+        "title": "Log and Syslog Viewer for Windows",
+        "url": "https://www.solarwinds.com/kiwi-syslog-server/use-cases/log-syslog-viewer"
+      },
+      {
+        "rank": 7,
+        "title": "Syslog Viewer - Free Plan Available",
+        "url": "https://www.papertrail.com/solution/syslog-viewer/"
+      },
+      {
+        "rank": 8,
+        "title": "Syslog Viewer and Parser with Interactive Web UI",
+        "url": "https://logdy.dev/blog/post/syslog-viewer-and-parser-with-interactive-web-ui"
+      }
+    ],
+    "table to json": [
+      {
+        "rank": 1,
+        "title": "CSV To JSON Converter",
+        "url": "https://www.convertcsv.com/csv-to-json.htm"
+      },
+      {
+        "rank": 2,
+        "title": "Excel to JSON Converter Online - Free XLSX to JSON",
+        "url": "https://tableconvert.com/excel-to-json"
+      },
+      {
+        "rank": 3,
+        "title": "How to convert the following table to JSON with javascript?",
+        "url": "https://stackoverflow.com/questions/9927126/how-to-convert-the-following-table-to-json-with-javascript"
+      },
+      {
+        "rank": 4,
+        "title": "Tabular-JSON: JSON with tables",
+        "url": "https://tabular-json.org/"
+      },
+      {
+        "rank": 5,
+        "title": "Any elegant way to convert table data to JSON?",
+        "url": "https://connect.superhuman.com/t/any-elegant-way-to-convert-table-data-to-json/51282"
+      },
+      {
+        "rank": 6,
+        "title": "Output Excel data as JSON - Office Scripts",
+        "url": "https://learn.microsoft.com/en-us/office/dev/scripts/resources/samples/get-table-data"
+      },
+      {
+        "rank": 7,
+        "title": "CSV to JSON Converter | Free, Open Source & Ad-free",
+        "url": "https://jam.dev/utilities/csv-to-json"
+      },
+      {
+        "rank": 8,
+        "title": "lightswitch05/table-to-json",
+        "url": "https://github.com/lightswitch05/table-to-json"
+      }
+    ],
+    "text to json converter": [
+      {
+        "rank": 1,
+        "title": "Online String to JSON Converter",
+        "url": "https://dadroit.com/string-to-json/"
+      },
+      {
+        "rank": 2,
+        "title": "TXT to JSON Converter • Online & Free",
+        "url": "https://mconverter.eu/convert/txt/json/"
+      },
+      {
+        "rank": 3,
+        "title": "String to JSON Converter",
+        "url": "https://jsonformatter.org/string-to-json-converter"
+      },
+      {
+        "rank": 4,
+        "title": "Free Online Text to JSON Converter",
+        "url": "https://amirch1.github.io/blog/text2json/index.html"
+      },
+      {
+        "rank": 5,
+        "title": "TXT to JSON Converter (Free, No Signup)",
+        "url": "https://aslitools.com/tools/txt-to-json"
+      },
+      {
+        "rank": 6,
+        "title": "Convert JSON to Plain Text",
+        "url": "https://onlinetools.com/json/convert-json-to-text"
+      },
+      {
+        "rank": 7,
+        "title": "How to convert a text document to json? Is that even ...",
+        "url": "https://www.reddit.com/r/gamemaker/comments/wvyjff/how_to_convert_a_text_document_to_json_is_that/"
+      },
+      {
+        "rank": 8,
+        "title": "How to Convert Text File to JSON with PHP | PHP and JSON ...",
+        "url": "https://www.youtube.com/watch?v=oPgXzgKslqo"
+      },
+      {
+        "rank": 9,
+        "title": "JSON Formatter & JSON To One Line",
+        "url": "https://www.text-utils.com/json-formatter/"
+      },
+      {
+        "rank": 10,
+        "title": "Json Parser Online",
+        "url": "http://json.parser.online.fr/"
+      }
+    ],
+    "toml to json": [
+      {
+        "rank": 1,
+        "title": "TOML to JSON",
+        "url": "https://transform.tools/toml-to-json"
+      },
+      {
+        "rank": 2,
+        "title": "TOML<->JSON Online Converter",
+        "url": "https://pseitz.github.io/toml-to-json-online-converter/"
+      },
+      {
+        "rank": 3,
+        "title": "woodruffw/toml2json: A very small CLI for converting TOML ...",
+        "url": "https://github.com/woodruffw/toml2json"
+      },
+      {
+        "rank": 4,
+        "title": "Convert TOML to JSON - Free download and install on ...",
+        "url": "https://apps.microsoft.com/detail/9p3jfkcn26wp?hl=en-US&gl=ME"
+      },
+      {
+        "rank": 5,
+        "title": "Convert TOML to JSON",
+        "url": "https://www.convertsimple.com/convert-toml-to-json/"
+      },
+      {
+        "rank": 6,
+        "title": "Online TOML to JSON converter",
+        "url": "https://toml-to-json.matiaskorhonen.fi/"
+      },
+      {
+        "rank": 7,
+        "title": "matiaskorhonen/online-toml-to-json",
+        "url": "https://github.com/matiaskorhonen/online-toml-to-json"
+      },
+      {
+        "rank": 8,
+        "title": "TOML To JSON Converter",
+        "url": "https://www.convertjson.com/toml-to-json.htm"
+      },
+      {
+        "rank": 9,
+        "title": "TOML to JSON Converter - DevEditor",
+        "url": "https://www.deveditor.io/toml-json/"
+      },
+      {
+        "rank": 10,
+        "title": "Convert TOML to JSON Online (Free) - Config Tool",
+        "url": "https://enterpurpose.com/tools/toml-to-json/"
+      }
+    ],
+    "tsv to json": [
+      {
+        "rank": 1,
+        "title": "Convert TSV to JSON",
+        "url": "https://onlinetools.com/tsv/convert-tsv-to-json"
+      },
+      {
+        "rank": 2,
+        "title": "Convert TSV to JSON",
+        "url": "https://www.convertsimple.com/convert-tsv-to-json/"
+      },
+      {
+        "rank": 3,
+        "title": "Converting tsv with arrays to JSON with jq",
+        "url": "https://stackoverflow.com/questions/51929141/converting-tsv-with-arrays-to-json-with-jq"
+      },
+      {
+        "rank": 4,
+        "title": "fletcher/tdp: Convert tabular data (CSV, TSV) into JSON",
+        "url": "https://github.com/fletcher/tdp"
+      },
+      {
+        "rank": 5,
+        "title": "Python - TSV conversion to JSON",
+        "url": "https://www.geeksforgeeks.org/python/python-tsv-conversion-to-json/"
+      },
+      {
+        "rank": 6,
+        "title": "TSV to JSON Converter | Free, Open Source & Ad-free",
+        "url": "https://jam.dev/utilities/tsv-to-json"
+      },
+      {
+        "rank": 7,
+        "title": "Convert TSV to JSON",
+        "url": "https://www.browserling.com/tools/tsv-to-json"
+      },
+      {
+        "rank": 8,
+        "title": "Online TSV to JSON converter | Free GroupDocs Apps",
+        "url": "https://products.groupdocs.app/conversion/tsv-to-json"
+      },
+      {
+        "rank": 9,
+        "title": "Streaming conversion of CSV/TSV to JSON",
+        "url": "https://www.huy.dev/2018-05-streaming-conversion-csv-tsv-json/"
+      },
+      {
+        "rank": 10,
+        "title": "Convert TSV to JSON",
+        "url": "https://dataconverter.io/convert/tsv-to-json"
+      }
+    ],
+    "txt to json": [
+      {
+        "rank": 1,
+        "title": "TXT to JSON Converter • Online & Free",
+        "url": "https://mconverter.eu/convert/txt/json/"
+      },
+      {
+        "rank": 2,
+        "title": "Online TXT to JSON Converter",
+        "url": "https://www.vertopal.com/en/convert/txt-to-json"
+      },
+      {
+        "rank": 3,
+        "title": "How do I convert a txt file to a Json file? : r/techsupport",
+        "url": "https://www.reddit.com/r/techsupport/comments/96v2ca/how_do_i_convert_a_txt_file_to_a_json_file/"
+      },
+      {
+        "rank": 4,
+        "title": "Online Txt to Json File Converter",
+        "url": "https://convertmcpack.net/converters/txt-json.php"
+      },
+      {
+        "rank": 5,
+        "title": "Convert TXT to JSON - Table Studio",
+        "url": "https://table.studio/convert/txt/to/json"
+      },
+      {
+        "rank": 6,
+        "title": "Txt json",
+        "url": "https://jsonformatter.org/c69327388a0154fffe97f832d5c8ec7d"
+      },
+      {
+        "rank": 7,
+        "title": "How to Convert a TXT File to a JSON File (Quick & Easy!)",
+        "url": "https://www.youtube.com/watch?v=6j0Azozl9Fo"
+      },
+      {
+        "rank": 8,
+        "title": "Nicely convert a .txt file to .json file",
+        "url": "https://stackoverflow.com/questions/73435918/nicely-convert-a-txt-file-to-json-file"
+      },
+      {
+        "rank": 9,
+        "title": "C# TXT to JSON - TXT to JSON Converter",
+        "url": "https://products.aspose.com/cells/net/conversion/txt-to-json/"
+      },
+      {
+        "rank": 10,
+        "title": "danwild/text2json: Convert delimited txt file to json",
+        "url": "https://github.com/danwild/text2json"
+      }
+    ],
+    "url parser": [
+      {
+        "rank": 1,
+        "title": "URL Parser",
+        "url": "https://appdevtools.com/url-parser"
+      },
+      {
+        "rank": 2,
+        "title": "urllib.parse — Parse URLs into components — Python 3.14.7 ...",
+        "url": "https://docs.python.org/3/library/urllib.parse.html"
+      },
+      {
+        "rank": 3,
+        "title": "URL: parse() static method - Web APIs | MDN",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/API/URL/parse_static"
+      },
+      {
+        "rank": 4,
+        "title": "Free URL Parser: Online Query String Parser",
+        "url": "https://static.app/url-parser"
+      },
+      {
+        "rank": 5,
+        "title": "parse_url - Manual",
+        "url": "https://www.php.net/manual/en/function.parse-url.php"
+      },
+      {
+        "rank": 6,
+        "title": "How to Parse URL in Node.js HTTP Module | Extract Query ...",
+        "url": "https://www.youtube.com/watch?v=9tchsy20aBI"
+      },
+      {
+        "rank": 7,
+        "title": "URL parser online",
+        "url": "https://semalt.tools/en/url-parser"
+      },
+      {
+        "rank": 8,
+        "title": "mihaigalos/url-parse: 🔗 A library for parsing URLs.",
+        "url": "https://github.com/mihaigalos/url-parse"
+      },
+      {
+        "rank": 9,
+        "title": "Best URL Parser: Simplifying Web Link Analysis | by Divsly",
+        "url": "https://medium.com/@divsly.marketing/best-url-parser-simplifying-web-link-analysis-f8deb026d5c7"
+      },
+      {
+        "rank": 10,
+        "title": "Free tool to visualize, parse, analyze and compare URLs ...",
+        "url": "https://parseurlonline.com/"
+      }
+    ],
+    "xml parser": [
+      {
+        "rank": 1,
+        "title": "Best XML Parser Online",
+        "url": "https://jsonformatter.org/xml-parser"
+      },
+      {
+        "rank": 2,
+        "title": "XMLParser | Apple Developer Documentation",
+        "url": "https://developer.apple.com/documentation/foundation/xmlparser"
+      },
+      {
+        "rank": 3,
+        "title": "XML::Parser - A perl module for parsing XML documents",
+        "url": "https://metacpan.org/pod/XML::Parser"
+      },
+      {
+        "rank": 4,
+        "title": "XML Parser",
+        "url": "https://www.w3schools.com/xml/xml_parser.asp"
+      },
+      {
+        "rank": 5,
+        "title": "fast-xml-parser",
+        "url": "https://www.npmjs.com/package/fast-xml-parser"
+      },
+      {
+        "rank": 6,
+        "title": "Online XML Parser",
+        "url": "https://reqbin.com/xml-parser"
+      },
+      {
+        "rank": 7,
+        "title": "W3Schools XML Parser tutorial | XML Tutorial for Beginners ...",
+        "url": "https://www.youtube.com/watch?v=Aplw1TRdmno"
+      },
+      {
+        "rank": 8,
+        "title": "XML Parser | Parse XML",
+        "url": "https://www.ultraedit.com/support/tutorials-power-tips/ultraedit/parsing-xml-files/"
+      }
+    ],
+    "xml to json": [
+      {
+        "rank": 1,
+        "title": "Best XML to JSON Converter Online",
+        "url": "https://jsonformatter.org/xml-to-json"
+      },
+      {
+        "rank": 2,
+        "title": "XML to JSON Converter",
+        "url": "https://www.site24x7.com/tools/xml-to-json.html"
+      },
+      {
+        "rank": 3,
+        "title": "XML to JSON Converter - Transform XML Data Online",
+        "url": "https://jsonlint.com/xml-to-json"
+      },
+      {
+        "rank": 4,
+        "title": "How to Convert XML to JSON using Python!",
+        "url": "https://www.youtube.com/watch?v=FqvGpSmisbg"
+      },
+      {
+        "rank": 5,
+        "title": "Parsing XML into JSON",
+        "url": "https://www.filemakermagazine.com/videos/parsing-xml-json"
+      },
+      {
+        "rank": 6,
+        "title": "XML to JSON Converter - Free Online Tool",
+        "url": "https://codeshack.io/xml-to-json-converter/"
+      },
+      {
+        "rank": 7,
+        "title": "Convert XML to JSON",
+        "url": "https://www.newtonsoft.com/json/help/html/ConvertXmlToJson.htm"
+      },
+      {
+        "rank": 8,
+        "title": "XML to JSON Converter | Free, Open Source & Ad-free",
+        "url": "https://jam.dev/utilities/xml-to-json"
+      },
+      {
+        "rank": 9,
+        "title": "How to convert XML to JSON using JavaScript | convert xml to ...",
+        "url": "https://www.youtube.com/watch?v=7wXh8KEMU98"
+      },
+      {
+        "rank": 10,
+        "title": "XML to JSON Converter",
+        "url": "https://www.geeksforgeeks.org/utilities/xml-to-json-converter/"
+      }
+    ],
+    "xml viewer": [
+      {
+        "rank": 1,
+        "title": "XML Online Viewer",
+        "url": "https://xml.onlineviewer.net/"
+      },
+      {
+        "rank": 2,
+        "title": "Best XML Viewer Online",
+        "url": "https://jsonformatter.org/xml-viewer"
+      },
+      {
+        "rank": 3,
+        "title": "XML Viewer - Chrome Web Store",
+        "url": "https://chromewebstore.google.com/detail/xml-viewer/legopflakafagikcpiapgnbokgkbejlk?hl=en"
+      },
+      {
+        "rank": 4,
+        "title": "XML Notepad",
+        "url": "https://microsoft.github.io/XmlNotepad/"
+      },
+      {
+        "rank": 5,
+        "title": "Best Online XML Viewer, XML Formatter, XML Editor, ...",
+        "url": "https://codebeautify.org/xmlviewer"
+      },
+      {
+        "rank": 6,
+        "title": "XML Viewer - Reader and Opener - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=evansir.xmlviewer&hl=en_US"
+      },
+      {
+        "rank": 7,
+        "title": "Free software to view XML files for GIS",
+        "url": "https://www.reddit.com/r/gis/comments/169vt87/does_a_free_software_exist_that_will_allow_me_to/"
+      },
+      {
+        "rank": 8,
+        "title": "XML Viewer Online - View, Format & Validate XML",
+        "url": "https://static.app/xml-viewer"
+      },
+      {
+        "rank": 9,
+        "title": "XML Viewer & Editor",
+        "url": "https://guifier.com/xml"
+      },
+      {
+        "rank": 10,
+        "title": "XML Viewer (Try Free)",
+        "url": "https://www.altova.com/xmlspy-xml-editor/xml-viewer"
+      }
+    ],
+    "yaml parser": [
+      {
+        "rank": 1,
+        "title": "Online YAML Parser",
+        "url": "https://yaml-online-parser.appspot.com/"
+      },
+      {
+        "rank": 2,
+        "title": "YAML Parser Online",
+        "url": "https://jsonformatter.org/yaml-parser"
+      },
+      {
+        "rank": 3,
+        "title": "tlsa/libcyaml: C library for reading and writing YAML.",
+        "url": "https://github.com/tlsa/libcyaml"
+      },
+      {
+        "rank": 4,
+        "title": "yaml",
+        "url": "https://www.npmjs.com/package/yaml"
+      },
+      {
+        "rank": 5,
+        "title": "Libraries - YAML Ain't Markup Language",
+        "url": "https://yaml.org/libraries/"
+      },
+      {
+        "rank": 6,
+        "title": "YAML Parser Online",
+        "url": "https://codebeautify.org/yaml-parser-online"
+      },
+      {
+        "rank": 7,
+        "title": "Build Your Own YAML Parser",
+        "url": "https://codingchallenges.fyi/challenges/challenge-yaml/"
+      },
+      {
+        "rank": 8,
+        "title": "How can I parse a YAML file from a Linux shell script?",
+        "url": "https://stackoverflow.com/questions/5014632/how-can-i-parse-a-yaml-file-from-a-linux-shell-script"
+      },
+      {
+        "rank": 9,
+        "title": "The YAML Validator: YAMLlint",
+        "url": "https://www.yamllint.com/"
+      }
+    ],
+    "yaml to json": [
+      {
+        "rank": 1,
+        "title": "Transform YAML into JSON",
+        "url": "https://onlineyamltools.com/convert-yaml-to-json"
+      },
+      {
+        "rank": 2,
+        "title": "YAML to JSON Converter Online",
+        "url": "https://jsonformatter.org/yaml-to-json"
+      },
+      {
+        "rank": 3,
+        "title": "YAML to JSON",
+        "url": "https://marketplace.visualstudio.com/items?itemName=ahebrank.yaml2json"
+      },
+      {
+        "rank": 4,
+        "title": "YAML to JSON Online Converter",
+        "url": "https://dadroit.com/yaml-to-json/"
+      },
+      {
+        "rank": 5,
+        "title": "YAML to JSON Converter",
+        "url": "https://www.geeksforgeeks.org/utilities/yaml-to-json-converter/"
+      },
+      {
+        "rank": 6,
+        "title": "Using JSON as YAML",
+        "url": "https://www.youtube.com/watch?v=8q25nmRikgc"
+      },
+      {
+        "rank": 7,
+        "title": "YAML to JSON Converter - Chrome Web Store",
+        "url": "https://chromewebstore.google.com/detail/yaml-to-json-converter/ljnpooaliebiknmmimdpdgahbeabjiln"
+      },
+      {
+        "rank": 8,
+        "title": "Convert YAML to JSON Online",
+        "url": "https://jsonlint.com/yaml-to-json"
+      },
+      {
+        "rank": 9,
+        "title": "Converting between JSON and YAML - How it's Done",
+        "url": "https://www.youtube.com/watch?v=L433MPex178"
+      },
+      {
+        "rank": 10,
+        "title": "Convert JSON to YAML online",
+        "url": "https://www.bairesdev.com/tools/json2yaml"
+      }
+    ],
+    "yaml viewer": [
+      {
+        "rank": 1,
+        "title": "Best YAML Viewer Online",
+        "url": "https://jsonformatter.org/yaml-viewer"
+      },
+      {
+        "rank": 2,
+        "title": "YAML Viewer Online",
+        "url": "https://codebeautify.org/yaml-viewer-online"
+      },
+      {
+        "rank": 3,
+        "title": "SwaggerEditor",
+        "url": "https://editor.swagger.io/"
+      },
+      {
+        "rank": 4,
+        "title": "YAML / YML Viewer & Editor - Apps on Google Play",
+        "url": "https://play.google.com/store/apps/details?id=com.cosmovex.yamlvedit&hl=en_US"
+      },
+      {
+        "rank": 5,
+        "title": "Visualizing and Editing YAML Data",
+        "url": "https://todiagram.com/yaml-editor-visualization"
+      },
+      {
+        "rank": 6,
+        "title": "YAML Preview UI",
+        "url": "https://marketplace.visualstudio.com/items?itemName=fla9ua.yaml-preview-ui"
+      },
+      {
+        "rank": 7,
+        "title": "YAML Viewer & Editor",
+        "url": "https://guifier.com/yaml"
+      },
+      {
+        "rank": 8,
+        "title": "Edit and View YAML",
+        "url": "https://onlineyamltools.com/edit-yaml"
+      },
+      {
+        "rank": 9,
+        "title": "YAML Viewer - Obsidian Plugin",
+        "url": "https://community.obsidian.md/plugins/yaml-viewer"
+      },
+      {
+        "rank": 10,
+        "title": "Best YAML Viewer and Reader Online",
+        "url": "https://www.testmuai.com/free-online-tools/yaml-viewer/"
+      }
+    ],
+    "yaml vs json": [
+      {
+        "rank": 1,
+        "title": "YAML vs. JSON : r/golang",
+        "url": "https://www.reddit.com/r/golang/comments/vsq41i/yaml_vs_json/"
+      },
+      {
+        "rank": 2,
+        "title": "YAML vs JSON - Difference Between Data Serialization ...",
+        "url": "https://aws.amazon.com/compare/the-difference-between-yaml-and-json/"
+      },
+      {
+        "rank": 3,
+        "title": "What is the difference between YAML and JSON? [closed]",
+        "url": "https://stackoverflow.com/questions/1726802/what-is-the-difference-between-yaml-and-json"
+      },
+      {
+        "rank": 4,
+        "title": "YAML vs. JSON: Which Is More Efficient for Language ...",
+        "url": "https://betterprogramming.pub/yaml-vs-json-which-is-more-efficient-for-language-models-5bc11dd0f6df"
+      },
+      {
+        "rank": 5,
+        "title": "JSON vs YAML: What's the Difference and Which Do I Use?",
+        "url": "https://www.snaplogic.com/blog/json-vs-yaml-whats-the-difference-and-which-one-is-right-for-your-enterprise"
+      },
+      {
+        "rank": 6,
+        "title": "What is the difference between YAML vs JSON?",
+        "url": "https://www.youtube.com/watch?v=-nJiJNNnAHo"
+      },
+      {
+        "rank": 7,
+        "title": "YAML vs. JSON: Breaking Down the Key Differences",
+        "url": "https://kodekloud.com/blog/yaml-vs-json/"
+      },
+      {
+        "rank": 8,
+        "title": "YAML vs JSON vs XML",
+        "url": "https://www.phoenixdata.ai/glossary/yaml-json-and-xml-a-practical-guide-to-choosing-the-right-format"
+      }
+    ],
+    "yaml vs toml": [
+      {
+        "rank": 1,
+        "title": "YAML vs TOML : r/devops",
+        "url": "https://www.reddit.com/r/devops/comments/6f82nu/yaml_vs_toml/"
+      },
+      {
+        "rank": 2,
+        "title": "TOML vs YAML",
+        "url": "https://gist.github.com/oconnor663/9aeb4ed56394cb013a20"
+      },
+      {
+        "rank": 3,
+        "title": "Isn't it why toml is seemingly increasingly used to replace ...",
+        "url": "https://news.ycombinator.com/item?id=40269318"
+      },
+      {
+        "rank": 4,
+        "title": "JSON vs. YAML vs. TOML",
+        "url": "https://martin-ueding.de/posts/json-vs-yaml-vs-toml/"
+      },
+      {
+        "rank": 5,
+        "title": "What Is a TOML File and Why Do Buildpacks Use TOML?",
+        "url": "https://www.heroku.com/blog/why-buildpacks-use-toml/"
+      },
+      {
+        "rank": 6,
+        "title": "An In-depth Comparison of JSON, YAML, and TOML | AnBowell",
+        "url": "https://www.anbowell.com/blog/an-in-depth-comparison-of-json-yaml-and-toml"
+      },
+      {
+        "rank": 7,
+        "title": "Config Files: INI, XML, JSON, YAML, TOML",
+        "url": "https://www.barenakedcoder.com/blog/2020/03/config-files-ini-xml-json-yaml-toml/"
+      }
+    ]
+  },
+  "competitor_pages": {
+    "appdevtools.com/url-parser": {
+      "total_count": 27,
+      "keywords": [
+        {
+          "kw": "url parse",
+          "vol": 720,
+          "kd": 59,
+          "rank": 32
+        },
+        {
+          "kw": "url parser",
+          "vol": 720,
+          "kd": 25,
+          "rank": 9
+        },
+        {
+          "kw": "url parsing",
+          "vol": 720,
+          "kd": 39,
+          "rank": 31
+        },
+        {
+          "kw": "url-parse",
+          "vol": 720,
+          "kd": 60,
+          "rank": 33
+        },
+        {
+          "kw": "query string url",
+          "vol": 390,
+          "kd": 38,
+          "rank": 50
+        },
+        {
+          "kw": "parse a url",
+          "vol": 140,
+          "kd": 38,
+          "rank": 14
+        },
+        {
+          "kw": "parse url",
+          "vol": 140,
+          "kd": 60,
+          "rank": 27
+        },
+        {
+          "kw": "parse-url",
+          "vol": 140,
+          "kd": 60,
+          "rank": 27
+        },
+        {
+          "kw": "parseurl",
+          "vol": 140,
+          "kd": 36,
+          "rank": 57
+        },
+        {
+          "kw": "parsing a url",
+          "vol": 140,
+          "kd": 19,
+          "rank": 39
+        },
+        {
+          "kw": "parsing url",
+          "vol": 140,
+          "kd": 37,
+          "rank": 26
+        },
+        {
+          "kw": "parsing urls",
+          "vol": 140,
+          "kd": 30,
+          "rank": 47
+        },
+        {
+          "kw": "url parser javascript",
+          "vol": 110,
+          "kd": 29,
+          "rank": 57
+        },
+        {
+          "kw": "online url parser",
+          "vol": 90,
+          "kd": 0,
+          "rank": 6
+        },
+        {
+          "kw": "parse url online",
+          "vol": 90,
+          "kd": 22,
+          "rank": 10
+        },
+        {
+          "kw": "url parse online",
+          "vol": 90,
+          "kd": 18,
+          "rank": 8
+        },
+        {
+          "kw": "url parser online",
+          "vol": 90,
+          "kd": 11,
+          "rank": 7
+        },
+        {
+          "kw": "url parsing online",
+          "vol": 90,
+          "kd": 11,
+          "rank": 5
+        },
+        {
+          "kw": "urlparse online",
+          "vol": 90,
+          "kd": 20,
+          "rank": 8
+        },
+        {
+          "kw": "parse query string",
+          "vol": 70,
+          "kd": 37,
+          "rank": 6
+        },
+        {
+          "kw": "parsequerystring",
+          "vol": 70,
+          "kd": 0,
+          "rank": 31
+        },
+        {
+          "kw": "query string parse",
+          "vol": 70,
+          "kd": 61,
+          "rank": 14
+        },
+        {
+          "kw": "query string parser",
+          "vol": 70,
+          "kd": 29,
+          "rank": 2
+        },
+        {
+          "kw": "querystring parse",
+          "vol": 70,
+          "kd": 30,
+          "rank": 18
+        },
+        {
+          "kw": "javascript get parameters from url",
+          "vol": 50,
+          "kd": 25,
+          "rank": 82
+        },
+        {
+          "kw": "query parse",
+          "vol": 40,
+          "kd": 35,
+          "rank": 19
+        },
+        {
+          "kw": "url parser java",
+          "vol": 40,
+          "kd": 1,
+          "rank": 52
+        }
+      ]
+    },
+    "jsonformatter.org/yaml-viewer": {
+      "total_count": 30,
+      "keywords": [
+        {
+          "kw": "yaml viewer",
+          "vol": 260,
+          "kd": 7,
+          "rank": 1
+        },
+        {
+          "kw": "how to open a yaml file",
+          "vol": 140,
+          "kd": 21,
+          "rank": 2
+        },
+        {
+          "kw": "how to open yaml file",
+          "vol": 140,
+          "kd": 14,
+          "rank": 2
+        },
+        {
+          "kw": "load yaml",
+          "vol": 140,
+          "kd": 21,
+          "rank": 24
+        },
+        {
+          "kw": "render yaml",
+          "vol": 110,
+          "kd": 6,
+          "rank": 17
+        },
+        {
+          "kw": "yaml compare online",
+          "vol": 110,
+          "kd": 0,
+          "rank": 25
+        },
+        {
+          "kw": "online yaml tools",
+          "vol": 90,
+          "kd": 24,
+          "rank": 4
+        },
+        {
+          "kw": "yaml read",
+          "vol": 90,
+          "kd": 5,
+          "rank": 10
+        },
+        {
+          "kw": "yaml reader",
+          "vol": 90,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "compare yaml online",
+          "vol": 70,
+          "kd": 0,
+          "rank": 31
+        },
+        {
+          "kw": "compare yaml files",
+          "vol": 50,
+          "kd": 0,
+          "rank": 43
+        },
+        {
+          "kw": "view yaml file",
+          "vol": 50,
+          "kd": 8,
+          "rank": 1
+        },
+        {
+          "kw": "yaml file reader",
+          "vol": 50,
+          "kd": 0,
+          "rank": 1
+        },
+        {
+          "kw": "yaml viewer online",
+          "vol": 50,
+          "kd": 4,
+          "rank": 1
+        },
+        {
+          "kw": "yaml visualizer",
+          "vol": 50,
+          "kd": 4,
+          "rank": 1
+        },
+        {
+          "kw": "open a yaml file",
+          "vol": 40,
+          "kd": 14,
+          "rank": 2
+        },
+        {
+          "kw": "open yaml file",
+          "vol": 40,
+          "kd": 27,
+          "rank": 3
+        },
+        {
+          "kw": "yaml playground",
+          "vol": 40,
+          "kd": 13,
+          "rank": 36
+        },
+        {
+          "kw": "yaml-playground",
+          "vol": 40,
+          "kd": 13,
+          "rank": 33
+        },
+        {
+          "kw": "how to read yaml file",
+          "vol": 30,
+          "kd": 13,
+          "rank": 10
+        },
+        {
+          "kw": "openapi viewer online",
+          "vol": 30,
+          "kd": 20,
+          "rank": 48
+        },
+        {
+          "kw": "read yaml",
+          "vol": 30,
+          "kd": 14,
+          "rank": 5
+        },
+        {
+          "kw": "reading yaml",
+          "vol": 30,
+          "kd": 8,
+          "rank": 27
+        },
+        {
+          "kw": "yaml diff online",
+          "vol": 30,
+          "kd": 0,
+          "rank": 29
+        },
+        {
+          "kw": "yaml editor for windows",
+          "vol": 30,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "yaml editor windows",
+          "vol": 30,
+          "kd": 0,
+          "rank": 27
+        },
+        {
+          "kw": "yaml matlab",
+          "vol": 30,
+          "kd": 0,
+          "rank": 56
+        },
+        {
+          "kw": "yamlls",
+          "vol": 30,
+          "kd": 10,
+          "rank": 52
+        },
+        {
+          "kw": "read yaml file",
+          "vol": 20,
+          "kd": 11,
+          "rank": 26
+        },
+        {
+          "kw": "reading yaml file in java",
+          "vol": 20,
+          "kd": 0,
+          "rank": 37
+        }
+      ]
+    },
+    "jwt.io/": {
+      "total_count": 323,
+      "keywords": [
+        {
+          "kw": "json web token",
+          "vol": 22200,
+          "kd": 61,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken",
+          "vol": 22200,
+          "kd": 77,
+          "rank": 1
+        },
+        {
+          "kw": "jwt",
+          "vol": 22200,
+          "kd": 50,
+          "rank": 1
+        },
+        {
+          "kw": "web token",
+          "vol": 22200,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "web tokens",
+          "vol": 22200,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "jwt decode",
+          "vol": 18100,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "jwt io",
+          "vol": 6600,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token",
+          "vol": 6600,
+          "kd": 39,
+          "rank": 1
+        },
+        {
+          "kw": "jwt tokens",
+          "vol": 6600,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "jwt.io",
+          "vol": 6600,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token decode",
+          "vol": 2400,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "decode jwt",
+          "vol": 1600,
+          "kd": 37,
+          "rank": 1
+        },
+        {
+          "kw": "decoding jwt",
+          "vol": 1600,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "gettoken",
+          "vol": 1300,
+          "kd": 2,
+          "rank": 49
+        },
+        {
+          "kw": "json decode",
+          "vol": 1300,
+          "kd": 72,
+          "rank": 3
+        },
+        {
+          "kw": "json decoder",
+          "vol": 1300,
+          "kd": 60,
+          "rank": 5
+        },
+        {
+          "kw": "what is a jwt token",
+          "vol": 1000,
+          "kd": 45,
+          "rank": 1
+        },
+        {
+          "kw": "what is jwt token",
+          "vol": 1000,
+          "kd": 38,
+          "rank": 1
+        },
+        {
+          "kw": "decode token",
+          "vol": 720,
+          "kd": 37,
+          "rank": 1
+        },
+        {
+          "kw": "jwt parse",
+          "vol": 720,
+          "kd": 28,
+          "rank": 1
+        },
+        {
+          "kw": "jwt parser",
+          "vol": 720,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "parse jwt",
+          "vol": 720,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "parse jwt token",
+          "vol": 720,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "create jwt token",
+          "vol": 590,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "decode jwt token",
+          "vol": 590,
+          "kd": 37,
+          "rank": 1
+        },
+        {
+          "kw": "decoding jwt token",
+          "vol": 590,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "json web token decode online",
+          "vol": 590,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "json web token example",
+          "vol": 590,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "jwt decode online",
+          "vol": 590,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "jwt online decode",
+          "vol": 590,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "jwt online decoder",
+          "vol": 590,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token generation",
+          "vol": 590,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token generator",
+          "vol": 590,
+          "kd": 15,
+          "rank": 1
+        },
+        {
+          "kw": "sample jwt token",
+          "vol": 590,
+          "kd": 39,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken encode",
+          "vol": 480,
+          "kd": 47,
+          "rank": 2
+        },
+        {
+          "kw": "jwt encode",
+          "vol": 480,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "jwt encoding",
+          "vol": 480,
+          "kd": 45,
+          "rank": 1
+        },
+        {
+          "kw": "jwt generator",
+          "vol": 480,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "jwt io decode",
+          "vol": 480,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "jwt secret generator",
+          "vol": 480,
+          "kd": 14,
+          "rank": 4
+        },
+        {
+          "kw": "jwt-encode",
+          "vol": 480,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "jwt.io decode",
+          "vol": 480,
+          "kd": 38,
+          "rank": 1
+        },
+        {
+          "kw": "bearer token decode",
+          "vol": 390,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "go-jwt",
+          "vol": 390,
+          "kd": 12,
+          "rank": 15
+        },
+        {
+          "kw": "jwt claims",
+          "vol": 390,
+          "kd": 35,
+          "rank": 3
+        },
+        {
+          "kw": "jwt secret",
+          "vol": 390,
+          "kd": 21,
+          "rank": 2
+        },
+        {
+          "kw": "jsonwebtoken validate",
+          "vol": 320,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "jwt debugger",
+          "vol": 320,
+          "kd": 13,
+          "rank": 1
+        },
+        {
+          "kw": "jwt io debugger",
+          "vol": 320,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "jwt secret key generator",
+          "vol": 320,
+          "kd": 15,
+          "rank": 5
+        },
+        {
+          "kw": "jwt validation",
+          "vol": 320,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "jwt validator",
+          "vol": 320,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "jwt verification",
+          "vol": 260,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "jwt verify",
+          "vol": 260,
+          "kd": 39,
+          "rank": 1
+        },
+        {
+          "kw": "jwt editor",
+          "vol": 210,
+          "kd": 28,
+          "rank": 2
+        },
+        {
+          "kw": "jwt ms",
+          "vol": 210,
+          "kd": 19,
+          "rank": 10
+        },
+        {
+          "kw": "jwt viewer",
+          "vol": 210,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "token view",
+          "vol": 210,
+          "kd": 100,
+          "rank": 2
+        },
+        {
+          "kw": "token viewer",
+          "vol": 210,
+          "kd": 68,
+          "rank": 1
+        },
+        {
+          "kw": "generate jwt secret",
+          "vol": 170,
+          "kd": 7,
+          "rank": 5
+        },
+        {
+          "kw": "jwt bearer token",
+          "vol": 170,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "jwt expired",
+          "vol": 170,
+          "kd": 7,
+          "rank": 4
+        },
+        {
+          "kw": "jwt expiry",
+          "vol": 170,
+          "kd": 2,
+          "rank": 1
+        },
+        {
+          "kw": "jwt oauth",
+          "vol": 170,
+          "kd": 22,
+          "rank": 13
+        },
+        {
+          "kw": "jwt sign",
+          "vol": 170,
+          "kd": 38,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token oauth",
+          "vol": 170,
+          "kd": 14,
+          "rank": 12
+        },
+        {
+          "kw": "token code",
+          "vol": 170,
+          "kd": 13,
+          "rank": 23
+        },
+        {
+          "kw": "token identification",
+          "vol": 170,
+          "kd": 8,
+          "rank": 34
+        },
+        {
+          "kw": "token identifier",
+          "vol": 170,
+          "kd": 16,
+          "rank": 2
+        },
+        {
+          "kw": "how to get a jwt token",
+          "vol": 140,
+          "kd": 13,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken online",
+          "vol": 140,
+          "kd": 49,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken refresh token",
+          "vol": 140,
+          "kd": 5,
+          "rank": 19
+        },
+        {
+          "kw": "jwt is expired",
+          "vol": 140,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "jwt jti",
+          "vol": 140,
+          "kd": 35,
+          "rank": 9
+        },
+        {
+          "kw": "jwt key",
+          "vol": 140,
+          "kd": 42,
+          "rank": 3
+        },
+        {
+          "kw": "jwt online",
+          "vol": 140,
+          "kd": 53,
+          "rank": 1
+        },
+        {
+          "kw": "jwt tool",
+          "vol": 140,
+          "kd": 32,
+          "rank": 2
+        },
+        {
+          "kw": "jwt tools",
+          "vol": 140,
+          "kd": 43,
+          "rank": 2
+        },
+        {
+          "kw": "oauth jwt",
+          "vol": 140,
+          "kd": 12,
+          "rank": 16
+        },
+        {
+          "kw": "online jwt decoder",
+          "vol": 140,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "test tokens",
+          "vol": 140,
+          "kd": 34,
+          "rank": 16
+        },
+        {
+          "kw": "token check",
+          "vol": 140,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "token checker",
+          "vol": 140,
+          "kd": 37,
+          "rank": 3
+        },
+        {
+          "kw": "token checking",
+          "vol": 140,
+          "kd": 28,
+          "rank": 1
+        },
+        {
+          "kw": "claims token",
+          "vol": 110,
+          "kd": 27,
+          "rank": 2
+        },
+        {
+          "kw": "encrypt jwt",
+          "vol": 110,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "encrypted jwt",
+          "vol": 110,
+          "kd": 22,
+          "rank": 5
+        },
+        {
+          "kw": "jwt ad",
+          "vol": 110,
+          "kd": 34,
+          "rank": 5
+        },
+        {
+          "kw": "jwt encrypt",
+          "vol": 110,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "jwt encryption",
+          "vol": 110,
+          "kd": 28,
+          "rank": 1
+        },
+        {
+          "kw": "jwt logo",
+          "vol": 110,
+          "kd": 8,
+          "rank": 2
+        },
+        {
+          "kw": "jwt token parser",
+          "vol": 110,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token validation",
+          "vol": 110,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token validator",
+          "vol": 110,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "log token",
+          "vol": 110,
+          "kd": 21,
+          "rank": 5
+        },
+        {
+          "kw": "php json web tokens",
+          "vol": 110,
+          "kd": 10,
+          "rank": 15
+        },
+        {
+          "kw": "rust jwt",
+          "vol": 110,
+          "kd": 1,
+          "rank": 29
+        },
+        {
+          "kw": "sign jsonwebtoken",
+          "vol": 110,
+          "kd": 36,
+          "rank": 2
+        },
+        {
+          "kw": "sign jwt",
+          "vol": 110,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "signjwt",
+          "vol": 110,
+          "kd": 18,
+          "rank": 3
+        },
+        {
+          "kw": "token claims",
+          "vol": 110,
+          "kd": 23,
+          "rank": 3
+        },
+        {
+          "kw": "token db",
+          "vol": 110,
+          "kd": 12,
+          "rank": 30
+        },
+        {
+          "kw": "token log",
+          "vol": 110,
+          "kd": 3,
+          "rank": 25
+        },
+        {
+          "kw": "token logging",
+          "vol": 110,
+          "kd": 0,
+          "rank": 28
+        },
+        {
+          "kw": "unauthorized nil json web token",
+          "vol": 110,
+          "kd": 0,
+          "rank": 17
+        },
+        {
+          "kw": "what are jwt tokens",
+          "vol": 110,
+          "kd": 39,
+          "rank": 1
+        },
+        {
+          "kw": "aws-jwt-verify",
+          "vol": 90,
+          "kd": 8,
+          "rank": 24
+        },
+        {
+          "kw": "bearer jwt",
+          "vol": 90,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "decode jwt token online",
+          "vol": 90,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "express jwt",
+          "vol": 90,
+          "kd": 4,
+          "rank": 22
+        },
+        {
+          "kw": "io/jsonwebtoken",
+          "vol": 90,
+          "kd": 19,
+          "rank": 3
+        },
+        {
+          "kw": "json token decode",
+          "vol": 90,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "json web token decode",
+          "vol": 90,
+          "kd": 40,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken jwt",
+          "vol": 90,
+          "kd": 61,
+          "rank": 1
+        },
+        {
+          "kw": "jwt bearer",
+          "vol": 90,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "jwt decode python",
+          "vol": 90,
+          "kd": 19,
+          "rank": 33
+        },
+        {
+          "kw": "jwt expiration",
+          "vol": 90,
+          "kd": 7,
+          "rank": 1
+        },
+        {
+          "kw": "jwt expire",
+          "vol": 90,
+          "kd": 2,
+          "rank": 2
+        },
+        {
+          "kw": "jwt express",
+          "vol": 90,
+          "kd": 15,
+          "rank": 9
+        },
+        {
+          "kw": "jwt go",
+          "vol": 90,
+          "kd": 21,
+          "rank": 12
+        },
+        {
+          "kw": "jwt inspector",
+          "vol": 90,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "jwt key generator",
+          "vol": 90,
+          "kd": 19,
+          "rank": 3
+        },
+        {
+          "kw": "jwt pronunciation",
+          "vol": 90,
+          "kd": 22,
+          "rank": 20
+        },
+        {
+          "kw": "jwt scopes",
+          "vol": 90,
+          "kd": 0,
+          "rank": 52
+        },
+        {
+          "kw": "jwt-go",
+          "vol": 90,
+          "kd": 21,
+          "rank": 13
+        },
+        {
+          "kw": "jwt.decode python",
+          "vol": 90,
+          "kd": 20,
+          "rank": 29
+        },
+        {
+          "kw": "jwtbearer",
+          "vol": 90,
+          "kd": 20,
+          "rank": 5
+        },
+        {
+          "kw": "jwtdecoder",
+          "vol": 90,
+          "kd": 17,
+          "rank": 1
+        },
+        {
+          "kw": "jwtpayload",
+          "vol": 90,
+          "kd": 25,
+          "rank": 2
+        },
+        {
+          "kw": "ms jwt",
+          "vol": 90,
+          "kd": 32,
+          "rank": 5
+        },
+        {
+          "kw": "nil json web token",
+          "vol": 90,
+          "kd": 0,
+          "rank": 11
+        },
+        {
+          "kw": "python jwt decode",
+          "vol": 90,
+          "kd": 22,
+          "rank": 24
+        },
+        {
+          "kw": "transaction token",
+          "vol": 90,
+          "kd": 6,
+          "rank": 39
+        },
+        {
+          "kw": "verify token",
+          "vol": 90,
+          "kd": 26,
+          "rank": 1
+        },
+        {
+          "kw": "access token decode",
+          "vol": 70,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "auth0 jsonwebtoken",
+          "vol": 70,
+          "kd": 33,
+          "rank": 3
+        },
+        {
+          "kw": "auth0 jwt",
+          "vol": 70,
+          "kd": 28,
+          "rank": 4
+        },
+        {
+          "kw": "auth0 jwt token",
+          "vol": 70,
+          "kd": 20,
+          "rank": 3
+        },
+        {
+          "kw": "decode access token",
+          "vol": 70,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "eyj0exaioijkv1qilcjhbgcioijiuzi1nij9",
+          "vol": 70,
+          "kd": 0,
+          "rank": 23
+        },
+        {
+          "kw": "how to pronounce jwt",
+          "vol": 70,
+          "kd": 11,
+          "rank": 23
+        },
+        {
+          "kw": "immunity token",
+          "vol": 70,
+          "kd": 0,
+          "rank": 29
+        },
+        {
+          "kw": "javascript jwt",
+          "vol": 70,
+          "kd": 41,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken javascript",
+          "vol": 70,
+          "kd": 41,
+          "rank": 2
+        },
+        {
+          "kw": "jsonwebtoken js",
+          "vol": 70,
+          "kd": 32,
+          "rank": 2
+        },
+        {
+          "kw": "jsonwebtoken rust",
+          "vol": 70,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "jti jwt",
+          "vol": 70,
+          "kd": 43,
+          "rank": 11
+        },
+        {
+          "kw": "jwt access token",
+          "vol": 70,
+          "kd": 38,
+          "rank": 1
+        },
+        {
+          "kw": "jwt aud",
+          "vol": 70,
+          "kd": 5,
+          "rank": 11
+        },
+        {
+          "kw": "jwt checker",
+          "vol": 70,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "jwt issuer is not configured",
+          "vol": 70,
+          "kd": 0,
+          "rank": 31
+        },
+        {
+          "kw": "jwt javascript",
+          "vol": 70,
+          "kd": 41,
+          "rank": 2
+        },
+        {
+          "kw": "jwt js",
+          "vol": 70,
+          "kd": 67,
+          "rank": 1
+        },
+        {
+          "kw": "jwt json",
+          "vol": 70,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "jwt passport",
+          "vol": 70,
+          "kd": 5,
+          "rank": 29
+        },
+        {
+          "kw": "jwt ruby",
+          "vol": 70,
+          "kd": 1,
+          "rank": 20
+        },
+        {
+          "kw": "jwt token decode online",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token expired",
+          "vol": 70,
+          "kd": 3,
+          "rank": 4
+        },
+        {
+          "kw": "jwt token streamelements",
+          "vol": 70,
+          "kd": 0,
+          "rank": 16
+        },
+        {
+          "kw": "jwt token verification",
+          "vol": 70,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "jwt website",
+          "vol": 70,
+          "kd": 53,
+          "rank": 1
+        },
+        {
+          "kw": "oauth token decode",
+          "vol": 70,
+          "kd": 33,
+          "rank": 1
+        },
+        {
+          "kw": "parse token",
+          "vol": 70,
+          "kd": 37,
+          "rank": 1
+        },
+        {
+          "kw": "parser token",
+          "vol": 70,
+          "kd": 14,
+          "rank": 1
+        },
+        {
+          "kw": "ruby jwt token",
+          "vol": 70,
+          "kd": 0,
+          "rank": 17
+        },
+        {
+          "kw": "token converter",
+          "vol": 70,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "token io",
+          "vol": 70,
+          "kd": 26,
+          "rank": 1
+        },
+        {
+          "kw": "token parser",
+          "vol": 70,
+          "kd": 32,
+          "rank": 1
+        },
+        {
+          "kw": "token parsing",
+          "vol": 70,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "typetoken",
+          "vol": 70,
+          "kd": 9,
+          "rank": 37
+        },
+        {
+          "kw": "validate jwt token",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "auth json",
+          "vol": 50,
+          "kd": 29,
+          "rank": 6
+        },
+        {
+          "kw": "create jwt",
+          "vol": 50,
+          "kd": 14,
+          "rank": 1
+        },
+        {
+          "kw": "create jwt token online",
+          "vol": 50,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "decode jwt online",
+          "vol": 50,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "encrypt token",
+          "vol": 50,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "gem jwt",
+          "vol": 50,
+          "kd": 10,
+          "rank": 13
+        },
+        {
+          "kw": "generate jwt token online",
+          "vol": 50,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "generate token online",
+          "vol": 50,
+          "kd": 20,
+          "rank": 2
+        },
+        {
+          "kw": "get token online",
+          "vol": 50,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "hono jwt",
+          "vol": 50,
+          "kd": 4,
+          "rank": 32
+        },
+        {
+          "kw": "hono/jwt",
+          "vol": 50,
+          "kd": 1,
+          "rank": 32
+        },
+        {
+          "kw": "how to decode jwt token",
+          "vol": 50,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "j token",
+          "vol": 50,
+          "kd": 24,
+          "rank": 1
+        },
+        {
+          "kw": "job token",
+          "vol": 50,
+          "kd": 0,
+          "rank": 63
+        },
+        {
+          "kw": "jsonio",
+          "vol": 50,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken jwks",
+          "vol": 50,
+          "kd": 29,
+          "rank": 2
+        },
+        {
+          "kw": "jsonwebtoken rs256",
+          "vol": 50,
+          "kd": 19,
+          "rank": 3
+        },
+        {
+          "kw": "jwot",
+          "vol": 50,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "jwt api gateway",
+          "vol": 50,
+          "kd": 12,
+          "rank": 26
+        },
+        {
+          "kw": "jwt converter",
+          "vol": 50,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "jwt cookie",
+          "vol": 50,
+          "kd": 11,
+          "rank": 2
+        },
+        {
+          "kw": "jwt cookies",
+          "vol": 50,
+          "kd": 12,
+          "rank": 3
+        },
+        {
+          "kw": "jwt creator",
+          "vol": 50,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "jwt devise",
+          "vol": 50,
+          "kd": 0,
+          "rank": 16
+        },
+        {
+          "kw": "jwt expiration time",
+          "vol": 50,
+          "kd": 8,
+          "rank": 3
+        },
+        {
+          "kw": "jwt gem",
+          "vol": 50,
+          "kd": 9,
+          "rank": 13
+        },
+        {
+          "kw": "jwt github",
+          "vol": 50,
+          "kd": 69,
+          "rank": 4
+        },
+        {
+          "kw": "jwt jwk",
+          "vol": 50,
+          "kd": 14,
+          "rank": 12
+        },
+        {
+          "kw": "jwt jwks",
+          "vol": 50,
+          "kd": 8,
+          "rank": 19
+        },
+        {
+          "kw": "jwt rs256",
+          "vol": 50,
+          "kd": 16,
+          "rank": 3
+        },
+        {
+          "kw": "jwt sso",
+          "vol": 50,
+          "kd": 0,
+          "rank": 12
+        },
+        {
+          "kw": "jwt token view",
+          "vol": 50,
+          "kd": 28,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token viewer",
+          "vol": 50,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "oidc jwt",
+          "vol": 50,
+          "kd": 19,
+          "rank": 12
+        },
+        {
+          "kw": "python decode jwt",
+          "vol": 50,
+          "kd": 8,
+          "rank": 19
+        },
+        {
+          "kw": "rfc 9068",
+          "vol": 50,
+          "kd": 1,
+          "rank": 37
+        },
+        {
+          "kw": "rs256 jwt",
+          "vol": 50,
+          "kd": 16,
+          "rank": 8
+        },
+        {
+          "kw": "the web io",
+          "vol": 50,
+          "kd": 17,
+          "rank": 16
+        },
+        {
+          "kw": "token analyzer",
+          "vol": 50,
+          "kd": 78,
+          "rank": 2
+        },
+        {
+          "kw": "token issuer",
+          "vol": 50,
+          "kd": 5,
+          "rank": 13
+        },
+        {
+          "kw": "token validation",
+          "vol": 50,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "token validator",
+          "vol": 50,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "validate jwt",
+          "vol": 50,
+          "kd": 33,
+          "rank": 1
+        },
+        {
+          "kw": "what is jti in jwt",
+          "vol": 50,
+          "kd": 8,
+          "rank": 20
+        },
+        {
+          "kw": "what is token in java",
+          "vol": 50,
+          "kd": 0,
+          "rank": 55
+        },
+        {
+          "kw": "auth token decode",
+          "vol": 40,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "check token",
+          "vol": 40,
+          "kd": 53,
+          "rank": 2
+        },
+        {
+          "kw": "debug access token",
+          "vol": 40,
+          "kd": 20,
+          "rank": 2
+        },
+        {
+          "kw": "decode signature",
+          "vol": 40,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "generate jwt secret key",
+          "vol": 40,
+          "kd": 13,
+          "rank": 6
+        },
+        {
+          "kw": "how to decode jwt",
+          "vol": 40,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "javascript token",
+          "vol": 40,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "javascript tokens",
+          "vol": 40,
+          "kd": 22,
+          "rank": 4
+        },
+        {
+          "kw": "js tokens",
+          "vol": 40,
+          "kd": 29,
+          "rank": 3
+        },
+        {
+          "kw": "js-tokens",
+          "vol": 40,
+          "kd": 36,
+          "rank": 3
+        },
+        {
+          "kw": "json web",
+          "vol": 40,
+          "kd": 52,
+          "rank": 1
+        },
+        {
+          "kw": "jsonwebtoken api",
+          "vol": 40,
+          "kd": 32,
+          "rank": 1
+        },
+        {
+          "kw": "jti claim",
+          "vol": 40,
+          "kd": 16,
+          "rank": 14
+        },
+        {
+          "kw": "jwks generator",
+          "vol": 40,
+          "kd": 7,
+          "rank": 35
+        },
+        {
+          "kw": "jwt alternatives",
+          "vol": 40,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "jwt analyzer",
+          "vol": 40,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "jwt cracker",
+          "vol": 40,
+          "kd": 25,
+          "rank": 5
+        },
+        {
+          "kw": "jwt decode library",
+          "vol": 40,
+          "kd": 21,
+          "rank": 3
+        },
+        {
+          "kw": "jwt encode python",
+          "vol": 40,
+          "kd": 23,
+          "rank": 30
+        },
+        {
+          "kw": "jwt icon",
+          "vol": 40,
+          "kd": 6,
+          "rank": 3
+        },
+        {
+          "kw": "jwt microsoft",
+          "vol": 40,
+          "kd": 32,
+          "rank": 12
+        },
+        {
+          "kw": "jwt token reader",
+          "vol": 40,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "jwt web token",
+          "vol": 40,
+          "kd": 58,
+          "rank": 1
+        },
+        {
+          "kw": "jwt-cracker",
+          "vol": 40,
+          "kd": 26,
+          "rank": 5
+        },
+        {
+          "kw": "jwt-decode library",
+          "vol": 40,
+          "kd": 22,
+          "rank": 3
+        },
+        {
+          "kw": "jwt-decode token",
+          "vol": 40,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "jwtverify",
+          "vol": 40,
+          "kd": 24,
+          "rank": 2
+        },
+        {
+          "kw": "microsoft jwt",
+          "vol": 40,
+          "kd": 16,
+          "rank": 11
+        },
+        {
+          "kw": "pyjwt decode",
+          "vol": 40,
+          "kd": 20,
+          "rank": 29
+        },
+        {
+          "kw": "token dev",
+          "vol": 40,
+          "kd": 46,
+          "rank": 2
+        },
+        {
+          "kw": "token javascript",
+          "vol": 40,
+          "kd": 24,
+          "rank": 2
+        },
+        {
+          "kw": "token js",
+          "vol": 40,
+          "kd": 35,
+          "rank": 3
+        },
+        {
+          "kw": "token jwt",
+          "vol": 40,
+          "kd": 37,
+          "rank": 1
+        },
+        {
+          "kw": "token online",
+          "vol": 40,
+          "kd": 45,
+          "rank": 1
+        },
+        {
+          "kw": "token reader",
+          "vol": 40,
+          "kd": 49,
+          "rank": 1
+        },
+        {
+          "kw": "tokens javascript",
+          "vol": 40,
+          "kd": 23,
+          "rank": 7
+        },
+        {
+          "kw": "tokens jwt",
+          "vol": 40,
+          "kd": 58,
+          "rank": 1
+        },
+        {
+          "kw": "what does unauthorized nil json web token mean",
+          "vol": 40,
+          "kd": 0,
+          "rank": 18
+        },
+        {
+          "kw": "what is a token logger",
+          "vol": 40,
+          "kd": 0,
+          "rank": 62
+        },
+        {
+          "kw": "authentication token generator",
+          "vol": 30,
+          "kd": 17,
+          "rank": 2
+        },
+        {
+          "kw": "decode auth token",
+          "vol": 30,
+          "kd": 24,
+          "rank": 1
+        },
+        {
+          "kw": "decode oauth token",
+          "vol": 30,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "decrypt oauth token",
+          "vol": 30,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "edit jwt",
+          "vol": 30,
+          "kd": 20,
+          "rank": 3
+        },
+        {
+          "kw": "encoded jwt",
+          "vol": 30,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "how to validate jwt token",
+          "vol": 30,
+          "kd": 13,
+          "rank": 3
+        },
+        {
+          "kw": "hs256 jwt",
+          "vol": 30,
+          "kd": 36,
+          "rank": 3
+        },
+        {
+          "kw": "javascript decode jwt",
+          "vol": 30,
+          "kd": 11,
+          "rank": 2
+        },
+        {
+          "kw": "javascript web token",
+          "vol": 30,
+          "kd": 77,
+          "rank": 1
+        },
+        {
+          "kw": "jornaya token",
+          "vol": 30,
+          "kd": 0,
+          "rank": 40
+        },
+        {
+          "kw": "js decode jwt",
+          "vol": 30,
+          "kd": 12,
+          "rank": 2
+        },
+        {
+          "kw": "jsonwebtoken rails",
+          "vol": 30,
+          "kd": 17,
+          "rank": 7
+        },
+        {
+          "kw": "jti token",
+          "vol": 30,
+          "kd": 22,
+          "rank": 11
+        },
+        {
+          "kw": "jwt builder",
+          "vol": 30,
+          "kd": 27,
+          "rank": 2
+        },
+        {
+          "kw": "jwt builders",
+          "vol": 30,
+          "kd": 14,
+          "rank": 8
+        },
+        {
+          "kw": "jwt cheat sheet",
+          "vol": 30,
+          "kd": 11,
+          "rank": 33
+        },
+        {
+          "kw": "jwt connector",
+          "vol": 30,
+          "kd": 16,
+          "rank": 6
+        },
+        {
+          "kw": "jwt connectors",
+          "vol": 30,
+          "kd": 0,
+          "rank": 13
+        },
+        {
+          "kw": "jwt errors",
+          "vol": 30,
+          "kd": 0,
+          "rank": 23
+        },
+        {
+          "kw": "jwt hs256",
+          "vol": 30,
+          "kd": 34,
+          "rank": 5
+        },
+        {
+          "kw": "jwt is missing",
+          "vol": 30,
+          "kd": 0,
+          "rank": 24
+        },
+        {
+          "kw": "jwt malformed",
+          "vol": 30,
+          "kd": 0,
+          "rank": 15
+        },
+        {
+          "kw": "jwt op",
+          "vol": 30,
+          "kd": 52,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token claims",
+          "vol": 30,
+          "kd": 34,
+          "rank": 3
+        },
+        {
+          "kw": "jwt token editor",
+          "vol": 30,
+          "kd": 43,
+          "rank": 2
+        },
+        {
+          "kw": "jwt token encode",
+          "vol": 30,
+          "kd": 30,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token encoder",
+          "vol": 30,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "jwt token io",
+          "vol": 30,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "login json",
+          "vol": 30,
+          "kd": 16,
+          "rank": 8
+        },
+        {
+          "kw": "net jwt",
+          "vol": 30,
+          "kd": 2,
+          "rank": 12
+        },
+        {
+          "kw": "oauth 2.0 json web token",
+          "vol": 30,
+          "kd": 37,
+          "rank": 16
+        },
+        {
+          "kw": "oauth 2.0 jwt",
+          "vol": 30,
+          "kd": 29,
+          "rank": 18
+        },
+        {
+          "kw": "online jwt generator",
+          "vol": 30,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "online token",
+          "vol": 30,
+          "kd": 27,
+          "rank": 1
+        },
+        {
+          "kw": "parse jwt token online",
+          "vol": 30,
+          "kd": 24,
+          "rank": 1
+        },
+        {
+          "kw": "token decode online",
+          "vol": 30,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "token decoder online",
+          "vol": 30,
+          "kd": 28,
+          "rank": 1
+        },
+        {
+          "kw": "token provider",
+          "vol": 30,
+          "kd": 6,
+          "rank": 21
+        },
+        {
+          "kw": "token response",
+          "vol": 30,
+          "kd": 17,
+          "rank": 32
+        },
+        {
+          "kw": "token string",
+          "vol": 30,
+          "kd": 10,
+          "rank": 14
+        },
+        {
+          "kw": "tokens json",
+          "vol": 30,
+          "kd": 51,
+          "rank": 1
+        },
+        {
+          "kw": "verify jwt",
+          "vol": 30,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "hs256 decode",
+          "vol": 20,
+          "kd": 19,
+          "rank": 2
+        },
+        {
+          "kw": "java json web token example",
+          "vol": 20,
+          "kd": 31,
+          "rank": 1
+        },
+        {
+          "kw": "java jwt token example",
+          "vol": 20,
+          "kd": 24,
+          "rank": 10
+        },
+        {
+          "kw": "java web token example",
+          "vol": 20,
+          "kd": 34,
+          "rank": 1
+        },
+        {
+          "kw": "json web token example java",
+          "vol": 20,
+          "kd": 54,
+          "rank": 1
+        },
+        {
+          "kw": "jwt :: decode javascript",
+          "vol": 20,
+          "kd": 14,
+          "rank": 1
+        },
+        {
+          "kw": "jwt decode javascript",
+          "vol": 20,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "jwt decode js",
+          "vol": 20,
+          "kd": 17,
+          "rank": 2
+        },
+        {
+          "kw": "jwt encode online",
+          "vol": 20,
+          "kd": 39,
+          "rank": 1
+        },
+        {
+          "kw": "jwt google",
+          "vol": 20,
+          "kd": 11,
+          "rank": 8
+        },
+        {
+          "kw": "jwt json web token java example",
+          "vol": 20,
+          "kd": 54,
+          "rank": 7
+        },
+        {
+          "kw": "jwt owasp",
+          "vol": 20,
+          "kd": 28,
+          "rank": 28
+        },
+        {
+          "kw": "jwt token expiration time",
+          "vol": 20,
+          "kd": 10,
+          "rank": 4
+        },
+        {
+          "kw": "jwt token online",
+          "vol": 20,
+          "kd": 53,
+          "rank": 1
+        },
+        {
+          "kw": "jwt worldwide",
+          "vol": 20,
+          "kd": 23,
+          "rank": 29
+        },
+        {
+          "kw": "jwt-decode javascript",
+          "vol": 20,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "jwt-decode js",
+          "vol": 20,
+          "kd": 17,
+          "rank": 2
+        },
+        {
+          "kw": "jwt.decode javascript",
+          "vol": 20,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "oauth token validation",
+          "vol": 20,
+          "kd": 44,
+          "rank": 9
+        },
+        {
+          "kw": "owasp jwt",
+          "vol": 20,
+          "kd": 28,
+          "rank": 31
+        },
+        {
+          "kw": "token info",
+          "vol": 20,
+          "kd": 36,
+          "rank": 1
+        },
+        {
+          "kw": "token information",
+          "vol": 20,
+          "kd": 58,
+          "rank": 1
+        },
+        {
+          "kw": "unrecognized token",
+          "vol": 20,
+          "kd": 0,
+          "rank": 39
+        },
+        {
+          "kw": "jwt token stream elements",
+          "vol": 10,
+          "kd": 0,
+          "rank": 17
+        },
+        {
+          "kw": "token verify",
+          "vol": 10,
+          "kd": 58,
+          "rank": 1
+        }
+      ]
+    },
+    "mockoon.com/tools/csv-parser-json-converter/": {
+      "total_count": 13,
+      "keywords": [
+        {
+          "kw": "csv parser",
+          "vol": 590,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "csv-parse",
+          "vol": 590,
+          "kd": 21,
+          "rank": 8
+        },
+        {
+          "kw": "csv-parse/sync",
+          "vol": 40,
+          "kd": 13,
+          "rank": 34
+        },
+        {
+          "kw": "online converter csv to json",
+          "vol": 40,
+          "kd": 10,
+          "rank": 61
+        },
+        {
+          "kw": "parser online",
+          "vol": 40,
+          "kd": 27,
+          "rank": 19
+        },
+        {
+          "kw": "csv online parser",
+          "vol": 30,
+          "kd": 5,
+          "rank": 2
+        },
+        {
+          "kw": "csv parse online",
+          "vol": 30,
+          "kd": 11,
+          "rank": 1
+        },
+        {
+          "kw": "csv parser online",
+          "vol": 30,
+          "kd": 1,
+          "rank": 2
+        },
+        {
+          "kw": "online csv parser",
+          "vol": 30,
+          "kd": 9,
+          "rank": 1
+        },
+        {
+          "kw": "parse :: csv online",
+          "vol": 30,
+          "kd": 2,
+          "rank": 1
+        },
+        {
+          "kw": "parse csv file",
+          "vol": 30,
+          "kd": 35,
+          "rank": 7
+        },
+        {
+          "kw": "parsing csv file",
+          "vol": 30,
+          "kd": 18,
+          "rank": 27
+        },
+        {
+          "kw": "read csv file online",
+          "vol": 30,
+          "kd": 0,
+          "rank": 31
+        }
+      ]
+    },
+    "onlinetools.com/tsv/convert-tsv-to-json": {
+      "total_count": 1,
+      "keywords": [
+        {
+          "kw": "tsv to json",
+          "vol": 50,
+          "kd": 0,
+          "rank": 1
+        }
+      ]
+    },
+    "scrapfly.io/blog/posts/jsonl-vs-json": {
+      "total_count": 31,
+      "keywords": [
+        {
+          "kw": "jsonls",
+          "vol": 3600,
+          "kd": 6,
+          "rank": 37
+        },
+        {
+          "kw": "json vs jsonl",
+          "vol": 590,
+          "kd": 1,
+          "rank": 1
+        },
+        {
+          "kw": "jsonl vs json",
+          "vol": 590,
+          "kd": 0,
+          "rank": 1
+        },
+        {
+          "kw": "json only",
+          "vol": 320,
+          "kd": 75,
+          "rank": 27
+        },
+        {
+          "kw": "json line",
+          "vol": 260,
+          "kd": 30,
+          "rank": 4
+        },
+        {
+          "kw": "json lines",
+          "vol": 260,
+          "kd": 7,
+          "rank": 3
+        },
+        {
+          "kw": "ndjson vs json",
+          "vol": 210,
+          "kd": 2,
+          "rank": 35
+        },
+        {
+          "kw": "ndjson vs jsonl",
+          "vol": 140,
+          "kd": 0,
+          "rank": 24
+        },
+        {
+          "kw": "html vs json",
+          "vol": 110,
+          "kd": 18,
+          "rank": 27
+        },
+        {
+          "kw": "json to jsonl",
+          "vol": 110,
+          "kd": 3,
+          "rank": 8
+        },
+        {
+          "kw": "json l",
+          "vol": 90,
+          "kd": 24,
+          "rank": 4
+        },
+        {
+          "kw": "json vs",
+          "vol": 90,
+          "kd": 13,
+          "rank": 6
+        },
+        {
+          "kw": "jsonl to json",
+          "vol": 90,
+          "kd": 0,
+          "rank": 4
+        },
+        {
+          "kw": "jsonp vs json",
+          "vol": 90,
+          "kd": 2,
+          "rank": 63
+        },
+        {
+          "kw": "difference between json and jsonl",
+          "vol": 70,
+          "kd": 0,
+          "rank": 1
+        },
+        {
+          "kw": "json line format",
+          "vol": 70,
+          "kd": 33,
+          "rank": 11
+        },
+        {
+          "kw": "json lines format",
+          "vol": 70,
+          "kd": 13,
+          "rank": 8
+        },
+        {
+          "kw": "json vs json5",
+          "vol": 70,
+          "kd": 3,
+          "rank": 50
+        },
+        {
+          "kw": "jsonc vs json",
+          "vol": 70,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "convert json to jsonl",
+          "vol": 50,
+          "kd": 0,
+          "rank": 18
+        },
+        {
+          "kw": "json5 vs json",
+          "vol": 50,
+          "kd": 3,
+          "rank": 47
+        },
+        {
+          "kw": "jsonl vs ndjson",
+          "vol": 50,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "orjson vs json",
+          "vol": 50,
+          "kd": 13,
+          "rank": 44
+        },
+        {
+          "kw": "pickle vs json",
+          "vol": 50,
+          "kd": 14,
+          "rank": 43
+        },
+        {
+          "kw": "convert jsonl to json",
+          "vol": 40,
+          "kd": 1,
+          "rank": 12
+        },
+        {
+          "kw": "json advantages",
+          "vol": 40,
+          "kd": 10,
+          "rank": 24
+        },
+        {
+          "kw": "json or json",
+          "vol": 40,
+          "kd": 55,
+          "rank": 16
+        },
+        {
+          "kw": "json to jsonl converter",
+          "vol": 40,
+          "kd": 0,
+          "rank": 22
+        },
+        {
+          "kw": "json vs json",
+          "vol": 30,
+          "kd": 38,
+          "rank": 5
+        },
+        {
+          "kw": "jsonl extension",
+          "vol": 30,
+          "kd": 4,
+          "rank": 7
+        },
+        {
+          "kw": "python jsonlines",
+          "vol": 30,
+          "kd": 25,
+          "rank": 22
+        }
+      ]
+    },
+    "sslshopper.com/certificate-decoder.html": {
+      "total_count": 390,
+      "keywords": [
+        {
+          "kw": "certificate trust list",
+          "vol": 135000,
+          "kd": 8,
+          "rank": 77
+        },
+        {
+          "kw": "crt viewer",
+          "vol": 40500,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "cert decoder",
+          "vol": 2900,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "cert format",
+          "vol": 2900,
+          "kd": 11,
+          "rank": 30
+        },
+        {
+          "kw": "cert formats",
+          "vol": 2900,
+          "kd": 15,
+          "rank": 67
+        },
+        {
+          "kw": "certificate decoder",
+          "vol": 2900,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "certificate format",
+          "vol": 2900,
+          "kd": 16,
+          "rank": 34
+        },
+        {
+          "kw": "free public certificates",
+          "vol": 2400,
+          "kd": 81,
+          "rank": 65
+        },
+        {
+          "kw": "decoder online",
+          "vol": 1600,
+          "kd": 48,
+          "rank": 39
+        },
+        {
+          "kw": "login certificate",
+          "vol": 1600,
+          "kd": 40,
+          "rank": 65
+        },
+        {
+          "kw": "what is p e m",
+          "vol": 1600,
+          "kd": 28,
+          "rank": 93
+        },
+        {
+          "kw": "decode ssl",
+          "vol": 1300,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "pem file",
+          "vol": 1300,
+          "kd": 30,
+          "rank": 33
+        },
+        {
+          "kw": "pem files",
+          "vol": 1300,
+          "kd": 17,
+          "rank": 50
+        },
+        {
+          "kw": "ssl decode",
+          "vol": 1300,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "ssl decoder",
+          "vol": 1300,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "crt sh",
+          "vol": 1000,
+          "kd": 13,
+          "rank": 62
+        },
+        {
+          "kw": "openssl cert check",
+          "vol": 1000,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "openssl certificate check",
+          "vol": 1000,
+          "kd": 43,
+          "rank": 1
+        },
+        {
+          "kw": "openssl display certificate",
+          "vol": 1000,
+          "kd": 18,
+          "rank": 8
+        },
+        {
+          "kw": "openssl dump certificate",
+          "vol": 1000,
+          "kd": 16,
+          "rank": 6
+        },
+        {
+          "kw": "openssl inspect certificate",
+          "vol": 1000,
+          "kd": 18,
+          "rank": 3
+        },
+        {
+          "kw": "openssl read cert",
+          "vol": 1000,
+          "kd": 14,
+          "rank": 3
+        },
+        {
+          "kw": "openssl read certificate",
+          "vol": 1000,
+          "kd": 14,
+          "rank": 3
+        },
+        {
+          "kw": "openssl to view certificate",
+          "vol": 1000,
+          "kd": 16,
+          "rank": 3
+        },
+        {
+          "kw": "openssl view cert",
+          "vol": 1000,
+          "kd": 16,
+          "rank": 3
+        },
+        {
+          "kw": "openssl view certificate",
+          "vol": 1000,
+          "kd": 14,
+          "rank": 3
+        },
+        {
+          "kw": "read certificate openssl",
+          "vol": 1000,
+          "kd": 21,
+          "rank": 2
+        },
+        {
+          "kw": "read ssl certificate openssl",
+          "vol": 1000,
+          "kd": 18,
+          "rank": 2
+        },
+        {
+          "kw": "validate certificate openssl",
+          "vol": 1000,
+          "kd": 29,
+          "rank": 2
+        },
+        {
+          "kw": "validate ssl certificate openssl",
+          "vol": 1000,
+          "kd": 28,
+          "rank": 2
+        },
+        {
+          "kw": "view certificate openssl",
+          "vol": 1000,
+          "kd": 14,
+          "rank": 3
+        },
+        {
+          "kw": "view ssl certificate openssl",
+          "vol": 1000,
+          "kd": 18,
+          "rank": 4
+        },
+        {
+          "kw": "cer decoder",
+          "vol": 880,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "certificate decoder ssl",
+          "vol": 880,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "decode ssl cert",
+          "vol": 880,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "decode ssl certificate",
+          "vol": 880,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "decrypt ssl certificate",
+          "vol": 880,
+          "kd": 14,
+          "rank": 1
+        },
+        {
+          "kw": "ssl cert decoder",
+          "vol": 880,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificate decoder",
+          "vol": 880,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "cert verify",
+          "vol": 720,
+          "kd": 100,
+          "rank": 1
+        },
+        {
+          "kw": "certificate web",
+          "vol": 720,
+          "kd": 96,
+          "rank": 66
+        },
+        {
+          "kw": "decoder link",
+          "vol": 720,
+          "kd": 42,
+          "rank": 22
+        },
+        {
+          "kw": "find my certificates",
+          "vol": 720,
+          "kd": 15,
+          "rank": 77
+        },
+        {
+          "kw": "decoder website",
+          "vol": 590,
+          "kd": 55,
+          "rank": 53
+        },
+        {
+          "kw": "decoding sites",
+          "vol": 590,
+          "kd": 49,
+          "rank": 46
+        },
+        {
+          "kw": "find my cert",
+          "vol": 590,
+          "kd": 19,
+          "rank": 68
+        },
+        {
+          "kw": "openssl validate certificate",
+          "vol": 590,
+          "kd": 22,
+          "rank": 3
+        },
+        {
+          "kw": "precertificate",
+          "vol": 480,
+          "kd": 2,
+          "rank": 50
+        },
+        {
+          "kw": "cert pem",
+          "vol": 390,
+          "kd": 23,
+          "rank": 22
+        },
+        {
+          "kw": "cert viewer",
+          "vol": 390,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "certificates pem",
+          "vol": 390,
+          "kd": 25,
+          "rank": 22
+        },
+        {
+          "kw": "decode cert",
+          "vol": 390,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "decode certificate",
+          "vol": 390,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "decode pem",
+          "vol": 390,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "decoding certificate",
+          "vol": 390,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "digital certificate viewer",
+          "vol": 390,
+          "kd": 48,
+          "rank": 1
+        },
+        {
+          "kw": "pem cert",
+          "vol": 390,
+          "kd": 23,
+          "rank": 26
+        },
+        {
+          "kw": "pem certificate",
+          "vol": 390,
+          "kd": 21,
+          "rank": 11
+        },
+        {
+          "kw": "pem decode",
+          "vol": 390,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "pem decoder",
+          "vol": 390,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "certificate authority tool",
+          "vol": 320,
+          "kd": 31,
+          "rank": 52
+        },
+        {
+          "kw": "decrypt ssl",
+          "vol": 320,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "ssl decryption",
+          "vol": 320,
+          "kd": 0,
+          "rank": 32
+        },
+        {
+          "kw": "ssl shopper cert decoder",
+          "vol": 320,
+          "kd": 56,
+          "rank": 1
+        },
+        {
+          "kw": "ssl shopper certificate decoder",
+          "vol": 320,
+          "kd": 54,
+          "rank": 1
+        },
+        {
+          "kw": "sslshopper certificate decoder",
+          "vol": 320,
+          "kd": 40,
+          "rank": 1
+        },
+        {
+          "kw": "cer file",
+          "vol": 260,
+          "kd": 0,
+          "rank": 41
+        },
+        {
+          "kw": "cert file",
+          "vol": 260,
+          "kd": 31,
+          "rank": 23
+        },
+        {
+          "kw": "cert files",
+          "vol": 260,
+          "kd": 21,
+          "rank": 34
+        },
+        {
+          "kw": "certificate file",
+          "vol": 260,
+          "kd": 9,
+          "rank": 19
+        },
+        {
+          "kw": "certification file",
+          "vol": 260,
+          "kd": 0,
+          "rank": 16
+        },
+        {
+          "kw": "decoder tool",
+          "vol": 260,
+          "kd": 45,
+          "rank": 39
+        },
+        {
+          "kw": "get-certificate",
+          "vol": 260,
+          "kd": 16,
+          "rank": 28
+        },
+        {
+          "kw": "certificate format pem",
+          "vol": 210,
+          "kd": 25,
+          "rank": 33
+        },
+        {
+          "kw": "certificate in pem format",
+          "vol": 210,
+          "kd": 25,
+          "rank": 40
+        },
+        {
+          "kw": "certificate pem format",
+          "vol": 210,
+          "kd": 24,
+          "rank": 36
+        },
+        {
+          "kw": "decode x509",
+          "vol": 210,
+          "kd": 6,
+          "rank": 1
+        },
+        {
+          "kw": "decode x509 certificate",
+          "vol": 210,
+          "kd": 6,
+          "rank": 1
+        },
+        {
+          "kw": "decrypt x509 certificate",
+          "vol": 210,
+          "kd": 18,
+          "rank": 1
+        },
+        {
+          "kw": "download certificate",
+          "vol": 210,
+          "kd": 41,
+          "rank": 41
+        },
+        {
+          "kw": "pem certificate format",
+          "vol": 210,
+          "kd": 24,
+          "rank": 34
+        },
+        {
+          "kw": "pem format certificate",
+          "vol": 210,
+          "kd": 25,
+          "rank": 36
+        },
+        {
+          "kw": "ssl certificate in pem format",
+          "vol": 210,
+          "kd": 18,
+          "rank": 27
+        },
+        {
+          "kw": "what is the certificate number",
+          "vol": 210,
+          "kd": 0,
+          "rank": 82
+        },
+        {
+          "kw": "x 509 decoder",
+          "vol": 210,
+          "kd": 8,
+          "rank": 1
+        },
+        {
+          "kw": "x.509 certificate decoder",
+          "vol": 210,
+          "kd": 10,
+          "rank": 1
+        },
+        {
+          "kw": "x509 cert decoder",
+          "vol": 210,
+          "kd": 10,
+          "rank": 1
+        },
+        {
+          "kw": "x509 certificate decoder",
+          "vol": 210,
+          "kd": 9,
+          "rank": 1
+        },
+        {
+          "kw": "x509 decode",
+          "vol": 210,
+          "kd": 6,
+          "rank": 1
+        },
+        {
+          "kw": "x509 decoder",
+          "vol": 210,
+          "kd": 10,
+          "rank": 1
+        },
+        {
+          "kw": "cer cert",
+          "vol": 170,
+          "kd": 0,
+          "rank": 38
+        },
+        {
+          "kw": "cert validate",
+          "vol": 170,
+          "kd": 84,
+          "rank": 1
+        },
+        {
+          "kw": "cert validation",
+          "vol": 170,
+          "kd": 65,
+          "rank": 1
+        },
+        {
+          "kw": "certificate download",
+          "vol": 170,
+          "kd": 20,
+          "rank": 41
+        },
+        {
+          "kw": "decode certificate openssl",
+          "vol": 170,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "decode ssl certificate openssl",
+          "vol": 170,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "decrypt site",
+          "vol": 170,
+          "kd": 46,
+          "rank": 48
+        },
+        {
+          "kw": "decrypt website",
+          "vol": 170,
+          "kd": 45,
+          "rank": 48
+        },
+        {
+          "kw": "decryption site",
+          "vol": 170,
+          "kd": 46,
+          "rank": 51
+        },
+        {
+          "kw": "decryption website",
+          "vol": 170,
+          "kd": 45,
+          "rank": 51
+        },
+        {
+          "kw": "leaf certificate",
+          "vol": 170,
+          "kd": 0,
+          "rank": 64
+        },
+        {
+          "kw": "openssl cert info",
+          "vol": 170,
+          "kd": 20,
+          "rank": 3
+        },
+        {
+          "kw": "openssl certificate decoder",
+          "vol": 170,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "openssl certificate details",
+          "vol": 170,
+          "kd": 17,
+          "rank": 3
+        },
+        {
+          "kw": "openssl certificate info",
+          "vol": 170,
+          "kd": 17,
+          "rank": 3
+        },
+        {
+          "kw": "openssl certificate information",
+          "vol": 170,
+          "kd": 20,
+          "rank": 3
+        },
+        {
+          "kw": "openssl decode certificate",
+          "vol": 170,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "openssl decrypt certificate",
+          "vol": 170,
+          "kd": 23,
+          "rank": 2
+        },
+        {
+          "kw": "openssl get certificate from server",
+          "vol": 170,
+          "kd": 5,
+          "rank": 64
+        },
+        {
+          "kw": "openssl show cert info",
+          "vol": 170,
+          "kd": 19,
+          "rank": 8
+        },
+        {
+          "kw": "openssl show certificate",
+          "vol": 170,
+          "kd": 19,
+          "rank": 7
+        },
+        {
+          "kw": "openssl show certificate info",
+          "vol": 170,
+          "kd": 17,
+          "rank": 4
+        },
+        {
+          "kw": "openssl show certificates",
+          "vol": 170,
+          "kd": 17,
+          "rank": 8
+        },
+        {
+          "kw": "openssl show crt",
+          "vol": 170,
+          "kd": 18,
+          "rank": 3
+        },
+        {
+          "kw": "search certificate",
+          "vol": 170,
+          "kd": 38,
+          "rank": 69
+        },
+        {
+          "kw": "ssl certificate sample",
+          "vol": 170,
+          "kd": 12,
+          "rank": 60
+        },
+        {
+          "kw": "validate certificate",
+          "vol": 170,
+          "kd": 52,
+          "rank": 1
+        },
+        {
+          "kw": "view certificate",
+          "vol": 170,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "view certificates",
+          "vol": 170,
+          "kd": 33,
+          "rank": 2
+        },
+        {
+          "kw": "cacert pem",
+          "vol": 140,
+          "kd": 17,
+          "rank": 23
+        },
+        {
+          "kw": "cert decoder online",
+          "vol": 140,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "certificate decode online",
+          "vol": 140,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "certificate decoder online",
+          "vol": 140,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "certificate online viewer",
+          "vol": 140,
+          "kd": 46,
+          "rank": 1
+        },
+        {
+          "kw": "chrome show certificate",
+          "vol": 140,
+          "kd": 24,
+          "rank": 71
+        },
+        {
+          "kw": "clear certificate",
+          "vol": 140,
+          "kd": 0,
+          "rank": 21
+        },
+        {
+          "kw": "decode certificate online",
+          "vol": 140,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "decode ssl certificate online",
+          "vol": 140,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "how do i download a certificate from a website",
+          "vol": 140,
+          "kd": 6,
+          "rank": 74
+        },
+        {
+          "kw": "how to download a certificate from a website",
+          "vol": 140,
+          "kd": 5,
+          "rank": 78
+        },
+        {
+          "kw": "how to download ssl certificate from website",
+          "vol": 140,
+          "kd": 12,
+          "rank": 76
+        },
+        {
+          "kw": "how to download website certificate",
+          "vol": 140,
+          "kd": 1,
+          "rank": 72
+        },
+        {
+          "kw": "online cert decoder",
+          "vol": 140,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "online certificate decode",
+          "vol": 140,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "online certificate decoder",
+          "vol": 140,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "online certificate viewer",
+          "vol": 140,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "openssl cert",
+          "vol": 140,
+          "kd": 16,
+          "rank": 31
+        },
+        {
+          "kw": "pem crt",
+          "vol": 140,
+          "kd": 3,
+          "rank": 15
+        },
+        {
+          "kw": "safari view certificate",
+          "vol": 140,
+          "kd": 0,
+          "rank": 38
+        },
+        {
+          "kw": "view certificate chrome",
+          "vol": 140,
+          "kd": 0,
+          "rank": 33
+        },
+        {
+          "kw": "view certificate in chrome",
+          "vol": 140,
+          "kd": 5,
+          "rank": 40
+        },
+        {
+          "kw": "view certificate in safari",
+          "vol": 140,
+          "kd": 0,
+          "rank": 36
+        },
+        {
+          "kw": "view certificates chrome",
+          "vol": 140,
+          "kd": 1,
+          "rank": 47
+        },
+        {
+          "kw": "view certificates in chrome",
+          "vol": 140,
+          "kd": 5,
+          "rank": 60
+        },
+        {
+          "kw": "view certificates in safari",
+          "vol": 140,
+          "kd": 0,
+          "rank": 39
+        },
+        {
+          "kw": "view digital certificate in chrome",
+          "vol": 140,
+          "kd": 1,
+          "rank": 44
+        },
+        {
+          "kw": "view ssl certificate safari",
+          "vol": 140,
+          "kd": 0,
+          "rank": 35
+        },
+        {
+          "kw": "cer crt",
+          "vol": 110,
+          "kd": 5,
+          "rank": 39
+        },
+        {
+          "kw": "cer file format",
+          "vol": 110,
+          "kd": 0,
+          "rank": 44
+        },
+        {
+          "kw": "cert type",
+          "vol": 110,
+          "kd": 30,
+          "rank": 80
+        },
+        {
+          "kw": "cert validator",
+          "vol": 110,
+          "kd": 76,
+          "rank": 1
+        },
+        {
+          "kw": "certificate crt",
+          "vol": 110,
+          "kd": 2,
+          "rank": 30
+        },
+        {
+          "kw": "certificate file type",
+          "vol": 110,
+          "kd": 0,
+          "rank": 44
+        },
+        {
+          "kw": "certificate file types",
+          "vol": 110,
+          "kd": 0,
+          "rank": 68
+        },
+        {
+          "kw": "certificate id",
+          "vol": 110,
+          "kd": 3,
+          "rank": 56
+        },
+        {
+          "kw": "certificate identifier",
+          "vol": 110,
+          "kd": 28,
+          "rank": 3
+        },
+        {
+          "kw": "certificate viewer windows",
+          "vol": 110,
+          "kd": 19,
+          "rank": 8
+        },
+        {
+          "kw": "crt certificate",
+          "vol": 110,
+          "kd": 0,
+          "rank": 17
+        },
+        {
+          "kw": "der format",
+          "vol": 110,
+          "kd": 35,
+          "rank": 60
+        },
+        {
+          "kw": "download certificate from website",
+          "vol": 110,
+          "kd": 1,
+          "rank": 53
+        },
+        {
+          "kw": "download ssl certificate from website",
+          "vol": 110,
+          "kd": 5,
+          "rank": 75
+        },
+        {
+          "kw": "format of ssl certificate",
+          "vol": 110,
+          "kd": 0,
+          "rank": 31
+        },
+        {
+          "kw": "get certificate openssl",
+          "vol": 110,
+          "kd": 2,
+          "rank": 27
+        },
+        {
+          "kw": "openssl extract certificate",
+          "vol": 110,
+          "kd": 15,
+          "rank": 29
+        },
+        {
+          "kw": "openssl get certificate",
+          "vol": 110,
+          "kd": 14,
+          "rank": 3
+        },
+        {
+          "kw": "openssl get certificate info",
+          "vol": 110,
+          "kd": 18,
+          "rank": 6
+        },
+        {
+          "kw": "openssl online",
+          "vol": 110,
+          "kd": 19,
+          "rank": 16
+        },
+        {
+          "kw": "openssl show certificate details",
+          "vol": 110,
+          "kd": 18,
+          "rank": 6
+        },
+        {
+          "kw": "openssl to get certificate",
+          "vol": 110,
+          "kd": 4,
+          "rank": 29
+        },
+        {
+          "kw": "ssl certificate file types",
+          "vol": 110,
+          "kd": 0,
+          "rank": 58
+        },
+        {
+          "kw": "the certificate",
+          "vol": 110,
+          "kd": 29,
+          "rank": 17
+        },
+        {
+          "kw": "view certificate windows",
+          "vol": 110,
+          "kd": 7,
+          "rank": 20
+        },
+        {
+          "kw": "view certificates windows",
+          "vol": 110,
+          "kd": 1,
+          "rank": 20
+        },
+        {
+          "kw": "view windows certificates",
+          "vol": 110,
+          "kd": 2,
+          "rank": 25
+        },
+        {
+          "kw": "what is a crt file",
+          "vol": 110,
+          "kd": 9,
+          "rank": 38
+        },
+        {
+          "kw": "what is crt file",
+          "vol": 110,
+          "kd": 1,
+          "rank": 35
+        },
+        {
+          "kw": "windows certificate viewer",
+          "vol": 110,
+          "kd": 20,
+          "rank": 7
+        },
+        {
+          "kw": "cert info",
+          "vol": 90,
+          "kd": 68,
+          "rank": 1
+        },
+        {
+          "kw": "cert information",
+          "vol": 90,
+          "kd": 95,
+          "rank": 1
+        },
+        {
+          "kw": "cert reader",
+          "vol": 90,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "certificate analysis example",
+          "vol": 90,
+          "kd": 0,
+          "rank": 13
+        },
+        {
+          "kw": "certificate check online",
+          "vol": 90,
+          "kd": 100,
+          "rank": 1
+        },
+        {
+          "kw": "certificate info",
+          "vol": 90,
+          "kd": 87,
+          "rank": 1
+        },
+        {
+          "kw": "certificate information",
+          "vol": 90,
+          "kd": 95,
+          "rank": 1
+        },
+        {
+          "kw": "cipher checker",
+          "vol": 90,
+          "kd": 48,
+          "rank": 46
+        },
+        {
+          "kw": "crt decoder",
+          "vol": 90,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "curl show certificate",
+          "vol": 90,
+          "kd": 7,
+          "rank": 56
+        },
+        {
+          "kw": "decode certificate pem",
+          "vol": 90,
+          "kd": 15,
+          "rank": 1
+        },
+        {
+          "kw": "decode pem certificate",
+          "vol": 90,
+          "kd": 14,
+          "rank": 1
+        },
+        {
+          "kw": "how to open pem file",
+          "vol": 90,
+          "kd": 13,
+          "rank": 3
+        },
+        {
+          "kw": "how to open pem files",
+          "vol": 90,
+          "kd": 5,
+          "rank": 4
+        },
+        {
+          "kw": "how to view a certificate in chrome",
+          "vol": 90,
+          "kd": 3,
+          "rank": 60
+        },
+        {
+          "kw": "how to view certificate in chrome",
+          "vol": 90,
+          "kd": 3,
+          "rank": 76
+        },
+        {
+          "kw": "issued certificate",
+          "vol": 90,
+          "kd": 30,
+          "rank": 65
+        },
+        {
+          "kw": "online check certificate",
+          "vol": 90,
+          "kd": 91,
+          "rank": 1
+        },
+        {
+          "kw": "online saml decoder",
+          "vol": 90,
+          "kd": 11,
+          "rank": 41
+        },
+        {
+          "kw": "opencert",
+          "vol": 90,
+          "kd": 4,
+          "rank": 47
+        },
+        {
+          "kw": "opencerts",
+          "vol": 90,
+          "kd": 2,
+          "rank": 52
+        },
+        {
+          "kw": "openssl print certificate",
+          "vol": 90,
+          "kd": 16,
+          "rank": 5
+        },
+        {
+          "kw": "openssl view certificate details",
+          "vol": 90,
+          "kd": 20,
+          "rank": 3
+        },
+        {
+          "kw": "pem certificate decoder",
+          "vol": 90,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "pem encoded",
+          "vol": 90,
+          "kd": 40,
+          "rank": 32
+        },
+        {
+          "kw": "print certificate openssl",
+          "vol": 90,
+          "kd": 13,
+          "rank": 8
+        },
+        {
+          "kw": "public ca certificate",
+          "vol": 90,
+          "kd": 33,
+          "rank": 50
+        },
+        {
+          "kw": "saml decoder online",
+          "vol": 90,
+          "kd": 11,
+          "rank": 52
+        },
+        {
+          "kw": "saml online decoder",
+          "vol": 90,
+          "kd": 11,
+          "rank": 43
+        },
+        {
+          "kw": "save certificate",
+          "vol": 90,
+          "kd": 19,
+          "rank": 68
+        },
+        {
+          "kw": "validate certificate online",
+          "vol": 90,
+          "kd": 70,
+          "rank": 1
+        },
+        {
+          "kw": "509 certificates",
+          "vol": 70,
+          "kd": 18,
+          "rank": 93
+        },
+        {
+          "kw": "cert decode",
+          "vol": 70,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "cert file format",
+          "vol": 70,
+          "kd": 10,
+          "rank": 40
+        },
+        {
+          "kw": "cert serial number",
+          "vol": 70,
+          "kd": 0,
+          "rank": 15
+        },
+        {
+          "kw": "decode public key",
+          "vol": 70,
+          "kd": 13,
+          "rank": 2
+        },
+        {
+          "kw": "decrypt certificate",
+          "vol": 70,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "decryption certificate",
+          "vol": 70,
+          "kd": 5,
+          "rank": 2
+        },
+        {
+          "kw": "digital certificate serial number",
+          "vol": 70,
+          "kd": 3,
+          "rank": 20
+        },
+        {
+          "kw": "how to open cert manager",
+          "vol": 70,
+          "kd": 10,
+          "rank": 82
+        },
+        {
+          "kw": "how to read a pem file",
+          "vol": 70,
+          "kd": 13,
+          "rank": 2
+        },
+        {
+          "kw": "how to read pem file",
+          "vol": 70,
+          "kd": 13,
+          "rank": 2
+        },
+        {
+          "kw": "open certificate",
+          "vol": 70,
+          "kd": 48,
+          "rank": 4
+        },
+        {
+          "kw": "open certificate manager",
+          "vol": 70,
+          "kd": 18,
+          "rank": 43
+        },
+        {
+          "kw": "open certificates",
+          "vol": 70,
+          "kd": 48,
+          "rank": 5
+        },
+        {
+          "kw": "openssl decoder",
+          "vol": 70,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "public key decoder",
+          "vol": 70,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "recover certificates",
+          "vol": 70,
+          "kd": 0,
+          "rank": 65
+        },
+        {
+          "kw": "root certificates download",
+          "vol": 70,
+          "kd": 45,
+          "rank": 79
+        },
+        {
+          "kw": "select certificate",
+          "vol": 70,
+          "kd": 0,
+          "rank": 16
+        },
+        {
+          "kw": "serial number of certificate",
+          "vol": 70,
+          "kd": 0,
+          "rank": 56
+        },
+        {
+          "kw": "ssl certificates download",
+          "vol": 70,
+          "kd": 67,
+          "rank": 38
+        },
+        {
+          "kw": "ssl shopper decoder",
+          "vol": 70,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "what is a certificate file",
+          "vol": 70,
+          "kd": 14,
+          "rank": 29
+        },
+        {
+          "kw": "authority key identifier",
+          "vol": 50,
+          "kd": 2,
+          "rank": 67
+        },
+        {
+          "kw": "cert inspector",
+          "vol": 50,
+          "kd": 69,
+          "rank": 1
+        },
+        {
+          "kw": "certificate der format",
+          "vol": 50,
+          "kd": 9,
+          "rank": 44
+        },
+        {
+          "kw": "certificate details",
+          "vol": 50,
+          "kd": 60,
+          "rank": 1
+        },
+        {
+          "kw": "certificate inspection",
+          "vol": 50,
+          "kd": 13,
+          "rank": 9
+        },
+        {
+          "kw": "certificate inspector",
+          "vol": 50,
+          "kd": 57,
+          "rank": 1
+        },
+        {
+          "kw": "certificate parser",
+          "vol": 50,
+          "kd": 26,
+          "rank": 1
+        },
+        {
+          "kw": "certificate transparency logs search",
+          "vol": 50,
+          "kd": 33,
+          "rank": 88
+        },
+        {
+          "kw": "certificate viewer chrome",
+          "vol": 50,
+          "kd": 1,
+          "rank": 67
+        },
+        {
+          "kw": "certificates certificate",
+          "vol": 50,
+          "kd": 49,
+          "rank": 38
+        },
+        {
+          "kw": "check pem file",
+          "vol": 50,
+          "kd": 12,
+          "rank": 1
+        },
+        {
+          "kw": "chrome certificate viewer",
+          "vol": 50,
+          "kd": 0,
+          "rank": 46
+        },
+        {
+          "kw": "cipher identifier dcode",
+          "vol": 50,
+          "kd": 20,
+          "rank": 55
+        },
+        {
+          "kw": "code ssl",
+          "vol": 50,
+          "kd": 31,
+          "rank": 24
+        },
+        {
+          "kw": "curl get certificate",
+          "vol": 50,
+          "kd": 12,
+          "rank": 48
+        },
+        {
+          "kw": "der certificate format",
+          "vol": 50,
+          "kd": 18,
+          "rank": 48
+        },
+        {
+          "kw": "der format certificate",
+          "vol": 50,
+          "kd": 35,
+          "rank": 43
+        },
+        {
+          "kw": "der key",
+          "vol": 50,
+          "kd": 0,
+          "rank": 46
+        },
+        {
+          "kw": "der-encoded certificate",
+          "vol": 50,
+          "kd": 6,
+          "rank": 35
+        },
+        {
+          "kw": "getssl",
+          "vol": 50,
+          "kd": 27,
+          "rank": 53
+        },
+        {
+          "kw": "how to check if old share certificates are still valid",
+          "vol": 50,
+          "kd": 0,
+          "rank": 74
+        },
+        {
+          "kw": "how to view certificate",
+          "vol": 50,
+          "kd": 41,
+          "rank": 5
+        },
+        {
+          "kw": "how to view certificates",
+          "vol": 50,
+          "kd": 9,
+          "rank": 4
+        },
+        {
+          "kw": "local certificates",
+          "vol": 50,
+          "kd": 12,
+          "rank": 43
+        },
+        {
+          "kw": "openssl certificate download",
+          "vol": 50,
+          "kd": 35,
+          "rank": 32
+        },
+        {
+          "kw": "openssl read pem",
+          "vol": 50,
+          "kd": 4,
+          "rank": 3
+        },
+        {
+          "kw": "openssl view pem",
+          "vol": 50,
+          "kd": 0,
+          "rank": 19
+        },
+        {
+          "kw": "openssl x509 read cert",
+          "vol": 50,
+          "kd": 16,
+          "rank": 3
+        },
+        {
+          "kw": "parse ssl certificate",
+          "vol": 50,
+          "kd": 24,
+          "rank": 1
+        },
+        {
+          "kw": "pem encoded certificate",
+          "vol": 50,
+          "kd": 28,
+          "rank": 13
+        },
+        {
+          "kw": "pem file certificate",
+          "vol": 50,
+          "kd": 29,
+          "rank": 40
+        },
+        {
+          "kw": "pem file viewer",
+          "vol": 50,
+          "kd": 13,
+          "rank": 1
+        },
+        {
+          "kw": "pem-encoded certificate",
+          "vol": 50,
+          "kd": 30,
+          "rank": 7
+        },
+        {
+          "kw": "read pem file",
+          "vol": 50,
+          "kd": 16,
+          "rank": 2
+        },
+        {
+          "kw": "read ssl certificate",
+          "vol": 50,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "request certificate",
+          "vol": 50,
+          "kd": 21,
+          "rank": 66
+        },
+        {
+          "kw": "rootca crt",
+          "vol": 50,
+          "kd": 48,
+          "rank": 35
+        },
+        {
+          "kw": "ssh tls",
+          "vol": 50,
+          "kd": 1,
+          "rank": 51
+        },
+        {
+          "kw": "ssl cert reader",
+          "vol": 50,
+          "kd": 70,
+          "rank": 1
+        },
+        {
+          "kw": "ssl cert viewer",
+          "vol": 50,
+          "kd": 78,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificate der format",
+          "vol": 50,
+          "kd": 9,
+          "rank": 12
+        },
+        {
+          "kw": "ssl certificate formats",
+          "vol": 50,
+          "kd": 5,
+          "rank": 54
+        },
+        {
+          "kw": "ssl certificate parser",
+          "vol": 50,
+          "kd": 40,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificate viewer",
+          "vol": 50,
+          "kd": 72,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificates formats",
+          "vol": 50,
+          "kd": 13,
+          "rank": 50
+        },
+        {
+          "kw": "ssl code",
+          "vol": 50,
+          "kd": 62,
+          "rank": 4
+        },
+        {
+          "kw": "ssl decrypt",
+          "vol": 50,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "string decoder online",
+          "vol": 50,
+          "kd": 48,
+          "rank": 63
+        },
+        {
+          "kw": "vde certificate search",
+          "vol": 50,
+          "kd": 0,
+          "rank": 37
+        },
+        {
+          "kw": "view pem file",
+          "vol": 50,
+          "kd": 12,
+          "rank": 2
+        },
+        {
+          "kw": "view ssl certificate",
+          "vol": 50,
+          "kd": 61,
+          "rank": 1
+        },
+        {
+          "kw": "what is a pem certificate",
+          "vol": 50,
+          "kd": 23,
+          "rank": 20
+        },
+        {
+          "kw": "what is crt certificate",
+          "vol": 50,
+          "kd": 2,
+          "rank": 38
+        },
+        {
+          "kw": "ca certificate pem",
+          "vol": 40,
+          "kd": 16,
+          "rank": 28
+        },
+        {
+          "kw": "ca pem",
+          "vol": 40,
+          "kd": 15,
+          "rank": 25
+        },
+        {
+          "kw": "cer certificate",
+          "vol": 40,
+          "kd": 0,
+          "rank": 34
+        },
+        {
+          "kw": "cer certificates",
+          "vol": 40,
+          "kd": 26,
+          "rank": 31
+        },
+        {
+          "kw": "cert analyzer",
+          "vol": 40,
+          "kd": 77,
+          "rank": 1
+        },
+        {
+          "kw": "cert recovery",
+          "vol": 40,
+          "kd": 0,
+          "rank": 72
+        },
+        {
+          "kw": "certificate analyzer",
+          "vol": 40,
+          "kd": 78,
+          "rank": 1
+        },
+        {
+          "kw": "certificate structure",
+          "vol": 40,
+          "kd": 46,
+          "rank": 59
+        },
+        {
+          "kw": "certificate subject",
+          "vol": 40,
+          "kd": 15,
+          "rank": 67
+        },
+        {
+          "kw": "certified etitle lienholder id number",
+          "vol": 40,
+          "kd": 15,
+          "rank": 91
+        },
+        {
+          "kw": "code decrypter online",
+          "vol": 40,
+          "kd": 49,
+          "rank": 51
+        },
+        {
+          "kw": "decode detector",
+          "vol": 40,
+          "kd": 45,
+          "rank": 39
+        },
+        {
+          "kw": "decode signature",
+          "vol": 40,
+          "kd": 21,
+          "rank": 63
+        },
+        {
+          "kw": "decoder detector",
+          "vol": 40,
+          "kd": 45,
+          "rank": 30
+        },
+        {
+          "kw": "decoder finder",
+          "vol": 40,
+          "kd": 26,
+          "rank": 39
+        },
+        {
+          "kw": "decrypt file online free",
+          "vol": 40,
+          "kd": 0,
+          "rank": 74
+        },
+        {
+          "kw": "extract public key from certificate",
+          "vol": 40,
+          "kd": 0,
+          "rank": 55
+        },
+        {
+          "kw": "file certificate",
+          "vol": 40,
+          "kd": 34,
+          "rank": 31
+        },
+        {
+          "kw": "file decrypt online",
+          "vol": 40,
+          "kd": 2,
+          "rank": 78
+        },
+        {
+          "kw": "fullchain cert",
+          "vol": 40,
+          "kd": 0,
+          "rank": 47
+        },
+        {
+          "kw": "fullchain certificate",
+          "vol": 40,
+          "kd": 0,
+          "rank": 48
+        },
+        {
+          "kw": "how to download certificate",
+          "vol": 40,
+          "kd": 4,
+          "rank": 48
+        },
+        {
+          "kw": "how to find ca certificate",
+          "vol": 40,
+          "kd": 41,
+          "rank": 8
+        },
+        {
+          "kw": "online reading certificate",
+          "vol": 40,
+          "kd": 0,
+          "rank": 60
+        },
+        {
+          "kw": "open pem file",
+          "vol": 40,
+          "kd": 12,
+          "rank": 2
+        },
+        {
+          "kw": "openssl certificate verification",
+          "vol": 40,
+          "kd": 1,
+          "rank": 24
+        },
+        {
+          "kw": "openssl show certs",
+          "vol": 40,
+          "kd": 14,
+          "rank": 18
+        },
+        {
+          "kw": "pem file opener",
+          "vol": 40,
+          "kd": 12,
+          "rank": 2
+        },
+        {
+          "kw": "pem viewer",
+          "vol": 40,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "safari show certificate",
+          "vol": 40,
+          "kd": 0,
+          "rank": 50
+        },
+        {
+          "kw": "select a certificate for authentication",
+          "vol": 40,
+          "kd": 1,
+          "rank": 90
+        },
+        {
+          "kw": "ssl cert file",
+          "vol": 40,
+          "kd": 33,
+          "rank": 26
+        },
+        {
+          "kw": "ssl certificate file",
+          "vol": 40,
+          "kd": 27,
+          "rank": 27
+        },
+        {
+          "kw": "ssl crt file",
+          "vol": 40,
+          "kd": 14,
+          "rank": 30
+        },
+        {
+          "kw": "view cert info",
+          "vol": 40,
+          "kd": 51,
+          "rank": 1
+        },
+        {
+          "kw": "view certificate details",
+          "vol": 40,
+          "kd": 26,
+          "rank": 1
+        },
+        {
+          "kw": "view certificate information",
+          "vol": 40,
+          "kd": 34,
+          "rank": 1
+        },
+        {
+          "kw": "what are pem files",
+          "vol": 40,
+          "kd": 20,
+          "rank": 51
+        },
+        {
+          "kw": "where is ssl certificate stored",
+          "vol": 40,
+          "kd": 13,
+          "rank": 95
+        },
+        {
+          "kw": "cert and key",
+          "vol": 30,
+          "kd": 23,
+          "rank": 47
+        },
+        {
+          "kw": "cert viewer online",
+          "vol": 30,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "certificate and key",
+          "vol": 30,
+          "kd": 21,
+          "rank": 60
+        },
+        {
+          "kw": "certificate o",
+          "vol": 30,
+          "kd": 18,
+          "rank": 32
+        },
+        {
+          "kw": "certificate view online",
+          "vol": 30,
+          "kd": 60,
+          "rank": 1
+        },
+        {
+          "kw": "certificate viewer online",
+          "vol": 30,
+          "kd": 44,
+          "rank": 1
+        },
+        {
+          "kw": "certificate xml",
+          "vol": 30,
+          "kd": 0,
+          "rank": 41
+        },
+        {
+          "kw": "certification xml",
+          "vol": 30,
+          "kd": 0,
+          "rank": 60
+        },
+        {
+          "kw": "how to get a pki certificate",
+          "vol": 30,
+          "kd": 0,
+          "rank": 90
+        },
+        {
+          "kw": "how to print servsafe certificate",
+          "vol": 30,
+          "kd": 0,
+          "rank": 74
+        },
+        {
+          "kw": "how to view certificates in windows",
+          "vol": 30,
+          "kd": 3,
+          "rank": 35
+        },
+        {
+          "kw": "online certificate request",
+          "vol": 30,
+          "kd": 39,
+          "rank": 47
+        },
+        {
+          "kw": "online crt",
+          "vol": 30,
+          "kd": 47,
+          "rank": 5
+        },
+        {
+          "kw": "online pem decoder",
+          "vol": 30,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "openssl check pem certificate",
+          "vol": 30,
+          "kd": 10,
+          "rank": 6
+        },
+        {
+          "kw": "openssl print certificate details",
+          "vol": 30,
+          "kd": 17,
+          "rank": 10
+        },
+        {
+          "kw": "openssl view certificate pem",
+          "vol": 30,
+          "kd": 3,
+          "rank": 3
+        },
+        {
+          "kw": "openssl view pem certificate",
+          "vol": 30,
+          "kd": 10,
+          "rank": 4
+        },
+        {
+          "kw": "openssl view pem file",
+          "vol": 30,
+          "kd": 12,
+          "rank": 4
+        },
+        {
+          "kw": "openssl website",
+          "vol": 30,
+          "kd": 82,
+          "rank": 32
+        },
+        {
+          "kw": "pem decoder online",
+          "vol": 30,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "pfx viewer",
+          "vol": 30,
+          "kd": 6,
+          "rank": 6
+        },
+        {
+          "kw": "public certificate ssl",
+          "vol": 30,
+          "kd": 96,
+          "rank": 25
+        },
+        {
+          "kw": "rsa private key decoder",
+          "vol": 30,
+          "kd": 3,
+          "rank": 67
+        },
+        {
+          "kw": "ssl certificate and key",
+          "vol": 30,
+          "kd": 34,
+          "rank": 75
+        },
+        {
+          "kw": "ssl certificate content",
+          "vol": 30,
+          "kd": 43,
+          "rank": 2
+        },
+        {
+          "kw": "ssl certificate contents",
+          "vol": 30,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificate public key",
+          "vol": 30,
+          "kd": 34,
+          "rank": 39
+        },
+        {
+          "kw": "ssl decode online",
+          "vol": 30,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "ssl decoder online",
+          "vol": 30,
+          "kd": 29,
+          "rank": 1
+        },
+        {
+          "kw": "ssl decryption tool",
+          "vol": 30,
+          "kd": 13,
+          "rank": 2
+        },
+        {
+          "kw": "ssl decryption tools",
+          "vol": 30,
+          "kd": 12,
+          "rank": 6
+        },
+        {
+          "kw": "ssl file",
+          "vol": 30,
+          "kd": 88,
+          "rank": 30
+        },
+        {
+          "kw": "ssl public certificate",
+          "vol": 30,
+          "kd": 100,
+          "rank": 20
+        },
+        {
+          "kw": "ssl scanner for windows",
+          "vol": 30,
+          "kd": 31,
+          "rank": 45
+        },
+        {
+          "kw": "tls cert decoder",
+          "vol": 30,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "tls certificate decoder",
+          "vol": 30,
+          "kd": 20,
+          "rank": 1
+        },
+        {
+          "kw": "validate pem file",
+          "vol": 30,
+          "kd": 13,
+          "rank": 1
+        },
+        {
+          "kw": "verify pem file",
+          "vol": 30,
+          "kd": 13,
+          "rank": 1
+        },
+        {
+          "kw": "view certificate firefox",
+          "vol": 30,
+          "kd": 3,
+          "rank": 45
+        },
+        {
+          "kw": "view site certificate chrome",
+          "vol": 30,
+          "kd": 5,
+          "rank": 55
+        },
+        {
+          "kw": "view ssl certificate firefox",
+          "vol": 30,
+          "kd": 1,
+          "rank": 49
+        },
+        {
+          "kw": "view website certificate chrome",
+          "vol": 30,
+          "kd": 0,
+          "rank": 68
+        },
+        {
+          "kw": "what is a ca bundle",
+          "vol": 30,
+          "kd": 0,
+          "rank": 90
+        },
+        {
+          "kw": "what's my chain cert",
+          "vol": 30,
+          "kd": 38,
+          "rank": 75
+        },
+        {
+          "kw": "where can i find my certificate number",
+          "vol": 30,
+          "kd": 0,
+          "rank": 78
+        },
+        {
+          "kw": "how to validate a certificate",
+          "vol": 20,
+          "kd": 20,
+          "rank": 2
+        },
+        {
+          "kw": "how to validate certificate",
+          "vol": 20,
+          "kd": 26,
+          "rank": 2
+        },
+        {
+          "kw": "online decrypter google",
+          "vol": 20,
+          "kd": 60,
+          "rank": 29
+        },
+        {
+          "kw": "online serial number decoder",
+          "vol": 20,
+          "kd": 64,
+          "rank": 43
+        },
+        {
+          "kw": "pem cert example",
+          "vol": 20,
+          "kd": 13,
+          "rank": 57
+        },
+        {
+          "kw": "pem certificate example",
+          "vol": 20,
+          "kd": 20,
+          "rank": 65
+        },
+        {
+          "kw": "pem file decoder",
+          "vol": 20,
+          "kd": 19,
+          "rank": 1
+        },
+        {
+          "kw": "read ssl certificate online",
+          "vol": 20,
+          "kd": 77,
+          "rank": 1
+        },
+        {
+          "kw": "receive certificate",
+          "vol": 20,
+          "kd": 25,
+          "rank": 55
+        },
+        {
+          "kw": "received certificate",
+          "vol": 20,
+          "kd": 10,
+          "rank": 25
+        },
+        {
+          "kw": "receiving certificate",
+          "vol": 20,
+          "kd": 0,
+          "rank": 46
+        },
+        {
+          "kw": "safari view ssl certificate",
+          "vol": 20,
+          "kd": 0,
+          "rank": 37
+        },
+        {
+          "kw": "safari view website certificate",
+          "vol": 20,
+          "kd": 0,
+          "rank": 42
+        },
+        {
+          "kw": "ssl certificate country code",
+          "vol": 20,
+          "kd": 1,
+          "rank": 47
+        },
+        {
+          "kw": "ssl certificate country codes",
+          "vol": 20,
+          "kd": 2,
+          "rank": 49
+        },
+        {
+          "kw": "ssl country code",
+          "vol": 20,
+          "kd": 0,
+          "rank": 53
+        },
+        {
+          "kw": "where do i find my certificate number",
+          "vol": 20,
+          "kd": 0,
+          "rank": 90
+        },
+        {
+          "kw": "where to find certificate number",
+          "vol": 20,
+          "kd": 0,
+          "rank": 87
+        },
+        {
+          "kw": "x 509 certificate download",
+          "vol": 20,
+          "kd": 0,
+          "rank": 51
+        },
+        {
+          "kw": "openssl read certificate chain",
+          "vol": 10,
+          "kd": 8,
+          "rank": 21
+        }
+      ]
+    },
+    "sslshopper.com/csr-decoder.html": {
+      "total_count": 120,
+      "keywords": [
+        {
+          "kw": "csr decoder",
+          "vol": 2900,
+          "kd": 10,
+          "rank": 1
+        },
+        {
+          "kw": "certificate csr",
+          "vol": 2400,
+          "kd": 45,
+          "rank": 8
+        },
+        {
+          "kw": "csr cert",
+          "vol": 2400,
+          "kd": 64,
+          "rank": 17
+        },
+        {
+          "kw": "csr certificate",
+          "vol": 2400,
+          "kd": 44,
+          "rank": 12
+        },
+        {
+          "kw": "what is a csr certificate",
+          "vol": 2400,
+          "kd": 32,
+          "rank": 27
+        },
+        {
+          "kw": "what is csr in ssl certificate",
+          "vol": 2400,
+          "kd": 39,
+          "rank": 22
+        },
+        {
+          "kw": "what is csr ssl certificate",
+          "vol": 2400,
+          "kd": 38,
+          "rank": 9
+        },
+        {
+          "kw": "csr generator",
+          "vol": 1300,
+          "kd": 37,
+          "rank": 58
+        },
+        {
+          "kw": "certificate request check",
+          "vol": 720,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "check csr",
+          "vol": 720,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "csr checker",
+          "vol": 720,
+          "kd": 10,
+          "rank": 1
+        },
+        {
+          "kw": "csr verify",
+          "vol": 720,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "verify csr",
+          "vol": 720,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "csr file",
+          "vol": 320,
+          "kd": 36,
+          "rank": 14
+        },
+        {
+          "kw": "csr files",
+          "vol": 320,
+          "kd": 41,
+          "rank": 11
+        },
+        {
+          "kw": "check csr openssl",
+          "vol": 260,
+          "kd": 11,
+          "rank": 1
+        },
+        {
+          "kw": "openssl check csr",
+          "vol": 260,
+          "kd": 13,
+          "rank": 2
+        },
+        {
+          "kw": "openssl csr view",
+          "vol": 260,
+          "kd": 15,
+          "rank": 4
+        },
+        {
+          "kw": "openssl dump csr",
+          "vol": 260,
+          "kd": 17,
+          "rank": 4
+        },
+        {
+          "kw": "openssl read csr",
+          "vol": 260,
+          "kd": 12,
+          "rank": 4
+        },
+        {
+          "kw": "openssl show csr",
+          "vol": 260,
+          "kd": 17,
+          "rank": 6
+        },
+        {
+          "kw": "openssl verify csr",
+          "vol": 260,
+          "kd": 15,
+          "rank": 2
+        },
+        {
+          "kw": "openssl view csr",
+          "vol": 260,
+          "kd": 15,
+          "rank": 5
+        },
+        {
+          "kw": "view csr openssl",
+          "vol": 260,
+          "kd": 15,
+          "rank": 2
+        },
+        {
+          "kw": "view csr with openssl",
+          "vol": 260,
+          "kd": 11,
+          "rank": 3
+        },
+        {
+          "kw": "csr form",
+          "vol": 210,
+          "kd": 0,
+          "rank": 54
+        },
+        {
+          "kw": "csr view",
+          "vol": 210,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "csr viewer",
+          "vol": 210,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "csr registry",
+          "vol": 170,
+          "kd": 2,
+          "rank": 71
+        },
+        {
+          "kw": "csr ssl",
+          "vol": 170,
+          "kd": 46,
+          "rank": 6
+        },
+        {
+          "kw": "ssl certificate csr",
+          "vol": 170,
+          "kd": 40,
+          "rank": 6
+        },
+        {
+          "kw": "ssl certificate request",
+          "vol": 170,
+          "kd": 63,
+          "rank": 4
+        },
+        {
+          "kw": "ssl shopper csr decoder",
+          "vol": 170,
+          "kd": 47,
+          "rank": 1
+        },
+        {
+          "kw": "sslshopper csr decoder",
+          "vol": 170,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "ssl com csr decoder",
+          "vol": 140,
+          "kd": 27,
+          "rank": 2
+        },
+        {
+          "kw": "what is a csr file",
+          "vol": 140,
+          "kd": 42,
+          "rank": 10
+        },
+        {
+          "kw": "what is csr file",
+          "vol": 140,
+          "kd": 38,
+          "rank": 23
+        },
+        {
+          "kw": "certificate signing request csr generator",
+          "vol": 110,
+          "kd": 41,
+          "rank": 56
+        },
+        {
+          "kw": "certlogik",
+          "vol": 110,
+          "kd": 2,
+          "rank": 15
+        },
+        {
+          "kw": "create csr online",
+          "vol": 110,
+          "kd": 31,
+          "rank": 55
+        },
+        {
+          "kw": "csr code",
+          "vol": 110,
+          "kd": 45,
+          "rank": 6
+        },
+        {
+          "kw": "csr codes",
+          "vol": 110,
+          "kd": 7,
+          "rank": 37
+        },
+        {
+          "kw": "csr request",
+          "vol": 110,
+          "kd": 45,
+          "rank": 6
+        },
+        {
+          "kw": "csr tool",
+          "vol": 110,
+          "kd": 41,
+          "rank": 7
+        },
+        {
+          "kw": "csr validator",
+          "vol": 110,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "generate csr online",
+          "vol": 110,
+          "kd": 31,
+          "rank": 47
+        },
+        {
+          "kw": "online csr generator",
+          "vol": 110,
+          "kd": 34,
+          "rank": 48
+        },
+        {
+          "kw": "certificate csr examples",
+          "vol": 90,
+          "kd": 24,
+          "rank": 61
+        },
+        {
+          "kw": "csr certificate example",
+          "vol": 90,
+          "kd": 28,
+          "rank": 41
+        },
+        {
+          "kw": "csr file for ssl",
+          "vol": 90,
+          "kd": 38,
+          "rank": 10
+        },
+        {
+          "kw": "csr request example",
+          "vol": 90,
+          "kd": 40,
+          "rank": 46
+        },
+        {
+          "kw": "csr web",
+          "vol": 90,
+          "kd": 40,
+          "rank": 43
+        },
+        {
+          "kw": "pkcs #10",
+          "vol": 90,
+          "kd": 11,
+          "rank": 57
+        },
+        {
+          "kw": "pkcs 10",
+          "vol": 90,
+          "kd": 8,
+          "rank": 55
+        },
+        {
+          "kw": "pkcs10",
+          "vol": 90,
+          "kd": 11,
+          "rank": 56
+        },
+        {
+          "kw": "ssl csr",
+          "vol": 90,
+          "kd": 48,
+          "rank": 4
+        },
+        {
+          "kw": "web csr",
+          "vol": 90,
+          "kd": 19,
+          "rank": 38
+        },
+        {
+          "kw": "what is a csr certificate signing request",
+          "vol": 90,
+          "kd": 40,
+          "rank": 36
+        },
+        {
+          "kw": "what is csr certificate",
+          "vol": 90,
+          "kd": 29,
+          "rank": 23
+        },
+        {
+          "kw": "csr certificate decoder",
+          "vol": 70,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "csr decode",
+          "vol": 70,
+          "kd": 11,
+          "rank": 1
+        },
+        {
+          "kw": "csr decoder online",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "csr login",
+          "vol": 70,
+          "kd": 0,
+          "rank": 36
+        },
+        {
+          "kw": "csr portal",
+          "vol": 70,
+          "kd": 33,
+          "rank": 42
+        },
+        {
+          "kw": "csr-portal",
+          "vol": 70,
+          "kd": 33,
+          "rank": 41
+        },
+        {
+          "kw": "decode ssl csr",
+          "vol": 70,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "free ssl godaddy",
+          "vol": 70,
+          "kd": 18,
+          "rank": 96
+        },
+        {
+          "kw": "generate ssl csr",
+          "vol": 70,
+          "kd": 28,
+          "rank": 51
+        },
+        {
+          "kw": "read certificate request",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "read certificate signing request",
+          "vol": 70,
+          "kd": 12,
+          "rank": 1
+        },
+        {
+          "kw": "ssl csr decoder",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "ssl decoder csr",
+          "vol": 70,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "certificate signing request godaddy",
+          "vol": 50,
+          "kd": 12,
+          "rank": 27
+        },
+        {
+          "kw": "code signing certificate for powershell",
+          "vol": 50,
+          "kd": 0,
+          "rank": 85
+        },
+        {
+          "kw": "csc dns",
+          "vol": 50,
+          "kd": 0,
+          "rank": 61
+        },
+        {
+          "kw": "csr checker digicert",
+          "vol": 50,
+          "kd": 44,
+          "rank": 4
+        },
+        {
+          "kw": "csr decoder digicert",
+          "vol": 50,
+          "kd": 37,
+          "rank": 3
+        },
+        {
+          "kw": "csr decoder tool",
+          "vol": 50,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "csr email",
+          "vol": 50,
+          "kd": 17,
+          "rank": 29
+        },
+        {
+          "kw": "csr in cyber security",
+          "vol": 50,
+          "kd": 6,
+          "rank": 56
+        },
+        {
+          "kw": "csr it",
+          "vol": 50,
+          "kd": 31,
+          "rank": 32
+        },
+        {
+          "kw": "digicert csr checker",
+          "vol": 50,
+          "kd": 37,
+          "rank": 3
+        },
+        {
+          "kw": "digicert csr decoder",
+          "vol": 50,
+          "kd": 28,
+          "rank": 3
+        },
+        {
+          "kw": "godaddy csr",
+          "vol": 50,
+          "kd": 4,
+          "rank": 30
+        },
+        {
+          "kw": "request checker",
+          "vol": 50,
+          "kd": 17,
+          "rank": 20
+        },
+        {
+          "kw": "certificate authority csr",
+          "vol": 40,
+          "kd": 38,
+          "rank": 59
+        },
+        {
+          "kw": "create certificate from csr",
+          "vol": 40,
+          "kd": 40,
+          "rank": 35
+        },
+        {
+          "kw": "csr computing",
+          "vol": 40,
+          "kd": 26,
+          "rank": 36
+        },
+        {
+          "kw": "csr details",
+          "vol": 40,
+          "kd": 51,
+          "rank": 2
+        },
+        {
+          "kw": "csr document",
+          "vol": 40,
+          "kd": 15,
+          "rank": 79
+        },
+        {
+          "kw": "csr lookup",
+          "vol": 40,
+          "kd": 35,
+          "rank": 1
+        },
+        {
+          "kw": "csr validation",
+          "vol": 40,
+          "kd": 25,
+          "rank": 1
+        },
+        {
+          "kw": "generate cer from csr",
+          "vol": 40,
+          "kd": 40,
+          "rank": 5
+        },
+        {
+          "kw": "generate crt from csr",
+          "vol": 40,
+          "kd": 2,
+          "rank": 55
+        },
+        {
+          "kw": "get certificate from csr",
+          "vol": 40,
+          "kd": 24,
+          "rank": 4
+        },
+        {
+          "kw": "get private key from csr openssl",
+          "vol": 40,
+          "kd": 8,
+          "rank": 54
+        },
+        {
+          "kw": "godaddy generate csr",
+          "vol": 40,
+          "kd": 8,
+          "rank": 27
+        },
+        {
+          "kw": "how to get csr certificate",
+          "vol": 40,
+          "kd": 40,
+          "rank": 26
+        },
+        {
+          "kw": "how to make decoder",
+          "vol": 40,
+          "kd": 0,
+          "rank": 91
+        },
+        {
+          "kw": "online csr decoder",
+          "vol": 40,
+          "kd": 22,
+          "rank": 1
+        },
+        {
+          "kw": "online csr viewer",
+          "vol": 40,
+          "kd": 11,
+          "rank": 1
+        },
+        {
+          "kw": "scr check",
+          "vol": 40,
+          "kd": 21,
+          "rank": 29
+        },
+        {
+          "kw": "what is a csr number",
+          "vol": 40,
+          "kd": 0,
+          "rank": 62
+        },
+        {
+          "kw": "what is a csr ssl",
+          "vol": 40,
+          "kd": 35,
+          "rank": 22
+        },
+        {
+          "kw": "what is csr for ssl",
+          "vol": 40,
+          "kd": 29,
+          "rank": 35
+        },
+        {
+          "kw": "what is csr in cyber security",
+          "vol": 40,
+          "kd": 22,
+          "rank": 74
+        },
+        {
+          "kw": "csr file for ssl certificate",
+          "vol": 30,
+          "kd": 37,
+          "rank": 22
+        },
+        {
+          "kw": "csr ssl certificate",
+          "vol": 30,
+          "kd": 47,
+          "rank": 5
+        },
+        {
+          "kw": "cst lookup",
+          "vol": 30,
+          "kd": 15,
+          "rank": 87
+        },
+        {
+          "kw": "how to get csr for ssl certificate",
+          "vol": 30,
+          "kd": 30,
+          "rank": 32
+        },
+        {
+          "kw": "openssl decode csr",
+          "vol": 30,
+          "kd": 7,
+          "rank": 1
+        },
+        {
+          "kw": "sign csr",
+          "vol": 30,
+          "kd": 38,
+          "rank": 33
+        },
+        {
+          "kw": "ssl cert request checker",
+          "vol": 30,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "ssl certificate request checker",
+          "vol": 30,
+          "kd": 33,
+          "rank": 1
+        },
+        {
+          "kw": "ssl check csr",
+          "vol": 30,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "ssl checker csr",
+          "vol": 30,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "ssl csr checker",
+          "vol": 30,
+          "kd": 21,
+          "rank": 1
+        },
+        {
+          "kw": "ssl request",
+          "vol": 30,
+          "kd": 41,
+          "rank": 3
+        },
+        {
+          "kw": "validate csr",
+          "vol": 30,
+          "kd": 23,
+          "rank": 1
+        },
+        {
+          "kw": "trying to verify number rcs",
+          "vol": 20,
+          "kd": 0,
+          "rank": 56
+        }
+      ]
+    },
+    "transform.tools/toml-to-json": {
+      "total_count": 1,
+      "keywords": [
+        {
+          "kw": "toml to json",
+          "vol": 90,
+          "kd": 5,
+          "rank": 1
+        }
+      ]
+    }
+  }
+}

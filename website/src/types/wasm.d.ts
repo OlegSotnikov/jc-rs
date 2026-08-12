@@ -6,8 +6,9 @@
  * Mirrors crates/jc-rs-wasm/pkg/jc-rs.d.ts.
  */
 declare module "*/jc-rs.js" {
-  export default function init(module_or_path?: string): Promise<unknown>;
+  export default function init(options?: { module_or_path: string }): Promise<unknown>;
   export function parse(name: string, input: string): unknown;
+  export function parseJson(name: string, input: string): string;
   export function parseRaw(name: string, input: string): unknown;
   export function parserInfo(name: string): unknown;
   export function parsers(): string[];

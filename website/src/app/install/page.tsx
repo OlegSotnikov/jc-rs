@@ -3,11 +3,25 @@ import { CopyLine } from "@/components/CopyLine";
 import { install, site } from "@/lib/site";
 import { summary } from "@/lib/parsers";
 
+const description =
+  "Static binaries for five targets, five crates on crates.io, a scratch Docker image for amd64 and arm64, a Homebrew tap, and a WebAssembly build on npm.";
+
 export const metadata: Metadata = {
   title: "Install",
-  description:
-    "Static binaries for five targets, five crates on crates.io, a scratch Docker image for amd64 and arm64, a Homebrew tap, and a WebAssembly build on npm.",
+  description,
   alternates: { canonical: "/install" },
+  openGraph: {
+    title: "Install jc-rs",
+    description,
+    url: `${site.origin}/install`,
+    images: [site.socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Install jc-rs",
+    description,
+    images: [site.socialImage.url],
+  },
 };
 
 export default function Install() {
@@ -41,8 +55,8 @@ export default function Install() {
       <section className="mt-12">
         <h2 className="text-2xl">Container</h2>
         <p className="mt-3 text-[var(--color-muted)]">
-          A <code className="font-mono text-sm">scratch</code> image, 2.3 MB compressed: the
-          binary and its licence, with no shell, no libc and no package manager.{" "}
+          A compact <code className="font-mono text-sm">scratch</code> image contains the binary
+          and its licence, with no shell, no libc and no package manager.{" "}
           <code className="font-mono text-sm">linux/amd64</code> and{" "}
           <code className="font-mono text-sm">linux/arm64</code> ship in one manifest, so{" "}
           <code className="font-mono text-sm">docker pull</code> picks the right one.
