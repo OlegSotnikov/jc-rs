@@ -13,7 +13,7 @@
     "check": "npm run type-check && npm run lint && npm run build"
   },
   "dependencies": {
-    "next": "^16.3.0",
+    "next": "^16.3.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -23,7 +23,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.3.0",
+    "eslint-config-next": "^16.3.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   }
