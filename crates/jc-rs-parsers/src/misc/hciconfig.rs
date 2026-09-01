@@ -123,7 +123,7 @@ impl Parser for HciconfigParser {
                     // RX bytes:1307 acl:0 sco:0 events:51 errors:0
                     let clean = trimmed.replace(':', " ");
                     let parts: Vec<&str> = clean.split_whitespace().collect();
-                    if parts.len() >= 10 {
+                    if parts.len() >= 11 {
                         d.insert("rx_bytes".to_string(), int_val(parts[2]));
                         d.insert("rx_acl".to_string(), int_val(parts[4]));
                         d.insert("rx_sco".to_string(), int_val(parts[6]));
@@ -134,7 +134,7 @@ impl Parser for HciconfigParser {
                     // TX bytes:1200 acl:0 sco:0 commands:51 errors:0
                     let clean = trimmed.replace(':', " ");
                     let parts: Vec<&str> = clean.split_whitespace().collect();
-                    if parts.len() >= 10 {
+                    if parts.len() >= 11 {
                         d.insert("tx_bytes".to_string(), int_val(parts[2]));
                         d.insert("tx_acl".to_string(), int_val(parts[4]));
                         d.insert("tx_sco".to_string(), int_val(parts[6]));
@@ -287,6 +287,21 @@ mod tests {
             assert!(arr.is_empty());
         } else {
             panic!("Expected Array");
+        }
+    }
+
+    #[test]
+    fn test_hciconfig_truncated_rx_tx_line() {
+        // A truncated "RX bytes:"/"TX bytes:" line (e.g. output cut off mid-line)
+        // yields exactly 10 whitespace-separated parts after the ':' replacement,
+        // but the parser indexed parts[10]. This must not panic.
+        let parser = HciconfigParser;
+        for stat in ["RX", "TX"] {
+            let input = format!(
+                "hci0:\tType: Primary  Bus: USB\n\t{stat} bytes:1307 acl:0 sco:0 events:51 errors"
+            );
+            // Should return a result without panicking.
+            let _ = parser.parse(&input, false).unwrap();
         }
     }
 }
