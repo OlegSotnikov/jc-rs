@@ -10,16 +10,16 @@
 # Pulling requires `docker login dhi.io`; the deploy notes say where the
 # credentials live.
 
-FROM dhi.io/node:26-alpine3.24-dev AS deps
+FROM dhi.io/node:24-alpine3.24-dev AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY --chown=1000:1000 package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
-FROM dhi.io/node:26-alpine3.24-dev AS build
+FROM dhi.io/node:24-alpine3.24-dev AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY --from=deps --chown=1000:1000 /app/node_modules ./node_modules
+COPY --chown=1000:1000 . .
 # The canonical origin is baked in: it reaches metadata, sitemap and robots, all
 # of which are rendered at build time.
 ARG NEXT_PUBLIC_SITE_ORIGIN=https://jc-rs.com
@@ -28,7 +28,7 @@ ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ENV NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
 RUN npm run build
 
-FROM dhi.io/node:26-alpine3.24 AS runtime
+FROM dhi.io/node:24-alpine3.24 AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
