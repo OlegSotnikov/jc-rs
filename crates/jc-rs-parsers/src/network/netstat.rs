@@ -339,7 +339,7 @@ fn linux_parse_socket(
     if state_col != usize::MAX {
         let ch = entry.chars().nth(state_col);
         let is_blank = ch.map(|c| c.is_whitespace()).unwrap_or(false);
-        if is_blank {
+        if is_blank && tokens.len() >= 4 {
             tokens.insert(4, None);
         }
     }
@@ -715,13 +715,18 @@ fn bsd_parse_item(
             tokens.insert(1, String::new());
         } else if has_state_col && is_udp_first && !has_socket_col {
             // Standard: state column missing for UDP; insert at position 5
-            if tokens.len() < headers.len() {
+            if tokens.len() < headers.len() && tokens.len() >= 5 {
                 tokens.insert(5, String::new());
             }
         }
         // socket column present (netstat -An/-Aa style): UDP missing state at position 7
         // Python: if 'socket' in headers and 'udp' in str(entry): entry.insert(7, None)
-        if has_socket_col && is_udp_any && !has_0win_col && tokens.len() < headers.len() {
+        if has_socket_col
+            && is_udp_any
+            && !has_0win_col
+            && tokens.len() < headers.len()
+            && tokens.len() >= 7
+        {
             tokens.insert(7, String::new());
         }
     }
@@ -1198,5 +1203,30 @@ mod tests {
     #[test]
     fn test_netstat_registered() {
         assert!(jc_rs_core::registry::find_parser("netstat").is_some());
+    }
+
+    #[test]
+    fn test_netstat_truncated_udp_line() {
+        // Command output cut off mid-line (e.g. a closed pipe) can leave a UDP
+        // row with far fewer columns than the header. The UDP column-normalizing
+        // inserts (at fixed positions 5 and 7) must not panic when the row is
+        // shorter than that position.
+        let inputs = [
+            // BSD-style header, then a truncated udp row.
+            "Active Internet connections (including servers)\n\
+             Proto Recv-Q Send-Q Local Address          Foreign Address        (state)\n\
+             udp4       0",
+            "Active Internet connections (including servers)\n\
+             Proto Recv-Q Send-Q Local Address          Foreign Address        (state)\n\
+             udp",
+            // Socket-address style header with a short udp row.
+            "Active Internet connections (servers and established)\n\
+             Proto Recv-Q Send-Q Local Address Foreign Address State PID/Program name Path\n\
+             udp 0",
+        ];
+        for input in inputs {
+            // Must return a result rather than panicking.
+            let _ = NetstatParser.parse(input, false).unwrap();
+        }
     }
 }
